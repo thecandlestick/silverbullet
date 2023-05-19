@@ -5,4 +5,4 @@
 
 [[kb]]
 
-[[teaching]]
+[[Teaching]]

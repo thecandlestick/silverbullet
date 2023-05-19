@@ -1,8 +1,3 @@
 
-[[tasks]]
-
-[[shopping]]
-
-[[kb]]
 
 [[Teaching]]

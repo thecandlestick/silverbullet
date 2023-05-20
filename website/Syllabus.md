@@ -21,6 +21,8 @@ The number and weighting of assignments is tentative and may change
 ## Assignments
 There will be 8 total homework assignments, primarily C++ coding-based. Your lowest homework score will be dropped.
 
+There is _no_ midterm exam and _no_ final exam
+
 ## Extra Credit
 There will be daily opportunities for extra credit, all requiring attendance and participation at the lecture.
 

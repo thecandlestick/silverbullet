@@ -1,4 +1,7 @@
-
+---
+tags:
+- navbar
+---
 # Contact
 email: jackmanhardt@mst.edu
 

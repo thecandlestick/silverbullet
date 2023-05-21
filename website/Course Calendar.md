@@ -1,4 +1,7 @@
-
+---
+tags:
+- navbar
+---
 # Course Calendar / Schedule of Topics
 
 Because the summer session is only 8 weeks, the course will move very fast! Check back here often for deadlines and materials

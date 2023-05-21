@@ -224,6 +224,10 @@ What else in C++ (implicitly) creates a new scope?
 ---
 ## Arrays
 
+basics
+arrays as parameters
+multidimensional arr
+
 
 ---
 ## Structs

@@ -8,4 +8,4 @@
 * Data Structures Laboratory
   
 2023 Summer 
-* Data Structures - [[SM23 CS1575]]
+* Data Structures - [[SS23 CS1575]]

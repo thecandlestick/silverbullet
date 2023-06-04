@@ -6,6 +6,7 @@ This course will use the C++ programming language for all coding assignments. _T
 ---
 ## Hello World
 
+<!-- #include [[examples/cpp-hello-world]] -->
 ```c++
 #include <iostream>
 
@@ -26,11 +27,22 @@ int main()
   return 0;
 }
 ```
+<!-- /include -->
 
 What is the purpose of _using namespace std_? 
 
 ---
 ## Variables
+[[examples/cpp-variables]]
+<!-- #include [[examples/cpp-variables]] -->
+---
+- Language: 
+- Credit: 
+- Last Update:
+
+##### Notes #####
+
+---
 
 ```c++
 #include <iostream>
@@ -57,7 +69,7 @@ int main()
 {
   int a=5;    //(Copy Constructor)    initial value: 5
   int b(3);   //(Copy Constructor)    initial value: 3
-  int c{2};   //(Initialization List) initial value: 2
+  int c{2};   //(Uniform Init)        initial value: 2
   int result; //                      initial value: ???
 
   a = a + b;  //(Assignment operator)
@@ -67,12 +79,14 @@ int main()
   return 0;
 }
 ```
+<!-- /include -->
+
 
 What is the initial value of _result?_ Why does this happen?
 
 ---
 ## Operators
-
+[[examples/cpp-operators]]
 ```c++
 #include <iostream>
 
@@ -97,9 +111,20 @@ Increment and Decrement
 Comparison Operators
 Logical Operators
 
+<!-- #use [[template/page/example]] {} -->
+---
+- Language: 
+- Credit: 
+- Last Update:
+
+##### Notes #####
+
+---
+<!-- /use -->
+
 ---
 ## Input and Output
-
+[[examples/cpp-io]]
 ```c++
 #include <iostream>
 using namespace std;
@@ -140,7 +165,7 @@ int main()
 
 ---
 ## Conditionals
-
+[[examples/cpp-conditionals]]
 ```c++
 #include <iostream>
 using namespace std;
@@ -170,7 +195,7 @@ Curly-brackets{} are only needed for multi-line conditional blocks
 
 ---
 ## Loops
-
+[[examples/cpp-loops]]
 while loops
 ```c++
 #include <iostream>
@@ -228,7 +253,7 @@ int main()
 
 ---
 ## Functions
-
+[[examples/cpp-functions]]
 ```c++
 #include <iostream>
 using namespace std;
@@ -347,12 +372,12 @@ void even(int x)
 
 ---
 ## Multiple Files
-
+[[examples/cpp-multi-file]]
 <>
 
 ---
 ## Scope
-
+[[examples/cpp-scope]]
 ```c++
 // "Global" Scope
 #include <iostream>
@@ -384,7 +409,7 @@ What else in C++ (implicitly) creates a new scope?
 
 ---
 ## Arrays
-
+[[examples/cpp-arrays]]
 basics
 ```c++
 #include <iostream>
@@ -392,7 +417,14 @@ using namespace std;
 
 int main()
 {
+  int foo [] = {16, 2, 77, 40, 12071};
+  int n, result = 0;
 
+  for ( n=0 ; n<5 ; ++n )
+  {
+    result += foo[n];
+  }
+  cout << result;
   return 0;
 }
 ```
@@ -401,13 +433,25 @@ arrays as parameters
 #include <iostream>
 using namespace std;
 
+void printarray(int arg[], int length)
+{
+  for (int n=0; n<length; ++n)
+    cout << arg[n] << ' ';
+  cout << endl;
+}
+
 int main()
 {
+  int firstarray[] = {5, 10, 15};
+  int secondarray[] = {2, 4, 6, 8, 10};
+  printarray(firstarray, 3);
+  printarray(secondarray, 5);
 
   return 0;
 }
 ```
 multidimensional arr
+<>
 ```c++
 #include <iostream>
 using namespace std;
@@ -420,16 +464,113 @@ int main()
 ```
 
 ---
-## Structs
-
-
----
 ## Classes
+[[examples/cpp-classes]]
+A typical class
+```c++
+class name_of_type
+{
+  public:
+    // function prototypes here
+  private:
+    // member data here
+};
+```
 
+```c++
+#include <iostream>
+using namespace std;
 
+class Rectangle
+{
+  private:
+    int width, height;
+  public:
+    void set_values(int, int);  
+    //You don't have to give names to parameters in prototypes! 🤯
+    int area() {return width*height;} //"inline" function
+};
+
+int main()
+{
+  Rectangle rect, rectb;
+  rect.set_values(3, 4);
+  rectb.set_values(5, 6);
+  cout << "rect area: " << rect.area() << endl
+       << "rectb area: " << rectb.area() << endl;
+  return 0;
+}
+
+// <Return Type> <Namespace(class name)>::<Function>(<Parameters>)
+void Rectangle::set_values(int x, int y)
+{
+  width = x;
+  height = y;
+}
+```
 ---
 ## Overloading
+[[examples/cpp-overloading]]
+```c++
+#include <iostream>
+using namespace std;
 
+int sum(int a, int b)
+{
+  return a+b;
+}
+
+//same function/namespace, different parameters
+double sum(double a, double b)
+{
+  return a+b;
+}
+
+int main()
+{
+  cout << sum(10, 20) << '\n'
+       << sum(1.0, 1.5) << '\n';
+  return 0;
+}
+```
+
+```c++
+//Assignment operator overload
+Fraction& Fraction::operator=(const Fraction &rhs)
+{
+  Numerator = rhs.Numerator;
+  Denominator = rhs.Denominator;
+  return (*this);
+}
+
+Fraction f, g, h;
+f = g = h;
+```
 
 ---
 ## Templates
+[[examples/cpp-templates]]
+```c++
+#include <iostream>
+using namespace std;
+
+template <typename T>
+T sum(T a, T b)
+{
+  T result;
+  result = a + b;
+  return result;
+}
+
+int main()
+{
+  int i=5, j=6, k;
+  double f=2.0, g=0.5, h;
+  k=sum<int>(i, j);
+  h=sum<double>(f, g);
+
+  cout << k << endl;
+  cout << h << endl;
+  return 0;
+}
+```

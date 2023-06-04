@@ -12,7 +12,7 @@ We assume you're on a Linux machine, and can install all the software needed by 
 See the syllabus for more details.
 
 ### How to get this code?
-Find the blue botton that says "clone", on the home page of this repository.
+Find the blue button that says "clone", on the home page of this repository.
 If you have an ssh key set up:
  `git clone git@... `
 If you don't have an ssh set up, or know what that is:
@@ -27,7 +27,7 @@ See the script's warnings.
 ### How to code?
 Using this script, we strongly encourage you to program incrementally. 
 Program code required by the unit tests, in the requested order. 
-In general, don't procede to a later function if you are not passing the first one.
+In general, don't proceed to a later function if you are not passing the first one.
 If you get stuck, instead of moving on, get help!
 See the syllabus for extended coding tips.
 

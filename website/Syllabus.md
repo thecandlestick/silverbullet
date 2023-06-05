@@ -59,6 +59,8 @@ Your assignments in this course will be graded by an open-source autograding too
 
 [[SS23 CS1575|Course Index]]
 
+[WSL Tutorial](https://learn.microsoft.com/en-us/training/modules/wsl/wsl-introduction/)
+
 ---
 
 # Policies

@@ -4,17 +4,15 @@ import {
   renderToText,
   traverseTree,
 } from "$sb/lib/tree.ts";
-import * as YAML from "yaml";
 import { Fragment, renderHtml, Tag } from "./html_render.ts";
 
 type MarkdownRenderOptions = {
   failOnUnknown?: true;
   smartHardBreak?: true;
   annotationPositions?: true;
-  renderFrontMatter?: true;
   attachmentUrlPrefix?: string;
   // When defined, use to inline images as data: urls
-  inlineAttachments?: (url: string) => Promise<string>;
+  inlineAttachments?: (url: string) => string;
 };
 
 function cleanTags(values: (Tag | null)[]): Tag[] {
@@ -78,33 +76,7 @@ function render(
         body: cleanTags(mapRender(t.children!)),
       };
     case "FrontMatter":
-      if (options.renderFrontMatter) {
-        const yamlCode = renderToText(t.children![1]);
-        const parsedYaml = YAML.parse(yamlCode) as Record<string, any>;
-        const rows: Tag[] = [];
-        for (const [k, v] of Object.entries(parsedYaml)) {
-          rows.push({
-            name: "tr",
-            body: [
-              { name: "td", attrs: { class: "key" }, body: k },
-              {
-                name: "td",
-                attrs: { class: "value" },
-                body: YAML.stringify(v),
-              },
-            ],
-          });
-        }
-        return {
-          name: "table",
-          attrs: {
-            class: "front-matter",
-          },
-          body: rows,
-        };
-      } else {
-        return null;
-      }
+      return null;
     case "CommentBlock":
       // Remove, for now
       return null;
@@ -261,7 +233,7 @@ function render(
       return {
         name: "a",
         attrs: {
-          href: `/${ref.replaceAll(" ", "_").replace("@", "#")}`,
+          href: `/${ref.replace("@", "#")}`,
         },
         body: linkText,
       };
@@ -392,34 +364,34 @@ function render(
   }
 }
 
-async function traverseTag(
+function traverseTag(
   t: Tag,
-  fn: (t: Tag) => Promise<void>,
-): Promise<void> {
-  await fn(t);
+  fn: (t: Tag) => void,
+) {
+  fn(t);
   if (typeof t === "string") {
     return;
   }
   if (t.body) {
     for (const child of t.body) {
-      await traverseTag(child, fn);
+      traverseTag(child, fn);
     }
   }
 }
 
-export async function renderMarkdownToHtml(
+export function renderMarkdownToHtml(
   t: ParseTree,
   options: MarkdownRenderOptions = {},
 ) {
   preprocess(t, options);
   const htmlTree = posPreservingRender(t, options);
   if (htmlTree && options.inlineAttachments) {
-    await traverseTag(htmlTree, async (t) => {
+    traverseTag(htmlTree, (t) => {
       if (typeof t === "string") {
         return;
       }
       if (t.name === "img") {
-        t.attrs!.src = await options.inlineAttachments!(t.attrs!.src!);
+        t.attrs!.src = options.inlineAttachments!(t.attrs!.src!);
       }
     });
   }

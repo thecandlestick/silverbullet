@@ -1,10 +1,4 @@
-import {
-  Decoration,
-  EditorState,
-  EditorView,
-  syntaxTree,
-  WidgetType,
-} from "../deps.ts";
+import { Decoration, EditorState, syntaxTree, WidgetType } from "../deps.ts";
 import {
   decoratorStateField,
   invisibleDecoration,
@@ -15,7 +9,6 @@ import { renderMarkdownToHtml } from "../../plugs/markdown/markdown_render.ts";
 import { ParseTree } from "$sb/lib/tree.ts";
 import { lezerToParseTree } from "../../common/markdown_parser/parse_tree.ts";
 import type { Editor } from "../editor.tsx";
-import { urlToPathname } from "../../plugos/util.ts";
 
 class TableViewWidget extends WidgetType {
   constructor(
@@ -40,24 +33,16 @@ class TableViewWidget extends WidgetType {
       });
     });
 
-    renderMarkdownToHtml(this.t, {
+    dom.innerHTML = renderMarkdownToHtml(this.t, {
       // Annotate every element with its position so we can use it to put
       // the cursor there when the user clicks on the table.
       annotationPositions: true,
-      inlineAttachments: async (url): Promise<string> => {
+      inlineAttachments: (url) => {
         if (!url.includes("://")) {
-          try {
-            const d = await this.editor.space.readAttachment(url, "dataurl");
-            return d.data as string;
-          } catch (e: any) {
-            console.error(e);
-            return url;
-          }
+          return `/.fs/${url}`;
         }
         return url;
       },
-    }).then((html) => {
-      dom.innerHTML = html;
     });
     return dom;
   }

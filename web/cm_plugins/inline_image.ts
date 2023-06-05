@@ -7,7 +7,7 @@ import {
 } from "../deps.ts";
 import { decoratorStateField } from "./util.ts";
 
-import type { Space } from "../../common/spaces/space.ts";
+import type { Space } from "../space.ts";
 
 class InlineImageWidget extends WidgetType {
   constructor(
@@ -16,29 +16,43 @@ class InlineImageWidget extends WidgetType {
     readonly space: Space,
   ) {
     super();
+    // console.log("Creating widget", url);
   }
 
   eq(other: InlineImageWidget) {
     return other.url === this.url && other.title === this.title;
   }
 
+  get estimatedHeight(): number {
+    const cachedHeight = this.space.getCachedImageHeight(this.url);
+    // console.log("Estimated height requested", this.url, cachedHeight);
+    return cachedHeight;
+  }
+
   toDOM() {
     const img = document.createElement("img");
+    // console.log("Creating DOM", this.url);
+    const cachedImageHeight = this.space.getCachedImageHeight(this.url);
+    img.onload = () => {
+      // console.log("Loaded", this.url, "with height", img.height);
+      if (img.height !== cachedImageHeight) {
+        this.space.setCachedImageHeight(this.url, img.height);
+      }
+    };
     if (this.url.startsWith("http")) {
       img.src = this.url;
     } else {
-      // Load the image as a dataURL and inject it into the img's src attribute
-      this.space.readAttachment(decodeURIComponent(this.url), "dataurl").then(
-        ({ data }) => {
-          img.src = data as string;
-        },
-      );
+      // This is an attachment image, rewrite the URL a little
+      img.src = `/.fs/${decodeURIComponent(this.url)}`;
     }
 
     img.alt = this.title;
     img.title = this.title;
     img.style.display = "block";
     img.className = "sb-inline-img";
+    if (cachedImageHeight > 0) {
+      img.height = cachedImageHeight;
+    }
 
     return img;
   }

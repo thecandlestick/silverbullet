@@ -3,6 +3,25 @@
 
 This course will use the C++ programming language for all coding assignments. _This class is programming intensive_, a strong grasp of C++ basics is expected.
 
+**Topics:**
+<!-- #query page where name =~ /cpp-/ select name order by lastModified -->
+|name                     |
+|-------------------------|
+|examples/cpp-hello-world |
+|examples/cpp-variables   |
+|examples/cpp-operators   |
+|examples/cpp-io          |
+|examples/cpp-conditionals|
+|examples/cpp-loops       |
+|examples/cpp-functions   |
+|examples/cpp-scope       |
+|examples/cpp-arrays      |
+|examples/cpp-classes     |
+|examples/cpp-overloading |
+|examples/cpp-templates   |
+<!-- /query -->
+
+
 ---
 ## Hello World
 
@@ -33,17 +52,8 @@ What is the purpose of _using namespace std_?
 
 ---
 ## Variables
-[[examples/cpp-variables]]
+
 <!-- #include [[examples/cpp-variables]] -->
----
-- Language: 
-- Credit: 
-- Last Update:
-
-##### Notes #####
-
----
-
 ```c++
 #include <iostream>
 
@@ -86,7 +96,8 @@ What is the initial value of _result?_ Why does this happen?
 
 ---
 ## Operators
-[[examples/cpp-operators]]
+
+<!-- #include [[examples/cpp-operators]] -->
 ```c++
 #include <iostream>
 
@@ -110,21 +121,13 @@ Compound Assignment Operators
 Increment and Decrement
 Comparison Operators
 Logical Operators
+<!-- /include -->
 
-<!-- #use [[template/page/example]] {} -->
----
-- Language: 
-- Credit: 
-- Last Update:
-
-##### Notes #####
-
----
-<!-- /use -->
 
 ---
 ## Input and Output
-[[examples/cpp-io]]
+
+<!-- #include [[examples/cpp-io]] -->
 ```c++
 #include <iostream>
 using namespace std;
@@ -162,10 +165,13 @@ int main()
   return 0;
 }
 ```
+<!-- /include -->
+
 
 ---
 ## Conditionals
-[[examples/cpp-conditionals]]
+
+<!-- #include [[examples/cpp-conditionals]] -->
 ```c++
 #include <iostream>
 using namespace std;
@@ -190,12 +196,15 @@ int main()
   return 0;
 }
 ```
+<!-- /include -->
+
 
 Curly-brackets{} are only needed for multi-line conditional blocks
 
 ---
 ## Loops
-[[examples/cpp-loops]]
+
+<!-- #include [[examples/cpp-loops]] -->
 while loops
 ```c++
 #include <iostream>
@@ -250,10 +259,13 @@ int main()
   return 0;
 }
 ```
+<!-- /include -->
+
 
 ---
 ## Functions
-[[examples/cpp-functions]]
+
+<!-- #include [[examples/cpp-functions]] -->
 ```c++
 #include <iostream>
 using namespace std;
@@ -369,15 +381,12 @@ void even(int x)
   else odd(x);
 }
 ```
-
----
-## Multiple Files
-[[examples/cpp-multi-file]]
-<>
+<!-- /include -->
 
 ---
 ## Scope
-[[examples/cpp-scope]]
+
+<!-- #include [[examples/cpp-scope]] -->
 ```c++
 // "Global" Scope
 #include <iostream>
@@ -404,12 +413,15 @@ int main()
   return 0;
 }
 ```
+<!-- /include -->
+
 
 What else in C++ (implicitly) creates a new scope?
 
 ---
 ## Arrays
-[[examples/cpp-arrays]]
+
+<!-- #include [[examples/cpp-arrays]] -->
 basics
 ```c++
 #include <iostream>
@@ -462,10 +474,13 @@ int main()
   return 0;
 }
 ```
+<!-- /include -->
+
 
 ---
 ## Classes
-[[examples/cpp-classes]]
+
+<!-- #include [[examples/cpp-classes]] -->
 A typical class
 ```c++
 class name_of_type
@@ -508,9 +523,12 @@ void Rectangle::set_values(int x, int y)
   height = y;
 }
 ```
+<!-- /include -->
+
 ---
 ## Overloading
-[[examples/cpp-overloading]]
+
+<!-- #include [[examples/cpp-overloading]] -->
 ```c++
 #include <iostream>
 using namespace std;
@@ -546,10 +564,13 @@ Fraction& Fraction::operator=(const Fraction &rhs)
 Fraction f, g, h;
 f = g = h;
 ```
+<!-- /include -->
+
 
 ---
 ## Templates
-[[examples/cpp-templates]]
+
+<!-- #include [[examples/cpp-templates]] -->
 ```c++
 #include <iostream>
 using namespace std;
@@ -574,3 +595,4 @@ int main()
   return 0;
 }
 ```
+<!-- /include -->

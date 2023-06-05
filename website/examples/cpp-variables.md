@@ -1,11 +1,3 @@
----
-- Language: 
-- Credit: 
-- Last Update:
-
-##### Notes #####
-
----
 
 ```c++
 #include <iostream>

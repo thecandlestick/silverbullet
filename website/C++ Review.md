@@ -11,7 +11,6 @@ This course will use the C++ programming language for all coding assignments. _T
 |examples/cpp-variables   |
 |examples/cpp-io          |
 |examples/cpp-conditionals|
-|examples/cpp-loops       |
 |examples/cpp-functions   |
 |examples/cpp-scope       |
 |examples/cpp-classes     |
@@ -19,6 +18,7 @@ This course will use the C++ programming language for all coding assignments. _T
 |examples/cpp-templates   |
 |examples/cpp-arrays      |
 |examples/cpp-operators   |
+|examples/cpp-loops       |
 <!-- /query -->
 
 
@@ -228,9 +228,9 @@ int main()
 {
   int n = 10;
 
-  while( n>0 ) // check condition
+  while( n>0 )  // check condition
   {
-    cout << n << ", "; // execute body
+    cout << n << ", ";  // execute body
     --n;
   }  // repeat
 
@@ -249,7 +249,7 @@ int main()
   string str;
   do 
   {
-    cout << "Enter text: ";   // execute body 
+    cout << "Enter text: ";  // execute body
     getline (cin, str);
     cout << "You entered: " << str << '\n';
   } while (str != "goodbye");  // check condition ; repeat
@@ -264,13 +264,13 @@ using namespace std;
 
 int main()
 {
-  //      [1]    [2]  [3]
-  for(int n=10; n>0; n--)  
-  {  
+//    [1]        [2]  [3]
+  for(int n=10; n>0; n--)
+  {
     cout << n << ", ";  // [4]
   }
-  //run [1], check [2], execute [4]/[3], check [2], execute [4]/[3]...
-  
+// exe [1], check [2], exe [3]/[4], check [2], exe [3]/[4], ...
+
   cout << "liftoff!\n"
   return 0;
 }

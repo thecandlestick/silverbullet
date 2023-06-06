@@ -26,50 +26,67 @@ A more common way of representing the state of memory is using _memory diagrams_
 
 ## Address-of (&) Operator
 
+[[examples/ptr-addr-of]]
 
 ## Declaration
 
+[[examples/ptr-declaration]]
 
 ## De-reference (*) Operator
 
+[[examples/ptr-dereference]]
 
 ## _const_ and Pointers
 
+[[examples/ptr-const]]
 
 ## Pointers as Parameters
 
+[[examples/ptr-param]]
 
 ## Arrays of Pointers 
 
+[[examples/ptr-array]]
 
 ## Pointers in Structs & Classes
 
+[[examples/ptr-member]]
 
 ## Pointers to Classes
 
+[[examples/ptr-class]]
 
 # Dynamic Memory
 
 ## _new_ Operator
 
+[[examples/ptr-new]]
 
 ## _delete_ Operator
 
+[[examples/ptr-delete]]
 
 ## Problems with Pointers
 
+[[examples/ptr-dangling]]
 
-## Example: 2D-Dynamic Array
+[[examples/ptr-mem-leak]]
 
+## 2D-Dynamic Array
 
+[[examples/ptr-2d-array]]
 
 # Default Member Functions
 
 
 ## Destructor
 
+[[examples/ptr-destructor]]
 
 ## Operator=
 
+[[examples/ptr-assign-op]]
 
 ## Copy Constructor
+
+[[examples/ptr-copy-constructor]]

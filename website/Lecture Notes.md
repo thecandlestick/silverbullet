@@ -9,5 +9,6 @@
 
 <!-- #query page where name =~ /notes-1575/ render [[template/basic]] -->
 * [[notes-1575/Jun5]]
+* [[notes-1575/Jun6]]
 <!-- /query -->
 

@@ -1,2 +1,7 @@
 data.db
 _plug
+p/
+template/
+snippet/
+../deno_cache/
+dist_bundle/

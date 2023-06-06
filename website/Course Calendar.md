@@ -1,11 +1,18 @@
 
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[SS23 CS1575|Home]] | [[Course Calendar|Calendar]] | [[Syllabus]] | [[Lecture Notes]] |
+
+---
+
+
 # Course Calendar / Schedule of Topics
 
 Because the summer session is only 8 weeks, the course will move very fast! Check back here often for deadlines and materials
 
 ## Week 1
 * M(6/5) - [[Syllabus]] ;  [[PA00]] Assigned
-* T(6/6) - [[C++]]
+* T(6/6) - [[C++ Review]]
 * W(6/7) - [[Pointers]] ; Syllabus Quiz DUE
 * R(6/8) - [[Pointers]]
 * F(6/9) - [[Pointers]] ; [[PA00]] DUE ; [[PA01]] Assigned

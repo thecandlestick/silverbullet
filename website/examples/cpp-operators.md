@@ -17,7 +17,21 @@ int main()  //The Assignment Operator (operator=)
 ```
 
 Arithmetic Operators
+
+```+ - * / %```
+
 Compound Assignment Operators
+
+```+= -= *= /=```
+
 Increment and Decrement
+
+```a++ b-- ++a --b```
+
 Comparison Operators
+
+```== != < > <= >=```
+
 Logical Operators
+
+```&& || !```

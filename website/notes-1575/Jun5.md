@@ -13,6 +13,12 @@ https://www.cnsr.dev/index_files/Classes/DataStructuresLab/Content/00-VirtualMac
 ---
 
 <!-- #include [[Syllabus]] -->
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[SS23 CS1575|Home]] | [[Course Calendar|Calendar]] | [[Syllabus]] | [[Lecture Notes]] |
+
+---
+
 # Contact
 email: jackmanhardt@mst.edu
 

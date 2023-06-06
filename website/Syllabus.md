@@ -1,4 +1,10 @@
 
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[SS23 CS1575|Home]] | [[Course Calendar|Calendar]] | [[Syllabus]] | [[Lecture Notes]] |
+
+---
+
 # Contact
 email: jackmanhardt@mst.edu
 

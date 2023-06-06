@@ -39,14 +39,4 @@ int main()
 }
 ```
 multidimensional arr
-<>
-```c++
-#include <iostream>
-using namespace std;
-
-int main()
-{
-
-  return 0;
-}
-```
+![2D Array](two-d-arr.png)

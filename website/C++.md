@@ -6,6 +6,6 @@
 
 [[Error Handling]] 
 
-[[Inheritance-Polymorphism]] 
+[[OOP]] 
 
 [[Modern C++]] 

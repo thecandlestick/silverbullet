@@ -67,6 +67,8 @@ Your assignments in this course will be graded by an open-source autograding too
 
 [WSL Tutorial](https://learn.microsoft.com/en-us/training/modules/wsl/wsl-introduction/)
 
+[[Assignment Tutorial]]
+
 ---
 
 # Policies

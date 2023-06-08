@@ -19,6 +19,7 @@ This course will use the C++ programming language for all coding assignments. _T
 |examples/cpp-arrays      |
 |examples/cpp-operators   |
 |examples/cpp-loops       |
+|snippet/cpp-program      |
 <!-- /query -->
 
 

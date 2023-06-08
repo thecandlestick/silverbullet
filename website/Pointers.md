@@ -97,7 +97,7 @@ int main()
   int *q = &x, *s = &z;
   float *p = &y;
 
-  cout << q << *q;  // 0 <memory-address>
+  cout << q << *q;  // <memory-address> 0
   *p = 2.345;   // y == 2.345
   *s = 3 + *q;  // z == ???
   *p = *q**s;   // y == ???
@@ -183,7 +183,7 @@ using namespace std;
 class Tiger
 {
   string name;
-  int *q;   // Pointers can be members of a class ...
+  int *q;
 };
 
 class Fish
@@ -198,7 +198,7 @@ class Fish
 int main()
 {
   Fish Nemo;
-  Fish* p = &Nemo;  // ... and pointers can point to class objects
+  Fish* p = &Nemo;
   
   // *p.x = 3;  INVALID
   (*p).x = 3;
@@ -215,15 +215,17 @@ int main()
 
 Standard variables are created at _compile time_, but it is also possible to create variables on-demand during _run time_.
 
-Pointers are used to track and manage these _dynamic_ variables.
+Variables created during run time have no name by which to refer to them. Instead, pointers are used to track and manage these _dynamic_ variables.
 
 ## _new_ Operator
 
 (Dynamically) Allocates a new variable or array of variables and returns a pointer to it
 
+```my_pointer = new <type>```
+
 ## _delete_ Operator
 
-De-allocates a dynamic variable
+Unlike standard variables that get removed when leaving their scope, dynamic variables can persist until the program completes. It is therefore the _programmer’s_ responsibility to clean up after themselves. the _delete_ operator must be used to de-allocate a dynamic variable.
 
 ```delete <ptr>;```  used for dynamic variables
 
@@ -252,6 +254,7 @@ int main()
 
 ## Problems with Pointers
 
+**Dangling Pointers** are pointers that are used with invalid addresses
 <!-- #include [[examples/ptr-dangling]] -->
 ```c++
 #include <iostream>
@@ -273,7 +276,7 @@ int main()
 }
 <!-- /include -->
 
-
+**Memory Leaks** occur when dynamic memory becomes unreachable
 <!-- #include [[examples/ptr-mem-leak]] -->
 ```c++
 #include <iostream>
@@ -290,6 +293,14 @@ int main()
 }
 <!-- /include -->
 
+These problems create very nasty bugs, because they often do not crash your program. They allow it to go on until something else breaks as a result!
+
+Some good rules-of-thumb to avoid pointer problems:
+* every call to ```new``` should have a corresponding call to ```delete```
+* pointers should be initialized to a value or ```nullptr```
+* after de-allocating a pointer, it should be set to ```nullptr```
+
+Other issues to watch out for include **double-free** errors (deleting a pointer twice) and **shallow copies** (copying a memory address when you intended to copy the object pointed to).
 
 ## 2D-Dynamic Array
 
@@ -319,17 +330,127 @@ int main()
 
 ---
 
+## The _this_ pointer
+
+Every member function in C++ has a _hidden_ extra parameter added to it implicitly. It contains the memory address of the _calling object_, and can be accessed by its name, ```this```. It can be used whenever you need a function to refer to the object that called it.
+<>
+
 # Default Member Functions
+
+Whenever a user-defined class is created, C++ automatically generates three special functions: a Destructor, an Operator= (assignment operator), and a copy-constructor.
+
+<!-- #include [[examples/ptr-def-mem-func]] -->
+```c++
+
+// For a class “Foo” with members “x” “y” “z”
+
+~Foo()
+{
+  // 🦗 ... nothing, the default destructor does nothing
+}
+
+const Foo& operator=( const Foo &rhs )
+{
+
+  if (this != &rhs) // alias check
+  {
+    x = rhs.x;  // direct copy of each member var
+    y = rhs.y;
+    z = rhs.z;
+  }
+
+  return (*this);  // return the calling object
+}
+
+Foo( const Foo &rhs )
+{
+
+  *this = rhs;  // invoke the operator=
+}
+```
+<!-- /include -->
 
 
 ## Destructor
 
-[[examples/ptr-destructor]]
+The destructor is the “clean-up” function that is called whenever an object reaches the end of it’s scope. It’s job is to safely de-allocate any dynamic member variables that may be tied to that object.
+
+<!-- #include [[examples/ptr-destructor]] -->
+```c++
+class IntBox  // example class with dynamic member variable
+{
+  int *item;
+  public:
+    IntBox(int i)
+    {
+      item = new int(i);
+    }
+};
+
+~IntBox()  // "proper" destructor
+{
+  delete item;
+}
+```
+<!-- /include -->
+
 
 ## Operator=
 
-[[examples/ptr-assign-op]]
+The assignment operator is used to make one (existing) object into a copy of another.
+
+<!-- #include [[examples/ptr-assign-op]] -->
+```c++
+class IntBox  // example class with dynamic member variable
+{
+  int *item;
+  public:
+    IntBox(int i)
+    {
+      item = new int(i);
+    }
+};
+
+// "proper" assignment operator
+const IntBox& operator=( const IntBox &rhs )
+{
+  if (this != &rhs)
+  {
+    *item = *rhs.item;  // "deep copy" of pointer members
+    return (*this);  // return the calling object
+  }
+}
+```
+<!-- /include -->
+
 
 ## Copy Constructor
 
-[[examples/ptr-copy-constructor]]
+The copy constructor serves a very similar purpose to the operator=, it ==creates a new object== that is a copy of another. There are a few different scenarios in which the copy constructor is invoked.
+
+* Declaration with initialization   ```int myInt = myOtherInt;```
+* Pass-by-value functions   ```int& Foo( int byValue )```
+* Return-by-value functions   ```int Bar( int &byReference )```
+
+<!-- #include [[examples/ptr-copy-constructor]] -->
+```c++
+class IntBox  // example class with dynamic member variable
+{
+  int *item;
+  public:
+    IntBox(int i)
+    {
+      item = new int(i);
+    }
+};
+
+// “proper" copy constructor
+IntBox( const IntBox &rhs )
+{
+  item = new int;  // initialize pointer
+  *this = rhs;  // invoke operator=
+}
+```
+<!-- /include -->
+
+As a general rule, if your class contains a pointer to a dynamically allocated object, you must override **all three** of the default member functions.

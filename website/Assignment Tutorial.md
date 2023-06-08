@@ -26,7 +26,7 @@ Once you have your SSH key added, the next step is to clone the repository. Navi
 
 ![broken img 💔](clone.png)
 
-Now in your terminal, run the command ```git clone <paste link here>```. If all goes well, you’ll now have a folder containing all the relevant files for the assignment. If this step fails, you can try installing Git with ```sudo apt install git``` (on Ubuntu/Debain, the command may differ for other Linux distributions) or refer to the section above.
+Now in your terminal, run the command ```git clone <paste link here>```. If all goes well, you’ll now have a folder containing all the relevant files for the assignment. If this step fails, you can try installing Git with ```sudo apt install git``` (on Ubuntu/Debian, the command may differ for other Linux distributions) or refer to the section above.
 
 ![broken img 💔](clone2.png)
 
@@ -79,3 +79,8 @@ For the files containing your code, enter the command ```git add <name of file> 
 Finish by running the command ```git commit -m “<describe your changes>“``` Followed by ```git push```. If you’ve done everything correctly, you should now see your completed assignment in git-classes.
 
 ![broken img 💔](commit-push.png)
+
+**Notes:**
+* Do not create any additional files, use the files provided
+* You may create additional functions if you wish, but all assigned functions must operate as specified for full points
+* Unless otherwise stated, **do not** use any libraries that aren’t included in the assignment to begin with

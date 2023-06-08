@@ -4,7 +4,7 @@
 
 ## The 3 Pillars of OOP
 
-* Encapsulation
+* [[Encapsulation]]
 * [[Inheritance]]
 * [[Polymorphism]]
 

@@ -217,11 +217,15 @@ Standard variables are created at _compile time_, but it is also possible to cre
 
 Variables created during run time have no name by which to refer to them. Instead, pointers are used to track and manage these _dynamic_ variables.
 
+Standard variables exist in a part of memory known as the **stack**. Dynamic variables exist in a different part of memory known as the **heap.**
+
 ## _new_ Operator
 
 (Dynamically) Allocates a new variable or array of variables and returns a pointer to it
 
-```my_pointer = new <type>```
+```my_pointer = new <type>``` used for dynamic variables
+
+```my_pointer = new <type>[<size>]``` for dynamic arrays
 
 ## _delete_ Operator
 
@@ -230,6 +234,8 @@ Unlike standard variables that get removed when leaving their scope, dynamic var
 ```delete <ptr>;```  used for dynamic variables
 
 ```delete [] <ptr>;```  used for dynamic arrays
+
+Please note: _delete_ **DOES NOT** alter the pointer in any way. It **ONLY** de-allocates the memory used by the object being _pointed to_.
 
 <!-- #include [[examples/ptr-new-delete]] -->
 ```c++

@@ -4,7 +4,7 @@
 
 [[Pointers]] 
 
-[[Error Handling]] 
+[[Exception Handling]] 
 
 [[OOP]] 
 

@@ -174,6 +174,10 @@ int main()
 
 ## Pointers & Classes
 
+When you have a pointer to a class object, the -> operator provides a convenient way to access member variables and member functions. 
+
+```ptr -> mem``` _de-references_ **ptr**, and then accesses **mem**. This is useful because the “.” operator happens before the * (de-reference) operator in terms of precedence.
+
 <!-- #include [[examples/ptr-class]] -->
 ```c++
 #include <iostream>
@@ -200,13 +204,14 @@ int main()
   Fish Nemo;
   Fish* p = &Nemo;
   
-  // *p.x = 3;  INVALID
-  (*p).x = 3;
-  p -> s = 1.61;
+  // *p.x = 3;  INVALID! p has no member x
+  (*p).x = 3;   // Valid, access member x of *p
+  p -> s = 1.61;  // Valid, access member s of *p
   p -> swim();
 
   return 0;
 }
+```
 <!-- /include -->
 
 ---
@@ -339,7 +344,8 @@ int main()
 ## The _this_ pointer
 
 Every member function in C++ has a _hidden_ extra parameter added to it implicitly. It contains the memory address of the _calling object_, and can be accessed by its name, ```this```. It can be used whenever you need a function to refer to the object that called it.
-<>
+
+```T* const this```
 
 # Default Member Functions
 
@@ -368,10 +374,9 @@ const Foo& operator=( const Foo &rhs )
   return (*this);  // return the calling object
 }
 
-Foo( const Foo &rhs )
+Foo( const Foo &rhs ) : x (rhs.x), y (rhs.y), z (rhs.z)
 {
-
-  *this = rhs;  // invoke the operator=
+  // Same as above  
 }
 ```
 <!-- /include -->
@@ -387,13 +392,21 @@ class IntBox  // example class with dynamic member variable
 {
   int *item;
   public:
-    IntBox(int i)
-    {
-      item = new int(i);
-    }
+    IntBox(int i){ item = new int(i); }
+    ~IntBox();
 };
 
-~IntBox()  // "proper" destructor
+int main()
+{
+  for (int i = 0; i < 3; i++)
+  {
+    IntBox myintbox(i);
+  }  // Destructor called here
+
+  return 0;
+}
+
+IntBox::~IntBox()  // "proper" destructor
 {
   delete item;
 }
@@ -407,18 +420,35 @@ The assignment operator is used to make one (existing) object into a copy of ano
 
 <!-- #include [[examples/ptr-assign-op]] -->
 ```c++
+#include <iostream>
+using namespace std;
+
 class IntBox  // example class with dynamic member variable
 {
   int *item;
   public:
-    IntBox(int i)
-    {
-      item = new int(i);
-    }
+    IntBox(int i){ item = new int(i); }  // constructor
+    void set(int x) { *item = x; }       // mutator
+    void print() { cout << *item; }      
+    const IntBox& operator=( const IntBox &rhs );
 };
 
+int main()
+{
+  IntBox b1(4);
+  IntBox b2(200);
+
+  b1 = b2; // operator= called here
+  
+  b1.set(5);
+  b1.print();
+  b2.print();
+
+  return 0;
+}
+
 // "proper" assignment operator
-const IntBox& operator=( const IntBox &rhs )
+const IntBox& IntBox::operator=( const IntBox &rhs )
 {
   if (this != &rhs)
   {
@@ -444,19 +474,29 @@ class IntBox  // example class with dynamic member variable
 {
   int *item;
   public:
-    IntBox(int i)
-    {
-      item = new int(i);
-    }
+    IntBox(int i) { item = new int(i); }
+    IntBox( const IntBox &rhs );
 };
 
+int main()
+{
+
+  IntBox b1(3); //created with parameterized constructor
+  IntBox b2(b1); //created with copy constructor
+  IntBox b3 = b1; //also created with copy constructor
+  
+  return 0;
+}
+
 // “proper" copy constructor
-IntBox( const IntBox &rhs )
+IntBox::IntBox( const IntBox &rhs )
 {
   item = new int;  // initialize pointer
-  *this = rhs;  // invoke operator=
+
+  *this = rhs; // common trick: invoke operator=
+  // *item = *rhs.item (would also work)
 }
 ```
 <!-- /include -->
 
-As a general rule, if your class contains a pointer to a dynamically allocated object, you must override **all three** of the default member functions.
+As a general rule, if your class contains a pointer to a dynamically allocated object, you must overwrite **all three** of the default member functions. For classes without pointers, this is generally not necessary.

@@ -18,9 +18,9 @@ Because the summer session is only 8 weeks, the course will move very fast! Chec
 * F(6/9) - [[Pointers]] ; [[PA00]] DUE ; [[PA01]] Assigned
 
 ## Week 2
-* M(6/12) - [[Data Structures]] ; Quiz 0 DUE
+* M(6/12) - [[Data Structures]] 
 * T(6/13) - [[Lists]]
-* W(6/14) - [[ArrayList]]
+* W(6/14) - [[ArrayList]] ; Quiz 0 DUE
 * R(6/15) - [[ArrayList]]
 * F(6/16) - [[Exception Handling]] ; [[PA01]] DUE ; [[PA02]] Assigned
 

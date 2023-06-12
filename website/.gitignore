@@ -5,4 +5,3 @@ template/
 snippet/
 ../deno_cache/
 dist_bundle/
-examples/

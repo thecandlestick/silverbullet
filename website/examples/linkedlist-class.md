@@ -1,0 +1,8 @@
+```c++
+class LinkedList
+{
+  private:
+    
+
+};
+```

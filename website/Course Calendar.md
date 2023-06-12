@@ -8,7 +8,7 @@
 
 # Course Calendar / Schedule of Topics
 
-Because the summer session is only 8 weeks, the course will move very fast! Check back here often for deadlines and materials [[new page]]
+Because the summer session is only 8 weeks, the course will move very fast! Check back here often for deadlines and materials
 
 ## Week 1
 * M(6/5) - [[Syllabus]] ;  [[PA00]] Assigned

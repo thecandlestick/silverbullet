@@ -31,9 +31,9 @@ int x = 0; float y = 3.14; char z = 'z';
 | Value | 0 | ‘z’ | ? | 3.14 | ... |
 | Variable | x | z | | y | ... |
 
-* [ ] sarah
-* [ ] ryan
-* [ ] tony
+* [x] sarah
+* [x] ryan
+* [x] tony
 
 Of course, not all datum fit neatly into a fixed-size _cell_, but this model is good enough to discuss what happens during code execution.
 
@@ -52,10 +52,10 @@ A more common way of representing the state of memory is using _memory diagrams_
 
 A _pointer_ is a variable that stores a memory address
 
-* [ ] garret
-* [ ] matt
-* [ ] dheeraj
-* [ ] tony
+* [x] garret
+* [x] matt
+* [x] dheeraj
+* [x] tony
 
 ## Address-of (&) Operator
 
@@ -105,9 +105,9 @@ int main()
 }
 <!-- /include -->
 
-* [ ] nina
-* [ ] dheeraj
-* [ ] daniel
+* [x] nina
+* [x] dheeraj
+* [x] daniel
 
 ## De-reference (*) Operator
 
@@ -124,7 +124,7 @@ int main()
   int *q = &x, *s = &z;
   float *p = &y;
 
-  cout << q << *q;  // 0 <memory-address>
+  cout << q << *q;  // <memory-address> 0
   *p = 2.345;   // y == 2.345
   *s = 3 + *q;  // z == ???
   *p = *q**s;   // y == ???
@@ -133,12 +133,12 @@ int main()
 }
 <!-- /include -->
 
-* [ ] Jordan
-* [ ] Dheeraj
-* [ ] shrija
-* [ ] sarah
-* [ ] garret
-* [ ] tony
+* [x] Jordan
+* [x] Dheeraj
+* [x] shrija
+* [x] sarah
+* [x] garret
+* [x] tony
       
 ## _const_ and Pointers
 
@@ -169,8 +169,7 @@ return 0;
 }
 <!-- /include -->
 
-* [ ] ryan
-* [ ] 
+* [x] ryan
 
 ## Pointers as Parameters / RetVal
 
@@ -206,7 +205,7 @@ int main()
 }
 <!-- /include -->
 
-* [ ] tony
+* [x] tony
       
 ## Pointers & Classes
 
@@ -236,13 +235,14 @@ int main()
   Fish Nemo;
   Fish* p = &Nemo;
   
-  // *p.x = 3;  INVALID
-  (*p).x = 3;
-  p -> s = 1.61;
+  // *p.x = 3;  INVALID! p has no member x
+  (*p).x = 3;   // Valid, access member x of *p
+  p -> s = 1.61;  // Valid, access member s of *p
   p -> swim();
 
   return 0;
 }
+```
 <!-- /include -->
 
-* [ ] ryan
+* [x] ryan

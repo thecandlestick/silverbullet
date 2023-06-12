@@ -12,13 +12,13 @@ Objectives:
 
 ---
 
-* [ ] sarah
-* [ ] tony
-* [ ] matt
-* [ ] sarah
-* [ ] ryan
-* [ ] sarah
-* [ ] makalyn
+* [x] sarah
+* [x] tony
+* [x] matt
+* [x] sarah
+* [x] ryan
+* [x] sarah
+* [x] makalyn
 
 # Dynamic Memory
 
@@ -44,7 +44,7 @@ Unlike standard variables that get removed when leaving their scope, dynamic var
 
 ```delete [] <ptr>;```  used for dynamic arrays
 
-* [ ] garret w
+* [x] garret w
 
 Please note: _delete_ **DOES NOT** alter the pointer in any way. It **ONLY** de-allocates the memory used by the object being _pointed to_.
 
@@ -94,8 +94,8 @@ int main()
 <!-- /include -->
 
 Valgrind
-* [ ] ben n
-* [ ] dheeraj
+* [x] ben n
+* [x] dheeraj
 
 **Memory Leaks** occur when dynamic memory becomes unreachable
 <!-- #include [[examples/ptr-mem-leak]] -->
@@ -123,5 +123,5 @@ Some good rules-of-thumb to avoid pointer problems:
 
 Other issues to watch out for include **double-free** errors (deleting a pointer twice) and **shallow copies** (copying a memory address when you intended to copy the object pointed to).
 
-* [ ] dheeraj (stdio_error)
-* [ ] ryan (grade.sh build error)
+* [x] dheeraj (stdio_error)
+* [x] ryan (grade.sh build error)

@@ -40,11 +40,11 @@ int main()
 }
 <!-- /include -->
 
-* [ ] duc
-* [ ] ben n
-* [ ] ryan
-* [ ] makalyn
-* [ ] sarah
+* [x] duc
+* [x] ben n
+* [x] ryan
+* [x] makalyn
+* [x] sarah
 
 ---
 
@@ -58,8 +58,8 @@ Every member function in C++ has a _hidden_ extra parameter added to it implicit
 
 Whenever a user-defined class is created, C++ automatically generates three special functions: a Destructor, an Operator= (assignment operator), and a copy-constructor.
 
-* [ ] matt
-* [ ] tony
+* [x] matt
+* [x] tony
 
 <!-- #include [[examples/ptr-def-mem-func]] -->
 ```c++

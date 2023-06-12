@@ -1,7 +1,7 @@
 
 
 Date: 2023-06-12
-Recording:
+Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=5cbe2517-462d-4185-a7fc-b01f013877e9
 
 Reminders:
 * [x] Quiz 0 due wednesday

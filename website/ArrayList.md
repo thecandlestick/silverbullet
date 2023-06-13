@@ -3,20 +3,21 @@
 [[examples/arraylist-class]]
 <!-- #include [[examples/arraylist-class]] -->
 ```c++
-#DEFINE MIN_CAPACITY = 8
+#define MIN_CAPACITY 8
 template <typename T>
 class ArrayList
 {
   private:
     int size;
-    int max;
+    int max_size;
     int *data;
   public:
     ArrayList() : size (0), max (MIN_CAPACITY) { data = new T[max]; }
 
     //OPERATIONS
+    T & operator[](int i);
     void insert(int i, const T& x);
-    void remove(int i);
+    void erase(int i);
     bool find(const T& x);
     // ... 
 };
@@ -57,7 +58,7 @@ void ArrayList::insert(int i, const T& x)
 [[examples/arraylist-remove]]
 <!-- #include [[examples/arraylist-remove]] -->
 ```c++
-void ArrayList::remove(int i)
+void ArrayList::erase(int i)
 {  
   if ( 0 <= i && i < size )
   {

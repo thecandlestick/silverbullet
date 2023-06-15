@@ -1,5 +1,6 @@
 ```c++
-void ArrayList::remove(int i)
+template <typename T>
+void ArrayList<T>::remove(int i)
 {  
   if ( 0 <= i && i < size )
   {
@@ -10,5 +11,7 @@ void ArrayList::remove(int i)
     if( size < max / 4 )
       resize(max / 2);
   }
+  else
+    // ...
 }
 ```

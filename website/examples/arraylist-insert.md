@@ -1,5 +1,6 @@
 ```c++
-void ArrayList::insert(int i, const T& x)
+template <typename T>
+void ArrayList<T>::insert(int i, const T& x)
 {
   if (0 <= i && i <= size)
   {
@@ -11,5 +12,7 @@ void ArrayList::insert(int i, const T& x)
     data[i] = x;
     size++:
   }
+  else
+    // ...
 }
 ```

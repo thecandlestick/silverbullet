@@ -1,5 +1,6 @@
 ```c++
-bool ArrayList::find(const T &x)
+template <typename T>
+bool ArrayList<T>::find(const T &x)
 {
   for(int k=0; k < size; k++)
     if ( data[k] == x )

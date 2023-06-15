@@ -8,9 +8,10 @@ template <typename T>
 class ArrayList
 {
   private:
-    int size;
-    int max_size;
-    int *data;
+    int size;       // # of elements currently stored
+    int max_size;   // length of storage array
+    T *data;        // pointer to storage array
+    void resize(int new_max_size);
   public:
     ArrayList() : size (0), max (MIN_CAPACITY) { data = new T[max]; }
 
@@ -24,70 +25,58 @@ class ArrayList
 ```
 <!-- /include -->
 
+
+![class diagram](arrlist-class-diagram.png)
+
 ---
 
 # Operations (member functions)
 
 ## Size
 
+```c++
+template <typename T>
+int ArrayList<T>::size()
+{
+  return size;
+}
+
+myArrayList.size();
+```
+
+
 ## Get/Set
+
+In C++ classes, Get & Set can be bundled together!
+
+
+<!-- #include [[examples/arraylist-bracket-op]] -->
+```c++
+template <typename T>
+T & ArrayList<T>::operator[](int i)
+{
+  // warning! no bounds-checking performed
+  return data[i];
+}
+<!-- /include -->
+
+## Resize (Auxiliary Function)
+
+[[examples/arraylist-resize]]
+
 
 ## Insert
 
 [[examples/arraylist-insert]]
-<!-- #include [[examples/arraylist-insert]] -->
-```c++
-void ArrayList::insert(int i, const T& x)
-{
-  if (0 <= i && i <= size)
-  {
-    if (size == max)
-      resize(max*2);
-    for(int k=size; k > i; k--)
-      data[k] = data[k-1];
-    
-    data[i] = x;
-    size++:
-  }
-}
-```
-<!-- /include -->
 
 ## Remove
 
 [[examples/arraylist-remove]]
-<!-- #include [[examples/arraylist-remove]] -->
-```c++
-void ArrayList::erase(int i)
-{  
-  if ( 0 <= i && i < size )
-  {
-    for(int k=i; k < size-1 ; k++)
-      data[k] = data[k+1];
-    
-    size--;
-    if( size < max / 4 )
-      resize(max / 2);
-  }
-}
-```
-<!-- /include -->
 
 ## Find
 
-[[arraylist-find]]
-<!-- #include [[arraylist-find]] -->
-```c++
-bool ArrayList::find(const T &x)
-{
-  for(int k=0; k < size; k++)
-    if ( data[k] == x )
-      return true; // x has been found
-  
-  return false;  // list does not contain x
-}
-```
-<!-- /include -->
+[[examples/arraylist-find]]
+
 
 ---
 
@@ -96,48 +85,12 @@ bool ArrayList::find(const T &x)
 ## Destructor
 
 [[examples/arraylist-destructor]]
-<!-- #include [[examples/arraylist-destructor]] -->
-```c++
-ArrayList::~ArrayList()
-{
-  delete [] data;
-}
-```
-<!-- /include -->
+
 
 ## Operator=
 
 [[examples/arraylist-assign-op]]
-<!-- #include [[examples/arraylist-assign-op]] -->
-```c++
-const ArrayList& ArrayList::operator=(const ArrayList& rhs)
-{
-  if (this != &rhs)
-  {
-    T *tmp = new T[rhs.max];  // allocate enough space for rhs data
-    for(int k=0; k < rhs.size; k++)
-      tmp.data[k] = rhs.data[k];  // deep copy
-    max = rhs.max;
-    size = rhs.size;
-    delete [] data;  // de-allocate old data
-    data = tmp;
-  }
-
-  return (*this);
-}
-```
-<!-- /include -->
-
 
 ## Copy Constructor
 
 [[examples/arraylist-copy-constructor]]
-<!-- #include [[examples/arraylist-copy-constructor]] -->
-```c++
-ArrayList::ArrayList(const ArrayList& rhs)
-{
-  data = nullptr; // avoid dangling pointer
-  *this = rhs;    // invoke operator=
-}
-```
-<!-- /include -->

@@ -4,9 +4,10 @@ template <typename T>
 class ArrayList
 {
   private:
-    int size;
-    int max_size;
-    int *data;
+    int size;       // # of elements currently stored
+    int max_size;   // length of storage array
+    T *data;        // pointer to storage array
+    void resize(int new_max_size);
   public:
     ArrayList() : size (0), max (MIN_CAPACITY) { data = new T[max]; }
 

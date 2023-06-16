@@ -1,5 +1,6 @@
 ```c++
-const ArrayList& ArrayList::operator=(const ArrayList& rhs)
+template <typename T>
+const ArrayList& ArrayList<T>::operator=(const ArrayList& rhs)
 {
   if (this != &rhs)
   {

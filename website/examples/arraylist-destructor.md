@@ -1,5 +1,6 @@
 ```c++
-ArrayList::~ArrayList()
+template <typename T>
+ArrayList<T>::~ArrayList()
 {
   delete [] data;
 }

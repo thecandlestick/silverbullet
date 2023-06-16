@@ -7,16 +7,16 @@ int main()
   int x = 3;
   const int y = 7;
 
-  int *p;
-  const int *q;
-  int const *r = &x;
-  const int const *s = &y;
+  int *p;                   // non-const ptr to non-const var
+  const int *q;             // non-const ptr to const var
+  int * const r = &x;       // const ptr to non-const var
+  const int const *s = &y;  // const ptr to const var
 
   p = &x;
   // p = &y;  INVALID
-  q = &x;
   q = &y;
-  //*q = 13;  INVALID
+  q = &x;
+  //*q = 13;  INVALID, q treats x as const when de-referenced
   *r = 4;
   //r = &y;  INVALID
   

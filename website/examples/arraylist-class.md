@@ -9,7 +9,8 @@ class ArrayList
     T *data;        // pointer to storage array
     void resize(int new_max_size);
   public:
-    ArrayList() : size (0), max (MIN_CAPACITY) { data = new T[max]; }
+    ArrayList() : size (0), max_size (MIN_CAPACITY) 
+                { data = new T[max]; } // default constructor
 
     //OPERATIONS
     T & operator[](int i);

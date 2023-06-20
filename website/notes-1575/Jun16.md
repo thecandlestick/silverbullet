@@ -4,11 +4,11 @@ Date: 2023-06-16
 Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=39871011-fa2d-4cf1-8a9d-b0230138cef8
 
 Reminders:
-* [ ] check stdio_tests
-* [ ] PA01 due tonight
+* [x] check stdio_tests
+* [x] PA01 due tonight
 
 Objectives:
-* [ ] Continue ArrayList implementation
+* [x] Continue ArrayList implementation
 
 ---
 
@@ -99,7 +99,8 @@ void ArrayList<T>::resize(int new_max_size)
   delete [] data;
   //Redirect data pointer
   data = tmp;
-
+  //Update max_size
+  max_size = new_max_size;
 }
 ```
 <!-- /include -->
@@ -107,10 +108,10 @@ void ArrayList<T>::resize(int new_max_size)
 
 
 data = new T[new_max_size];
-* [ ] tony
-* [ ] sarah
-* [ ] duc
-* [ ] dheeraj
+* [x] tony
+* [x] sarah
+* [x] duc
+* [x] dheeraj
 
 ## Insert
 ![class diagram](arrlist-class-diagram.png)
@@ -121,12 +122,12 @@ data = new T[new_max_size];
    5. increase size
    
 [[examples/arraylist-insert]]
-* [ ] sarah
-* [ ] matt
-* [ ] garret
-* [ ] jordan
-* [ ] duc
-* [ ] tony
+* [x] sarah
+* [x] matt
+* [x] garret
+* [x] jordan
+* [x] duc
+* [x] tony
 
 <!-- #include [[examples/arraylist-insert]] -->
 ```c++
@@ -135,8 +136,8 @@ void ArrayList<T>::insert(int i, const T& x)
 {
   if (0 <= i && i <= size)
   {
-    if (size == max)
-      resize(max*2);
+    if (size == max_size)
+      resize(max_size*2);
     for(int k=size; k > i; k--)
       data[k] = data[k-1];
     
@@ -151,9 +152,10 @@ void ArrayList<T>::insert(int i, const T& x)
 
 
 ## Remove
-* [ ] duc
-* [ ] dheeraj
-* [ ] matt
+* [x] duc
+* [x] dheeraj
+* [x] matt
+      
 ![class diagram](arrlist-class-diagram.png)1. check 0 <= i < size
 2. “shift” data left to right
 3. decrease size
@@ -172,8 +174,8 @@ void ArrayList<T>::remove(int i)
       data[k] = data[k+1];
     
     size--;
-    if( size < max / 4 )
-      resize(max / 2);
+    if( size < max_size / 4 )
+      resize(max_size / 2);
   }
   else
     // ...

@@ -5,3 +5,4 @@ template/
 snippet/
 ../deno_cache/
 dist_bundle/
+sandbox.md

@@ -8,7 +8,7 @@ Reminders:
 * [x] QUIZ 0 assigned
 
 Objectives:
-* [ ] Finish Pointers
+* [x] Finish Pointers
 
 ---
 

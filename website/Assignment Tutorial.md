@@ -45,6 +45,8 @@ These tests focus on specific parts of your code. The key idea is that the small
 
 The order of these tests is not arbitrary! It’s **Strongly Recommended** that you tackle them one at a time before moving onto the next, and complete each of them before moving onto stdio_tests.
 
+[[Using a Debugger]]
+
 ### stdio_tests
 
 stdio is short for “Standard Input/Output”. These tests look at the behavior of your program as a whole, which can identify errors in main() logic, I/O-formatting, or edge cases not caught by the unit tests.

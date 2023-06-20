@@ -1,16 +1,16 @@
 ```c++
-#define MIN_CAPACITY 8
+#define MIN_CAPACITY 4
 template <typename T>
 class ArrayList
 {
   private:
     int size;       // # of elements currently stored
-    int max_size;   // length of storage array
+    int capacity;   // length of storage array
     T *data;        // pointer to storage array
-    void resize(int new_max_size);
+    void resize(int new_capacity);
   public:
-    ArrayList() : size (0), max_size (MIN_CAPACITY) 
-                { data = new T[max]; } // default constructor
+    ArrayList() : size (0), capacity (MIN_CAPACITY) 
+                { data = new T[capacity]; } // default constructor
 
     //OPERATIONS
     T & operator[](int i);

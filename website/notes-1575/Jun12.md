@@ -53,9 +53,9 @@ Foo( const Foo &rhs ) : x (rhs.x), y (rhs.y), z (rhs.z)
 ```
 <!-- /include -->
 
-* [ ] garret w
-* [ ] makalyn
-* [ ] sarah
+* [x] garret w
+* [x] makalyn
+* [x] sarah
 
 ## Destructor
 
@@ -88,9 +88,9 @@ IntBox::~IntBox()  // "proper" destructor
 ```
 <!-- /include -->
 
-* [ ] tony
-* [ ] makalyn
-* [ ] kilian
+* [x] tony
+* [x] makalyn
+* [x] kilian
 
 ## Operator=
 
@@ -137,11 +137,11 @@ const IntBox& IntBox::operator=( const IntBox &rhs )
 ```
 <!-- /include -->
 
-* [ ] garret
-* [ ] jordan
-* [ ] sarah
-* [ ] kilian
-* [ ] daniel
+* [x] garret
+* [x] jordan
+* [x] sarah
+* [x] kilian
+* [x] daniel
 
 ## Copy Constructor
 
@@ -182,10 +182,10 @@ IntBox::IntBox( const IntBox &rhs )
 ```
 <!-- /include -->
 
-* [ ] duc
-* [ ] sarah
-* [ ] jordan
+* [x] duc
+* [x] sarah
+* [x] jordan
 
 As a general rule, if your class contains a pointer to a dynamically allocated object, you must overwrite **all three** of the default member functions. For classes without pointers, this is generally not necessary.
 
-* [ ] garret h
+* [x] garret h

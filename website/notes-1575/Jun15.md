@@ -13,10 +13,10 @@ Objectives:
 
 ADT Abstract Data Type -  mathematical object together with operations
 
-* [ ] matt
-* [ ] sarah
-* [ ] ryan
-* [ ] makalyn
+* [x] matt
+* [x] sarah
+* [x] ryan
+* [x] makalyn
 
 # The List Abstract Data Type
 
@@ -52,21 +52,21 @@ _Let L1 = < a, o, e, u, i >_
 * Find(L, x) -> _true_ if x is in L, _false_ otherwise
   * Find(L1, y) -> false
 
-* [ ] sarah
-* [ ] Duc
-* [ ] Dheeraj
-* [ ] tony
-* [ ] makalyn
-* [ ] makalyn
+* [x] sarah
+* [x] Duc
+* [x] Dheeraj
+* [x] tony
+* [x] makalyn
+* [x] makalyn
 
 
 What similarities exist between a List and an Array?
 Which operations do they share?
 
-* [ ] tony
-* [ ] duc
-* [ ] garret
-* [ ] daniel
+* [x] tony
+* [x] duc
+* [x] garret
+* [x] daniel
 
 Remember that an A.D.T. is a theoretical concept that has **nothing to do with C++ code**. Any structure, regardless of how it works or how it’s built, can be considered an implementation of a List as long as it can perform the above operations on a sequence of data.
 
@@ -102,7 +102,8 @@ class ArrayList
     T *data;        // pointer to storage array
     void resize(int new_max_size);
   public:
-    ArrayList() : size (0), max (MIN_CAPACITY) { data = new T[max]; }
+    ArrayList() : size (0), max_size (MIN_CAPACITY) 
+                { data = new T[max]; } // default constructor
 
     //OPERATIONS
     T & operator[](int i);
@@ -116,8 +117,8 @@ class ArrayList
 
 
 ![class diagram](arrlist-class-diagram.png)
-* [ ] garret
-* [ ] jordan
+* [x] garret
+* [x] jordan
 
 ---
 
@@ -136,8 +137,8 @@ myArrayList.size();
 ```
 
 
-* [ ] tony
-* [ ] sarah
+* [x] tony
+* [x] sarah
 
 ## Get/Set
 
@@ -156,8 +157,8 @@ T & ArrayList<T>::operator[](int i)
 }
 <!-- /include -->
 
-* [ ] ryan
-* [ ] tony
-* [ ] joran
-* [ ] duc
+* [x] ryan
+* [x] tony
+* [x] joran
+* [x] duc
 

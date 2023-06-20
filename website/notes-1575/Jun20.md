@@ -1,4 +1,103 @@
 
+
+Date: 2023-06-20
+Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=6cd0e529-5b7e-4d9a-a188-b0270138fe0d
+
+Reminders:
+* [ ] Quiz 1 due tomorrow
+
+Objectives:
+* [x] Finish ArrayList
+* [x] Exception Handling
+
+---
+
+
+
+# Default Member Functions
+
+## Destructor
+
+* [ ] garret w
+* [ ] tony
+* [ ] ryan
+* [ ] sarah
+* [ ] ben
+
+![class diagram](arraylist-diagram.png)
+
+[[examples/arraylist-destructor]]
+<!-- #include [[examples/arraylist-destructor]] -->
+```c++
+template <typename T>
+ArrayList<T>::~ArrayList()
+{
+  delete [] data;
+}
+```
+<!-- /include -->
+
+* [ ] sarah
+* [ ] tony
+* [ ] ryan
+
+## Operator=
+
+A = B;
+
+data = rhs.data;
+
+1. create new (correct-size) storage array
+2. deep copy using a loop
+3. update size and capacity
+4. return the calling obj
+
+[[examples/arraylist-assign-op]]
+<!-- #include [[examples/arraylist-assign-op]] -->
+```c++
+template <typename T>
+const ArrayList& ArrayList<T>::operator=(const ArrayList& rhs)
+{
+  if (this != &rhs)
+  {
+    T *tmp = new T[rhs.capacity];  // allocate enough space
+
+    for(int k=0; k < rhs.size; k++)
+      tmp.data[k] = rhs.data[k];  // deep copy
+
+    capacity = rhs.capacity;
+    size = rhs.size;
+    delete [] data;  // de-allocate old data
+    data = tmp;  // redirect data pointer
+  }
+
+  return (*this);  // return calling object
+}
+```
+<!-- /include -->
+
+
+
+## Copy Constructor
+
+[[examples/arraylist-copy-constructor]]
+
+* [ ] garret w
+
+<!-- #include [[examples/arraylist-copy-constructor]] -->
+```c++
+template <typename T>
+ArrayList<T>::ArrayList(const ArrayList& rhs)
+{
+  data = nullptr; // avoid dangling pointer
+  *this = rhs;    // invoke operator=
+}
+```
+<!-- /include -->
+
+
+---
+
 # Exception Handling in C++
 
 As computer scientists, we study and admire elegant and iron-clad algorithms that can be trusted to predictably arrive at the desired result. In reality, code is never so air-tight. There will always be **exceptions**, some foreseeable (_edge cases_) and others... unexpected 🐞.
@@ -14,6 +113,11 @@ There are 3 C++ keywords that are used in exception handling.
 * **catch** (type var) - defines a code block to handle an error
 
 A try-block is always followed immediately by one or more catch-blocks. When a throw statement is reached inside a try-block, the program jumps directly to a matching catch-block where the exception can be handled safely.
+
+* [ ] dheeraj
+* [ ] sarah
+* [ ] garret
+* [ ] ryan
 
 [[examples/except-basics]]
 <!-- #include [[examples/except-basics]] -->
@@ -50,11 +154,12 @@ ranges partition(float begin, float end, int p)
 ranges partition(float begin, float end, int p)
 {
   //Returns a vector of p equal partitions in range [begin, end]
+  ranges partitions;
   try {  // exception may occur in this block!
     if (p <= 0) throw p;  // throwing exception, jump to catch block!
 
     float partition_size = (end - begin) / p;
-    ranges partitions;
+
   
     pair<float, float> range;
     range.first = begin;
@@ -85,11 +190,12 @@ It is also possible to have multiple catch statements for handling different exc
 ranges partition(float begin, float end, int p)
 {
   //Returns a vector of p equal partitions in range [begin, end]
+  ranges partitions;
   try {  // exception may occur in this block!
     if (end <= begin) throw "end must be greater than begin!";
     if (p <= 0) throw p;  // throwing exception, jump to catch block!
     
-    ranges partitions;
+
     float partition_size = (end - begin) / p;
     
     pair<float, float> range;

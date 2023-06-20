@@ -8,8 +8,8 @@ void ArrayList<T>::remove(int i)
       data[k] = data[k+1];
     
     size--;
-    if( size < max / 4 )
-      resize(max / 2);
+    if( size < capacity / 4 )
+      resize(capacity / 2);
   }
   else
     // ...

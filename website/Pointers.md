@@ -10,11 +10,11 @@ Your program, and any variables it creates, live in the memory of your computer.
 You can think of memory as a continuous tape of addressable _cells_
 
 ```c++
-int x = 0; float y = 3.14; char z = 'z';
+int x; float y = 3.14; char z = 'z';
 ```
 | Addr. | 0x009 | 0x00A | 0x00B | 0x00C | ... |
 |----------|----------|----------|----------|----------|----------|
-| Value | 0 | ‘z’ | ? | 3.14 | ... |
+| Value | ? | ‘z’ | ? | 3.14 | ... |
 | Variable | x | z | | y | ... |
 
 
@@ -119,16 +119,16 @@ int main()
   int x = 3;
   const int y = 7;
 
-  int *p;
-  const int *q;
-  int const *r = &x;
-  const int const *s = &y;
+  int *p;                   // non-const ptr to non-const var
+  const int *q;             // non-const ptr to const var
+  int * const r = &x;       // const ptr to non-const var
+  const int const *s = &y;  // const ptr to const var
 
   p = &x;
   // p = &y;  INVALID
-  q = &x;
   q = &y;
-  //*q = 13;  INVALID
+  q = &x;
+  //*q = 13;  INVALID, q treats x as const when de-referenced
   *r = 4;
   //r = &y;  INVALID
   
@@ -176,7 +176,7 @@ int main()
 
 When you have a pointer to a class object, the -> operator provides a convenient way to access member variables and member functions. 
 
-```ptr -> mem``` _de-references_ **ptr**, and then accesses **mem**. This is useful because the “.” operator happens before the * (de-reference) operator in terms of precedence.
+```ptr -> mem``` _de-references_ **ptr**, and then accesses **mem**. This is useful because the “.” (access) operator happens before the * (de-reference) operator in terms of precedence.
 
 <!-- #include [[examples/ptr-class]] -->
 ```c++
@@ -226,7 +226,7 @@ Standard variables exist in a part of memory known as the **stack**. Dynamic var
 
 ## _new_ Operator
 
-(Dynamically) Allocates a new variable or array of variables and returns a pointer to it
+(Dynamically) Allocates a new variable or array of variables to the heap and returns a pointer to it
 
 ```my_pointer = new <type>``` used for dynamic variables
 
@@ -234,7 +234,7 @@ Standard variables exist in a part of memory known as the **stack**. Dynamic var
 
 ## _delete_ Operator
 
-Unlike standard variables that get removed when leaving their scope, dynamic variables can persist until the program completes. It is therefore the _programmer’s_ responsibility to clean up after themselves. the _delete_ operator must be used to de-allocate a dynamic variable.
+Unlike standard variables that get removed when leaving their scope, dynamic variables can persist indefinitely. It is therefore the _programmer’s_ responsibility to clean up after themselves. the _delete_ operator must be used to de-allocate a dynamic variable.
 
 ```delete <ptr>;```  used for dynamic variables
 
@@ -311,7 +311,7 @@ Some good rules-of-thumb to avoid pointer problems:
 * pointers should be initialized to a value or ```nullptr```
 * after de-allocating a pointer, it should be set to ```nullptr```
 
-Other issues to watch out for include **double-free** errors (deleting a pointer twice) and **shallow copies** (copying a memory address when you intended to copy the object pointed to).
+Other issues to watch out for include **double-free** errors (de-allocating the same piece of dynamic memory twice) and **shallow copies** (copying a memory address when you intended to copy the object pointed to).
 
 ## 2D-Dynamic Array
 

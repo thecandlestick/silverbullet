@@ -4,10 +4,10 @@ Date: 2023-06-13
 Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=4e414b32-af89-4e03-a634-b0200137de5c
 
 Reminders:
-* [ ] Quiz 0 Due Wednesday
+* [x] Quiz 0 Due Wednesday
 
 Objectives:
-* [ ] talk about data structures
+* [x] talk about data structures
 
 ---
 
@@ -56,13 +56,13 @@ Does this all sound kinda complicated? It can be, but don’t worry! Building ef
 
 **Stick 🏒 to the plan!** Everything’s in place for the perfect play, all that’s left is to implement! That said, no program is perfect. You can continue to iterate on these steps, further refining your algorithm, exploring a totally different high-level solution, or even changing how you represent the problem in the first place!
 
-* [ ] garret w
-* [ ] ryan
-* [ ] dheeraj
-* [ ] duc
-* [ ] sarah
-* [ ] ben w
-* [ ] garret h
-* [ ] tony
-* [ ] sarah
+* [x] garret w
+* [x] ryan
+* [x] dheeraj
+* [x] duc
+* [x] sarah
+* [x] ben w
+* [x] garret h
+* [x] tony
+* [x] sarah
       

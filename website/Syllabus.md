@@ -61,10 +61,6 @@ Your assignments in this course will be graded by an open-source autograding too
 
 ## Helpful Stuff
 
-[[Course Calendar]] 
-
-[[SS23 CS1575|Course Index]]
-
 [WSL Tutorial](https://learn.microsoft.com/en-us/training/modules/wsl/wsl-introduction/)
 
 [[Assignment Tutorial]]

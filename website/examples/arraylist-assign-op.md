@@ -7,7 +7,7 @@ const ArrayList& ArrayList<T>::operator=(const ArrayList& rhs)
     T *tmp = new T[rhs.capacity];  // allocate enough space
 
     for(int k=0; k < rhs.size; k++)
-      tmp.data[k] = rhs.data[k];  // deep copy
+      tmp[k] = rhs.data[k];  // deep copy
 
     capacity = rhs.capacity;
     size = rhs.size;

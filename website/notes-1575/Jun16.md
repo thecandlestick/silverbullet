@@ -18,18 +18,18 @@ Objectives:
 [[examples/arraylist-class]]
 <!-- #include [[examples/arraylist-class]] -->
 ```c++
-#define MIN_CAPACITY 8
+#define MIN_CAPACITY 4
 template <typename T>
 class ArrayList
 {
   private:
     int size;       // # of elements currently stored
-    int max_size;   // length of storage array
+    int capacity;   // length of storage array
     T *data;        // pointer to storage array
-    void resize(int new_max_size);
+    void resize(int new_capacity);
   public:
-    ArrayList() : size (0), max_size (MIN_CAPACITY) 
-                { data = new T[max]; } // default constructor
+    ArrayList() : size (0), capacity (MIN_CAPACITY) 
+                { data = new T[capacity]; } // default constructor
 
     //OPERATIONS
     T & operator[](int i);
@@ -88,10 +88,10 @@ T & ArrayList<T>::operator[](int i)
 <!-- #include [[examples/arraylist-resize]] -->
 ```c++
 template <typename T>
-void ArrayList<T>::resize(int new_max_size)
+void ArrayList<T>::resize(int new_capacity)
 {
   //Allocate new storage array
-  T* temp = new T[new_max_size];
+  T* temp = new T[new_capacity];
   //Perform a deep copy of the data
   for(int k=0; k < size; k++)
     temp[k] = data[k];
@@ -99,8 +99,8 @@ void ArrayList<T>::resize(int new_max_size)
   delete [] data;
   //Redirect data pointer
   data = tmp;
-  //Update max_size
-  max_size = new_max_size;
+  //Update capacity
+  capacity = new_capacity;
 }
 ```
 <!-- /include -->
@@ -136,8 +136,8 @@ void ArrayList<T>::insert(int i, const T& x)
 {
   if (0 <= i && i <= size)
   {
-    if (size == max_size)
-      resize(max_size*2);
+    if (size == capacity)
+      resize(capacity*2);
     for(int k=size; k > i; k--)
       data[k] = data[k-1];
     
@@ -174,8 +174,8 @@ void ArrayList<T>::remove(int i)
       data[k] = data[k+1];
     
     size--;
-    if( size < max_size / 4 )
-      resize(max_size / 2);
+    if( size < capacity / 4 )
+      resize(capacity / 2);
   }
   else
     // ...

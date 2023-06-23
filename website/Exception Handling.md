@@ -50,11 +50,12 @@ ranges partition(float begin, float end, int p)
 ranges partition(float begin, float end, int p)
 {
   //Returns a vector of p equal partitions in range [begin, end]
+  ranges partitions;
   try {  // exception may occur in this block!
     if (p <= 0) throw p;  // throwing exception, jump to catch block!
 
     float partition_size = (end - begin) / p;
-    ranges partitions;
+
   
     pair<float, float> range;
     range.first = begin;
@@ -85,11 +86,12 @@ It is also possible to have multiple catch statements for handling different exc
 ranges partition(float begin, float end, int p)
 {
   //Returns a vector of p equal partitions in range [begin, end]
+  ranges partitions;
   try {  // exception may occur in this block!
     if (end <= begin) throw "end must be greater than begin!";
     if (p <= 0) throw p;  // throwing exception, jump to catch block!
     
-    ranges partitions;
+
     float partition_size = (end - begin) / p;
     
     pair<float, float> range;

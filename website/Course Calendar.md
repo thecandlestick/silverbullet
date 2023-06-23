@@ -26,15 +26,15 @@ Because the summer session is only 8 weeks, the course will move very fast! Chec
 
 ## Week 3
 * M(6/19) - [[LinkedList]] ; [[PA01]] DUE 
-* T(6/20) - [[LinkedList]] ; [[PA02]] Assigned
+* T(6/20) - [[LinkedList]] 
 * W(6/21) - [[LinkedList]] ; Quiz 1 DUE
-* R(6/22) - [[Algorithm Complexity]]
-* F(6/23) - [[Algorithm Complexity]]  ; [[PA03]] Assigned
+* R(6/22) - [[Algorithm Complexity]] ; [[PA02]] Assigned
+* F(6/23) - [[Algorithm Complexity]]  ; [[PA03]] Assigned?
 
 ## Week 4
-* M(6/26) - [[Stacks & Queues]] ; Quiz 2 DUE ; [[PA02]] DUE
+* M(6/26) - [[Stacks & Queues]] ; Quiz 2 DUE
 * T(6/27) - [[Stacks & Queues]]
-* W(6/28) - [[Recursion]]
+* W(6/28) - [[Recursion]] ; [[PA02]] DUE
 * R(6/29) - [[Recursion]]
 * F(6/30) - [[Recursion]] ; [[PA03]] DUE ; [[PA04]] Assigned
 

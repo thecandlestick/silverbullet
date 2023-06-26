@@ -1,4 +1,5 @@
 ```c++
+template <typename T>
 ListNode<T>* find( const T& x )
 {
   ListNode<T> *p = m_head;

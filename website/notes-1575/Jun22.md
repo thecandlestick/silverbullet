@@ -4,10 +4,10 @@ Date: 2023-06-22
 Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=3ec00891-1e5e-4710-b85e-b0290141a4bc
 
 Reminders:
-* [ ] PA02 released
+* [x] PA02 released
 
 Objectives:
-* [ ] Continue LinkedLists
+* [x] Continue LinkedLists
 
 ---
 
@@ -47,9 +47,9 @@ const T& get(ListNode<T>* p)
   return p -> m_data;
 }
 
-* [ ] sarah
-* [ ] tony
-* [ ] Ben
+* [x] sarah
+* [x] tony
+* [x] Ben
 
 [[examples/linkedlist-get-set]]
 <!-- #include [[examples/linkedlist-get-set]] -->
@@ -72,12 +72,12 @@ void LinkedList<T>::set( ListNode<T> *p )
 [[examples/linkedlist-insert]]
 ![linked list](img/linklist-diagram.png)
 
-* [ ] duc
-* [ ] matt
-* [ ] tony
-* [ ] sarah
-* [ ] garret h
-* [ ] Ben
+* [x] duc
+* [x] matt
+* [x] tony
+* [x] sarah
+* [x] garret h
+* [x] Ben
 
 <!-- #include [[examples/linkedlist-insert]] -->
 ```c++

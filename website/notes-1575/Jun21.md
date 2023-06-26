@@ -4,10 +4,10 @@ Date: 2023-06-21
 Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=ffcaa239-eff3-480d-9141-b028013b4233
 
 Reminders:
-* [ ] Quiz 1 due tonight
+* [x] Quiz 1 due tonight
 
 Objectives:
-* [ ] start LinkedList 
+* [x] start LinkedList 
 
 ---
 
@@ -57,10 +57,10 @@ void ArrayList<T>::insert(int i, const T& x)
 ```
 <!-- /include -->
 
-* [ ] garret w
-* [ ] duc
-* [ ] sarah
-* [ ] tony
+* [x] garret w
+* [x] duc
+* [x] sarah
+* [x] tony
 
 
 # LinkedList Class & Diagram
@@ -87,10 +87,10 @@ class LinkedList
 <!-- /include -->
 
 ![](img%2Flinklist-diagram.png)
-* [ ] ben
-* [ ] duc
-* [ ] matt
-* [ ] dheeraj
+* [x] ben
+* [x] duc
+* [x] matt
+* [x] dheeraj
 
 ## Constructors
 

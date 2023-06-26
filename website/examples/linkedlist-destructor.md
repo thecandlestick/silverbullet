@@ -10,6 +10,8 @@ void LinkedList<T>::clear()  //useful aux. function to have
     m_head = tmp;
     tmp = m_head -> m_next;
   }
+
+  m_size = 0;
 }
 
 template <typename T>

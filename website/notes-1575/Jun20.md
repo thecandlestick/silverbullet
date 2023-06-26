@@ -4,7 +4,7 @@ Date: 2023-06-20
 Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=6cd0e529-5b7e-4d9a-a188-b0270138fe0d
 
 Reminders:
-* [ ] Quiz 1 due tomorrow
+* [x] Quiz 1 due tomorrow
 
 Objectives:
 * [x] Finish ArrayList
@@ -18,11 +18,11 @@ Objectives:
 
 ## Destructor
 
-* [ ] garret w
-* [ ] tony
-* [ ] ryan
-* [ ] sarah
-* [ ] ben
+* [x] garret w
+* [x] tony
+* [x] ryan
+* [x] sarah
+* [x] ben
 
 ![class diagram](arraylist-diagram.png)
 
@@ -37,9 +37,9 @@ ArrayList<T>::~ArrayList()
 ```
 <!-- /include -->
 
-* [ ] sarah
-* [ ] tony
-* [ ] ryan
+* [x] sarah
+* [x] tony
+* [x] ryan
 
 ## Operator=
 
@@ -63,7 +63,7 @@ const ArrayList& ArrayList<T>::operator=(const ArrayList& rhs)
     T *tmp = new T[rhs.capacity];  // allocate enough space
 
     for(int k=0; k < rhs.size; k++)
-      tmp.data[k] = rhs.data[k];  // deep copy
+      tmp[k] = rhs.data[k];  // deep copy
 
     capacity = rhs.capacity;
     size = rhs.size;
@@ -82,7 +82,7 @@ const ArrayList& ArrayList<T>::operator=(const ArrayList& rhs)
 
 [[examples/arraylist-copy-constructor]]
 
-* [ ] garret w
+* [x] garret w
 
 <!-- #include [[examples/arraylist-copy-constructor]] -->
 ```c++
@@ -114,10 +114,10 @@ There are 3 C++ keywords that are used in exception handling.
 
 A try-block is always followed immediately by one or more catch-blocks. When a throw statement is reached inside a try-block, the program jumps directly to a matching catch-block where the exception can be handled safely.
 
-* [ ] dheeraj
-* [ ] sarah
-* [ ] garret
-* [ ] ryan
+* [x] dheeraj
+* [x] sarah
+* [x] garret
+* [x] ryan
 
 [[examples/except-basics]]
 <!-- #include [[examples/except-basics]] -->

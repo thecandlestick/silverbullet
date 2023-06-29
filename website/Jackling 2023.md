@@ -29,6 +29,10 @@ Computers of the future may take inspiration from cellular automata as a model o
 
 ---
 
+# What if the Rules were changed?
+
+https://www.dcode.fr/game-of-life
+
 # Let’s Build it Together!
 
 https://leetcode.com/problems/game-of-life/

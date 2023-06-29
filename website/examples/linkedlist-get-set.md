@@ -6,7 +6,7 @@ const T& LinkedList<T>::get( ListNode<T> *p )
 }
 
 template <typename T>
-void LinkedList<T>::set( ListNode<T> *p )
+void LinkedList<T>::set( ListNode<T> *p, const T& x )
 {
   p -> m_data = x;
 }

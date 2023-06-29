@@ -21,5 +21,7 @@
 * [[notes-1575/Jun21]]
 * [[notes-1575/Jun22]]
 * [[notes-1575/Jun23]]
+* [[notes-1575/Jun26]]
+* [[notes-1575/Jun27]]
 <!-- /query -->
 

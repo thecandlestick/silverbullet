@@ -123,5 +123,36 @@ This allows us to classify functions by their simple-and-easy-to-work-with equiv
 
 Every runtime function is Θ to only one layer of the hierarchy, and each layer represents dramatically better performance than those that come above it. 
 
+From the formal definition of Big-O and Big-theta, we can prove some useful theorems that we can use to map a large, unruly function into its place in the complexity hierarchy.
+
+If T1(n) is O(f(n)) and T2(n) is O(g(n)), then:
+* T1(n) + T2(n) is O( max(f(n), g(n)) )
+* T1(n) * T2(n) is O( f(n)*g(n) )
+
+And from those theorems:
+* A polynomial of degree k is O( n^k )
+
 ---
 ## Complexity & Data Structures
+
+For the following comparison, assume that both lists accept a ListIterator to access data with operations:
+* prev() - move to previous data element
+* next() - move to next data element
+* moveTo(i) - move to element i
+
+For get, insert, erase, assume that you have a valid ListIterator
+
+| Operation | ArrayList | LinkedList |
+|----------|----------|----------|
+| get | O(1) | O(1) |
+| prev | O(?) | O(?) |
+| next | O(?) | O(?) |
+| moveTo | O(?) | O(?) |
+| insert | O(?) | O(?) |
+| erase | O(?) | O(?) |
+
+
+What conclusions can you draw about which list to use?
+
+How might implementing LinkedList as a doubly-linked (bidirectional) list change the results?
+

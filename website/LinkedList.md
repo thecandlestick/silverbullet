@@ -84,7 +84,7 @@ const T& LinkedList<T>::get( ListNode<T> *p )
 }
 
 template <typename T>
-void LinkedList<T>::set( ListNode<T> *p )
+void LinkedList<T>::set( ListNode<T> *p, const T& x )
 {
   p -> m_data = x;
 }
@@ -134,6 +134,7 @@ Step through a [visualization](https://pythontutor.com/visualize.html#code=class
 
 <!-- #include [[examples/linkedlist-find]] -->
 ```c++
+template <typename T>
 ListNode<T>* find( const T& x )
 {
   ListNode<T> *p = m_head;

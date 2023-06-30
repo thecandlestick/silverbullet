@@ -86,7 +86,7 @@ Human-readable format:
 **Definition: (Big-theta Notation)**
 
 ```
-Given functions f(x) and g(x), we say that f(x) is Θ(g(x)) if and only if there exist positive constants C1, C2 and n0 such that for every n > n0, C1*g(n) <= f(n) <= C*g(n)
+Given functions f(x) and g(x), we say that f(x) is Θ(g(x)) if and only if there exist positive constants C1, C2 and n0 such that for every n > n0, C1*g(n) <= f(n) <= C2*g(n)
 ```
 
 Equivalently:
@@ -123,7 +123,7 @@ This allows us to classify functions by their simple-and-easy-to-work-with equiv
 
 Every runtime function is Θ to only one layer of the hierarchy, and each layer represents dramatically better performance than those that come above it. 
 
-From the formal definition of Big-O and Big-theta, we can prove some useful theorems that we can use to map a large, unruly function into its place in the complexity hierarchy.
+From the formal definition of Big-O and Big-theta, we can prove some useful theorems that we can use to map a large, unruly function into its place in the complexity hierarchy. 
 
 If T1(n) is O(f(n)) and T2(n) is O(g(n)), then:
 * T1(n) + T2(n) is O( max(f(n), g(n)) )
@@ -131,6 +131,8 @@ If T1(n) is O(f(n)) and T2(n) is O(g(n)), then:
 
 And from those theorems:
 * A polynomial of degree k is O( n^k )
+
+**Note: The theorems above also work for big-Θ**
 
 ---
 ## Complexity & Data Structures

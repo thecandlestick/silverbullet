@@ -123,6 +123,8 @@ If T1(n) is O(f(n)) and T2(n) is O(g(n)), then:
 And from those theorems:
 * A polynomial of degree k is O( n^k )
 
+**Note: these theorems also apply for big-Θ**
+
 ---
 ## Complexity & Data Structures
 

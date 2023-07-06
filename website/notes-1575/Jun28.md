@@ -68,9 +68,9 @@ Let C = 4, n0 = 1
 * 3n^2 + n is O(n^2)
 * rate-of-growth is **equal**
 
-* [ ] garret
-* [ ] dheeraj
-* [ ] ben
+* [x] garret
+* [x] dheeraj
+* [x] ben
 
 **Definition: (Big-theta Notation)**
 
@@ -112,7 +112,7 @@ This allows us to classify functions by their simple-and-easy-to-work-with equiv
 
 Every runtime function is Θ to only one layer of the hierarchy, and each layer represents dramatically better performance than those that come above it. 
 
-* [ ] dheeraj
+* [x] dheeraj
 
 From the formal definition of Big-O and Big-theta, we can prove some useful theorems that we can use to map a large, unruly function into its place in the complexity hierarchy.
 
@@ -146,13 +146,13 @@ For get, insert, erase, assume that you have a valid ListIterator
 | erase | O(n) | O(1) |
 
 
-* [ ] dheeraj
-* [ ] garret
-* [ ] sarah
-* [ ] tony
-* [ ] tony
-* [ ] doug
-* [ ] garret w
+* [x] dheeraj
+* [x] garret
+* [x] sarah
+* [x] tony
+* [x] tony
+* [x] doug
+* [x] garret w
 
 What conclusions can you draw about which list to use?
 

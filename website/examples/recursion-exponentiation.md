@@ -1,5 +1,5 @@
 ```c++
-int pow(int base, int power)
+int recursive_pow(int base, int power)
 {
   if (power == 0)
     return 1;

@@ -8,6 +8,8 @@
 ## SS23 CS1575
 
 <!-- #query page where name =~ /notes-1575/ render [[template/basic]] -->
+* [[notes-1575/Jul03]]
+* [[notes-1575/Jul05]]
 * [[notes-1575/Jun05]]
 * [[notes-1575/Jun06]]
 * [[notes-1575/Jun07]]

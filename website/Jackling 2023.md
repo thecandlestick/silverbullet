@@ -17,6 +17,11 @@ https://playgameoflife.com/lexicon/1-2-3
 url: https://www.youtube.com/watch?v=Kk2MH9O4pXY
 ```
 
+## What can a _Life_ computer do?
+
+https://codegolf.stackexchange.com/questions/11880/build-a-working-game-of-tetris-in-conways-game-of-life
+
+
 ```embed
 url: https://youtu.be/viA-HIW-2C4
 ```
@@ -32,6 +37,8 @@ Computers of the future may take inspiration from cellular automata as a model o
 # What if the Rules were changed?
 
 https://www.dcode.fr/game-of-life
+
+
 
 # Let’s Build it Together!
 

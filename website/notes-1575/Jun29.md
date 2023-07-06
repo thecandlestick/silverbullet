@@ -19,9 +19,9 @@ In this section we’ll see how some limited, minimal data structures can still 
 
 A stack is a _sequence_ of elements of the same type
 
-* [ ] sarah
-* [ ] tony
-* [ ] dheeraj
+* [x] sarah
+* [x] tony
+* [x] dheeraj
 
 One end of the sequence is designated the _top_. A stack follows a strategy of _first-in, last-out_ (FILO) where the newest data in the sequence is always the first to be removed.
 
@@ -37,10 +37,10 @@ _Let S1 = < a, o, e, u, i >_
 * pop(S) -> S’ with top element removed
   * pop(S1) -> < o, e, u, i >
 
-* [ ] garret h
-* [ ] makalyn
-* [ ] sarah
-* [ ] ben
+* [x] garret h
+* [x] makalyn
+* [x] sarah
+* [x] ben
 
 ## Applications for Stacks
 
@@ -53,9 +53,9 @@ An expression is invalid if:
 * a closing bracket ) ] } does not have a matching opening bracket
 * the string in-between a pair of matching brackets is an invalid expression
 
-* [ ] sarah
-* [ ] tony
-* [ ] dheeraj
+* [x] sarah
+* [x] tony
+* [x] dheeraj
 
  { [] }
 
@@ -155,8 +155,8 @@ Can [[ArrayList]] operations efficiently implement _top_, _push_, and _pop_?
 YES we can if we define head -> **< a0, a1, a2, ... , an >** <- tail / top
 
 ![class diagram](arraylist-diagram.png)
-* [ ] sarah
-* [ ] dheeraj
+* [x] sarah
+* [x] dheeraj
 
 ```c++
 template <typename T>

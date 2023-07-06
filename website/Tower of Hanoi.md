@@ -47,8 +47,3 @@ int main()
   TOH(5, Start, Goal, Other);
 }
 ```
-
-**Bonus**
-How many recursive calls will TOH(n, Start, Goal, Other) make? 
-What does this tell you about the size of the returned MoveList?
-Can you use that information to write a more efficient implementation?

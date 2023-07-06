@@ -4,10 +4,10 @@ Date: 2023-06-30
 Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=cfd53f40-fb59-418e-96ec-b03101371b44
 
 Reminders:
-* [ ] Quiz 3 live
+* [x] Quiz 3 live
 
 Objectives:
-* [ ] Queues
+* [x] Queues
 
 ---
 
@@ -32,11 +32,11 @@ _Let Q1 = < a, o, e, u, i >_
 * dequeue(Q) -> Q’ with front element removed
   * dequeue(Q1) -> < o, e, u, i >
 
-* [ ] sarah
-* [ ] garret h
-* [ ] doug
-* [ ] makalyn
-* [ ] garret w
+* [x] sarah
+* [x] garret h
+* [x] doug
+* [x] makalyn
+* [x] garret w
 
 
 ## Applications for Queues
@@ -58,13 +58,13 @@ Consider the following queue:
 
 Can [[ArrayList]] operations efficiently implement _front, enqueue, dequeue?_ 
 
-* [ ] sarah
-* [ ] garret w
+* [x] sarah
+* [x] garret w
 
 ![class diagram](arraylist-diagram.png)
-* [ ] makalyn
-* [ ] garret w
-* [ ] sarah
+* [x] makalyn
+* [x] garret w
+* [x] sarah
 
 How might we re-engineer the ArrayQueue to make all 3 operations into constant-time algorithms?
 
@@ -101,10 +101,10 @@ class ArrayQueue
 
 [Visualization](https://www.cs.usfca.edu/~galles/visualization/QueueArray.html)
 
-* [ ] garret w
-* [ ] makalyn
-* [ ] matt
-* [ ] sarah
+* [x] garret w
+* [x] makalyn
+* [x] matt
+* [x] sarah
 
 [[examples/arrayqueue-ops]]
 <!-- #include [[examples/arrayqueue-ops]] -->
@@ -148,13 +148,13 @@ Can [[LinkedList]] operations efficiently implement _front, enqueue, dequeue?_
 
 ![linked list](img/linklist-diagram.png)
 
-* [ ] garret w
-* [ ] sarah
+* [x] garret w
+* [x] sarah
 
 How might we re-engineer the LinkedQueue to make all 3 operations into constant-time algorithms?
 
-* [ ] dheeraj
-* [ ] duc
+* [x] dheeraj
+* [x] duc
 
 ![](img%2Flinkq-diagram.png)
 

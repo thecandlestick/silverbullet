@@ -4,20 +4,20 @@ Date: 2023-06-27
 Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=d704704f-f289-4b52-874f-b02e013d5817
 
 Reminders:
-* [ ] PA02 due TOMORROW
+* [x] PA02 due TOMORROW
 
 Objectives:
-* [ ] Continue algo complexity
+* [x] Continue algo complexity
 
 ---
 
-* [ ] sarah
-* [ ] ben n
-* [ ] tony
-* [ ] ben w
-* [ ] sarah
-* [ ] matt
-* [ ] garret w
+* [x] sarah
+* [x] ben n
+* [x] tony
+* [x] ben w
+* [x] sarah
+* [x] matt
+* [x] garret w
 
 [[examples/runtime-looping]]
 
@@ -37,8 +37,8 @@ ListNode<T>* LinkedList<T>::find( const T& x )
 }
 ```
 
-* [ ] sarah
-* [ ] tony
+* [x] sarah
+* [x] tony
 
 _let n = size of linkedlist_
 RTF : 1 + Σ(Body + Test) = 1 + size*(4 + 2) = 6n + 1
@@ -62,8 +62,8 @@ Cost of Outer : 1 + Σ(1 + 1 + Inner) = 1 + 6n^2 + 3n
 
 RTF : Tsum(n) = 6n^2 + 3n + 2
 
-* [ ] garret h
-* [ ] makalyn
+* [x] garret h
+* [x] makalyn
 
 [[examples/runtime-logarithm]]
 
@@ -95,8 +95,8 @@ n = 16
 
 RTF: TbinS(n) = lg(n)* 11 + 3
 
-* [ ] garret w
-* [ ] makalyn
+* [x] garret w
+* [x] makalyn
 
 If you want to analyze other characteristics, you just need to come up with an equivalent function representation. For example, a function that maps size of input to bytes of memory needed to produce the output would allow you to analyze memory consumption (or _space complexity_)
 

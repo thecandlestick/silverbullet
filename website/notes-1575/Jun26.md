@@ -4,11 +4,11 @@ Date: 2023-06-26
 Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=07516bf7-0b31-403d-a4dc-b02d01388f1f
 
 Reminders:
-* [ ] PA02 due wednesday
-* [ ] Quiz 2 due tonight!
+* [x] PA02 due wednesday
+* [x] Quiz 2 due tonight!
 
 Objectives:
-* [ ] intro to algorithm complexity
+* [x] intro to algorithm complexity
 
 ---
 
@@ -31,9 +31,9 @@ What differs between Algo A and Algo B?
 
 We need an objective way to take these characteristics and decide which algorithm is the _better method_ for our purposes.
 
-* [ ] sarah
-* [ ] duc
-* [ ] doug
+* [x] sarah
+* [x] duc
+* [x] doug
 
 ---
 ## Empirical vs. Analytical Testing
@@ -47,9 +47,9 @@ In order to make this a fair and objective comparison, what factors would you ne
 * benchmark
 * controlled environment
 
-* [ ] dheeraj
-* [ ] garret w
-* [ ] sarah
+* [x] dheeraj
+* [x] garret w
+* [x] sarah
 
 Some of these things aren’t so easy to ensure, and empirical testing in general is prone to producing skewed results. **Analytical testing** gives us an often more useful method of ranking the two algorithms with mathematical certainty. To do so, we first need to convert the algorithms into functions representing their performance.
 
@@ -66,7 +66,7 @@ For instance, we may have the following runtime functions for Algo A and Algo B:
   **Ta(n) = 3n^2 + 6** operations where n is the size of the input
   **Tb(n) = 0.05n^3 + 2**
 
-* [ ] ben w
+* [x] ben w
 
 _size of input_ in this context is sometimes a bit of a misnomer. What we really mean by it is anything that affects the number of operations required. This is can refer things such as the amount of data currently contained in a data structure or the number of bits in an integer input, for instance. Another consideration is that _size_ of input is not the only factor affecting runtime, two inputs of the same size can give drastically different results.
 
@@ -86,7 +86,7 @@ void ArrayList<T>::swap(int i, int j)
 How many operations? 7
 Tswap(n) = 7
 
-* [ ] tony
+* [x] tony
 
 
 [[examples/runtime-branching]]

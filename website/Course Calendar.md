@@ -50,20 +50,20 @@ Because the summer session is only 8 weeks, the course will move very fast! Chec
 * T(7/11) - [[BST]]
 * W(7/12) - [[Heap]]
 * R(7/13) - [[Heap]]
-* F(7/14) - [[Heap]] ; [[PA05]] DUE ; [[PA06]] Assigned
+* F(7/14) - [[Heap]] ; [[PA04]] 
 
 ## Week 7
 * M(7/17) - [[Maps]] ; Quiz 5 DUE
-* T(7/18) - [[Maps]]
+* T(7/18) - [[Maps]] ; [[PA05]] Assigned;
 * W(7/19) - [[Maps]]
 * R(7/20) - [[Graphs]]
-* F(7/21) - [[Graphs]] ; [[PA06]] DUE ; [[PA07]] Assigned
+* F(7/21) - [[Graphs]] ; [[PA06]] Assigned ;
 
 ## Week 8
 * M(7/24) - Quiz 6 DUE
 * T(7/25)
 * W(7/26)
 * R(7/27)
-* F(7/28) - [[PA07]] DUE ; Quiz 7 DUE
+* F(7/28) - Quiz 7 DUE ; [[PA06]] Due ; PA-Resubmit DUE
 
 F(8/4) - Final Grades Available

@@ -10,6 +10,13 @@
 <!-- #query page where name =~ /notes-1575/ render [[template/basic]] -->
 * [[notes-1575/Jul03]]
 * [[notes-1575/Jul05]]
+* [[notes-1575/Jul06]]
+* [[notes-1575/Jul07]]
+* [[notes-1575/Jul10]]
+* [[notes-1575/Jul11]]
+* [[notes-1575/Jul12]]
+* [[notes-1575/Jul13]]
+* [[notes-1575/Jul14]]
 * [[notes-1575/Jun05]]
 * [[notes-1575/Jun06]]
 * [[notes-1575/Jun07]]

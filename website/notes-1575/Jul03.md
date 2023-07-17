@@ -4,12 +4,12 @@ Date: 2023-07-03
 Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=42500e79-7aa3-4bb1-8b1a-b0340139f606
 
 Reminders:
-* [ ] Pa03 live
-* [ ] Quiz 3 is due tonight
-* [ ] no lecture tomorrow
+* [x] Pa03 live
+* [x] Quiz 3 is due tonight
+* [x] no lecture tomorrow
 
 Objectives:
-* [ ] start recursion
+* [x] start recursion
 
 ---
 
@@ -60,11 +60,11 @@ result = 1;
 for( int i = power; i > 0; i--)
   result = result * base
 
-* [ ] ben n
-* [ ] sarah
-* [ ] kilian
-* [ ] daniel
-* [ ] garret w
+* [x] ben n
+* [x] sarah
+* [x] kilian
+* [x] daniel
+* [x] garret w
   
 
 Let’s write a recursive algorithm for computing exponents
@@ -74,15 +74,15 @@ Let’s write a recursive algorithm for computing exponents
   2^n -> 2^(n/2)*2^(n/2)
   2^n -> 2^(n/2)*2^(n/2)*2
 
-* [ ] garret w
-* [ ] sarah
-* [ ] ben w
-* [ ] ben n
+* [x] garret w
+* [x] sarah
+* [x] ben w
+* [x] ben n
       
 [[examples/recursion-exponentiation]]
 <!-- #include [[examples/recursion-exponentiation]] -->
 ```c++
-int pow(int base, int power)
+int recursive_pow(int base, int power)
 {
   if (power == 0)
     return 1;
@@ -106,4 +106,4 @@ What is the time complexity of our algorithm?
 (2^3) * 2^3
 2^1 * 2^1 * 2^1
 
-* [ ] kilian
+* [x] kilian

@@ -1,4 +1,33 @@
 
+
+Date: 2023-07-17
+Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=e4de6687-2ca1-4ecc-a9b7-b04201388236
+
+Reminders:
+* [ ] Quiz 5 due tonight (trees, BST, maps)
+
+Objectives:
+* [x] Finish OOP
+* [x] Polymorphism
+
+---
+
+
+# Object Oriented Programming
+
+OOP is a _programming paradigm_ centered around the idea of organizing your code through _objects_. Objects are a coupling of data and the code that is meant to act on that data. (variables + functions)
+
+## The 3 Pillars of OOP
+
+There are three (generally) agreed upon aspects OOP design
+
+* [[Encapsulation]]
+* [[Inheritance]]
+* [[Polymorphism]]
+
+
+Different programming languages will express these ideas in different ways. Some languages may support only some aspects of OOP design, and others may be incompatible with OOP entirely.
+
 # Polymorphism in C++
 
 Poly - many 
@@ -7,6 +36,11 @@ Morph - shape
 **Definition-0:** The ability of an object to take _many shapes_
 
 ## Static vs. Dynamic Type
+
+* [ ] kilian
+* [ ] sarah
+* [ ] tony
+
 
 [[examples/poly-static-dyn-type]]
 ```c++
@@ -56,7 +90,8 @@ A common use-case for polymorphism is for representing _heterogeneous collection
 ```c++
 class FarmAnimal
 {
-  void speak() { cout << "... "; }
+  virtual void speak() { cout << "... "; }
+  int age();
 };
 
 class 🐄 : public FarmAnimal
@@ -66,7 +101,7 @@ class 🐄 : public FarmAnimal
 
 class 🐖 : public FarmAnimal
 {
-  void speak() { cout << "Oink "; }
+  virtual void speak() { cout << "Oink "; }
 };
 
 class 🐎 : public FarmAnimal
@@ -81,12 +116,18 @@ int main()
   farm[1] = new 🐖;
   farm[2] = new 🐎;
 
-  for (int k=0; k < 4; k++)
+  for (int k=0; k < 3; k++)
   {
     farm[k] -> speak();  // output: "... ... ... "
   }
 }
 ```
+
+* [ ] garret w
+* [ ] sarah
+* [ ] tony
+* [ ] dheeraj
+* [ ] garret w
 
 By default, C++ will always consider the _static type_ of an object when determining which version of a member function to call. If you want to change this, you must use the _virtual_ function qualifier.
 
@@ -115,7 +156,7 @@ class 🐮💢 : public 🐄
 int main()
 {
   FarmAnimal *my_cow = new 🐮💢;
-  my_cow -> speak();  // output: 
+  my_cow -> speak();  // output: Grr! 
 }
 ```
 
@@ -130,7 +171,7 @@ When working with polymorphic classes, it is important to always make destructor
 class FarmAnimal
 {
   public:
-    ~FarmAnimal() {}
+    virtual ~FarmAnimal() {}
 }
 
 class 🐔 : pubic FarmAnimal
@@ -159,10 +200,16 @@ A **pure virtual function** is a function with no accompanying code body, it is 
 class FarmAnimal
 {
   virtual void speak() = 0;  // speak is a pure virtual function 
+  int age;
 }
+
+FarmAnimal myfarmanimal; // Error!
 ```
 
 An **abstract class** is a class that has at least one _pure virtual function_. A consequence of a class being abstract is that abstract classes _cannot be instantiated_. 
+
+* [ ] tony
+* [ ] matt
 
 When inheriting from an abstract class, the derived type will be abstract unless _ALL_ pure virtual functions are redefined.
 
@@ -179,3 +226,5 @@ int main()
 A class that contains _only_ pure virtual functions are known as **interfaces**. These interfaces are a powerful tool for enforcing an organizational structure for large software projects 
 
 (ex. The C++ Standard Library uses polymorphism extensively!)
+
+

@@ -25,7 +25,7 @@ A classic example of recursion is that of the _Fibonacci Sequence_
 
 Where the i-th Fibonacci number is the sum of the two previous, with the exception that the first and second numbers are _1, 1_
 
-This is so often to introduce recursion to programmers because it’s so simple. The i-th Fibonacci number is so clearly recursively defined that the algorithm practically writes itself!
+This is so often to introduce recursion to programmers because it’s simple. The i-th Fibonacci number is so clearly recursively defined that the algorithm practically writes itself!
 
 ```c++
 int fib(int i) // return the i-th Fibonacci number
@@ -52,8 +52,8 @@ However, those programmers (hopefully) then come to learn that this algorithm is
 | log(n) | logarithmic |
 | 1 | constant |
 
-* [ ] garret w
-* [ ] tony
+* [x] garret w
+* [x] tony
 
 So what gives? Why is something so quintessentially recursive in nature such a bad candidate for a recursive algorithm?
 * **Are all recursive algorithms _horribly inefficient_?** (no)
@@ -168,5 +168,5 @@ Pseudocode for the _n-Queens_ problem:
 
 Try to follow the algorithm yourself [here](http://eightqueen.becher-sundstroem.de/). Visualize each row as it’s own recursive function call and picture the call stack as you go.
 
-* [ ] tony
-* [ ] makalyn
+* [x] tony
+* [x] makalyn

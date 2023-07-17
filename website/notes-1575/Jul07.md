@@ -1,9 +1,22 @@
 
+
+Date: 2023-07-07
+Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=20a5e521-b26c-4504-a5b6-b03801462c9a
+
+Reminders:
+* [x] PA03 is due tonight
+* [x] quiz4 due monday
+
+Objectives:
+* [x] start discussion of Trees
+
+---
+
 Trees are a very special mathematical object that have inspired many data structures and algorithms. Trees appear all throughout the field of computer science in the most unexpected of places.
 
 # 🌲 and Me: an introduction
 
-Trees consist of **nodes** and **edges**. Nodes represent individual elements and edges form connections between them. For those familiar with graph theory, a Tree is a special case of [[Graphs]] (specifically a _connected, undirected, acyclic graph_).
+Trees consist of **nodes** and **edges**. Nodes represent individual elements and edges form connections between them.
 
 ## Terminology
 
@@ -15,6 +28,14 @@ Trees consist of **nodes** and **edges**. Nodes represent individual elements an
 * A node with no children is called a **leaf**
 
 ![](img%2Ftree-terminology.png)
+
+<3, 5, 7, 11> // length 3
+<3, 5, 7, 9> // not valid path!
+
+* [x] garret w
+* [x] sarah
+* [x] tony
+* [x] garret h
 
 * The **degree** of a node is the number of children that it has
 * The **degree** of a tree is the highest degree of any node
@@ -37,17 +58,30 @@ There are many ways of defining the properties of Trees, but for this class we a
   * a single node is a tree
   * two trees joined by a single edge is also a tree
 
+    n nodes tree + n nodes tree + one edge
+
+    how many nodes total: 2n
+    how many edges: n-1 + (n-1) + 1 = 2n -1
+
+* [x] dheeraj
+* [x] sarah
+* [x] tony
+
 What does this tell us? _Any_ node in a tree forms a **sub-tree** with its descendants... recursion ensues!
 
 # Applications for Trees
 
 **Expression trees**
 
-[](img%2Fexpression-tree.png)
+![](img%2Fexpression-tree.png)
+
+2 * ==(3 + 4)==
+
 
 **File systems**
 
-[](img%2Fdirectory-tree.png)
+![](img%2Fdirectory-tree.png)
+
 
 **Data structures & Algorithms!**
 
@@ -57,24 +91,4 @@ _honorable mentions:_ parse trees(Theory), spanning trees(Networks), decision tr
 
 Instead of a _linear ordering_ of the data like that of the _sequence-based_ abstract data types we’ve seen before (stack, queue, list), tree-based ADT make use of a _hierarchical_ relationship. 
 
-It is common to define a general-purpose _Tree_ Abstract Data Type for interacting with data that has an inherent hierarchical structure (see: Applications for Trees). For this course, however, we will focus on _Tree-inspired_ ADT and Data Structures that can be applied to any collection of data but utilize a hierarchy for efficiency purposes
 
-## There is no order. Give me your data 🖐😐
-
-Because there is no linear ordering to a tree, we need to devise algorithms for _enumerating_ the data whenever we want to traverse through it. There are a number of ways to do this and each one gives us a different _order_. 
-
-[[examples/pre-order-traversal]]
-
-
-[[examples/post-order-traversal]]
-
-
-You can experiment with these algorithms for binary trees [here](https://tree-visualizer.netlify.app/)
-
-## Special Trees
-
-A tree for optimizing _search/find_ operations
-[[BST]]
-
-A tree for optimizing _getMax/getMin_ operations
-[[Heaps]]

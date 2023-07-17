@@ -24,9 +24,16 @@ By _utility_, we mean what we want to be able to do with that data. Will we need
 
 Put another way, an ADT is a **mathematical object** together with its **operations.** Note that these concepts have nothing to do with code, the underlying details of how we store the data and make the operations function is completely programming-language-dependent and is typically tailored to the problem at hand.
 
+## ADT Covered in This Course:
+
+  * [[Lists]]
+  * [[Stacks & Queues]]
+  * [[Maps]]
+  * [[Priority Queues]]
+
 # Data Structures
 
-A **Data Structure** is a _particular implementation_ of an abstract data type. There can be, and indeed often are, many different implementations to choose from. This stems from the unfortunate but unavoidable fact that any implementation of an ADT is _always_ going to be less powerful than the mathematical object that it emulates.  (9^293945755482044628309847462244923635284048274623124545353242342340980984203489029834025664784382984702594908527345128374683498253462364758329592873645687364566834587639029348489029834239847247237929392567298750293237533898743293747823998237474798295030948809234848940320577286! is a valid integer, but can you store it in a computer?)
+A **Data Structure** is a _particular implementation_ of an abstract data type. There can be, and indeed often are, many different implementations to choose from. This stems from the unfortunate but unavoidable fact that any implementation of an ADT is _always_ going to be less powerful than the mathematical object that it emulates.  (9^2939823503094 is a valid integer, but can you store it in a computer?)
 
 We have to make concessions and consider the trade-offs between different data structures in order to build efficient and scalable programs. Which operations should we optimize? Do we care more about speed or memory-usage? Navigating these questions and choosing the right data structure for the job can mean the difference between a program finishing in seconds, hours, or never at all! 
 

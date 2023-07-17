@@ -4,11 +4,11 @@ Date: 2023-07-05
 Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=9cd3533a-e253-4016-8646-b036013f90af
 
 Reminders:
-* [ ] PA03 due friday
-* [ ] disregard remove function
+* [x] PA03 due friday
+* [x] disregard remove function
 
 Objectives:
-* [ ] continue recursion
+* [x] continue recursion
 
 ---
 
@@ -17,7 +17,7 @@ Objectives:
 
 <!-- #include [[examples/recursion-exponentiation]] -->
 ```c++
-int pow(int base, int power)
+int recursive_pow(int base, int power)
 {
   if (power == 0)
     return 1;
@@ -161,12 +161,12 @@ int main()
 
 
 
-* [ ] sarah
-* [ ] garret w
-* [ ] ben n
-* [ ] kilian
-* [ ] duc
-* [ ] doug
+* [x] sarah
+* [x] garret w
+* [x] ben n
+* [x] kilian
+* [x] duc
+* [x] doug
 
 ---
 # Recursion and Data Structures
@@ -200,11 +200,11 @@ LinkedList<T>* LinkedList<T>::find(const T& value)
 <!-- /include -->
 
 
-* [ ] sarah
-* [ ] duc
-* [ ] garret w
-* [ ] kilian
-* [ ] tony
+* [x] sarah
+* [x] duc
+* [x] garret w
+* [x] kilian
+* [x] tony
 
 [[examples/recursion-linkedlist-size]]
 

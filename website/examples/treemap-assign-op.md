@@ -15,7 +15,7 @@ template <typename K, typename V>
 TreeMap<K,V>& TreeMap<K,V>::operator=(const TreeMap<K,V> &rhs)
 {
   clear(m_root);
-  m_root = clone(rhs->m_root);
+  m_root = clone(rhs.m_root);
   return *this;
 }
 ```

@@ -1,30 +1,18 @@
 
-# Properties of Heaps
 
-A heap is a **complete tree** that possesses the **heap property**. A complete tree is one in which every _level_ of the tree except the last level is completely full and the last level is partially filled from left to right.
+Date: 2023-07-19
+Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=7626dd80-9968-4e72-bc60-b044014eb581
 
-Though a heap does not have to be a binary tree, binary heaps are widely studied.
+Reminders:
+* [x] PA05 is due Sunday
 
-The **min-heap property** means that given any node _N_ in the tree, _N_ is _lesser than_ all of its descendants. In a min-heap, the root node is the minimum element.
-
-The **max-heap property** means that given any node _N_ in the tree, _N_ is _greater than_ all of its descendants. In a max-heap, the root node is the maximum element.
-
-KC: Which of the following are valid heaps?
-
-![](img/balanced-tree.png)
-
----
-![](img%2Ftree4.png)
+Objectives:
+* [x] Finish Heaps
+* [x] Start Binary Heap Implementation
 
 ---
 
-![](img%2Ftree5.png)
 
----
-
-An interesting property of heaps is that they provide a **weak ordering** of the data. In informal terms, this simply means that not all elements are directly _comparable_ (nodes that are neither ancestor nor descendant are incomparable), but comparisons among elements is _transitive_ (if a > b && b > c then a > c). 
-
-This matters because for use in a priority queue, we care only about the maximum/minimum element. A weak ordering like that of a heap is cheaper to maintain than a **total ordering** that would be given by a fully sorted collection.
 
 # Building a Heap
 
@@ -39,27 +27,33 @@ DQ:
 ```
 Enqueue-Heap(x):
 
-  place x at ?
+  place x at first available spot (bottom level, leftmost)
 
-  while ( ? )
-    swap ? with ?
+  while ( x > parent and x is not the root )
+    swap x with its parent
 
 ```
 
 ## Removing nodes
 
+![](img/tree4.png)
 DQ: 
-* Which node would we want to remove (for a priority queue)?
+* Which node would we want to remove (for a priority queue)? root
 * How to satisfy the _complete-tree_ property?
 * How to satisfy the _heap_ property?
 
+  * [x] tony
+  * [x] garret w
+  * [x] sarah
+  * [x] ben w
+
 ```
-Dequeue-Heap(x):
+Dequeue-Heap():
 
-  replace ? with ?
+  replace root with bottom rightmost node
 
-  while ( ? )
-    swap ? with ?
+  while ( root is greater than its children )
+    swap root with smallest child
 
 ```
 
@@ -72,11 +66,16 @@ DQ:
 ```
 Sift-Down(x):
 
-  while (?)
-    swap ? with ?
+  while ( x is greater than its children )
+    swap x with smallest child
 
 
-Heapify collection by applying Sift-Down to each node, starting from the bottom
+Heapify(root):
+
+  Sift-Down(root)
+
+  for each child:
+    Sift-Down(child)
 ```
 
 
@@ -92,13 +91,19 @@ It is possible to make an array-based representation for any arbitrary tree, but
 
 ## Indexing Schemes
 
+* [x] sarah
+* [x] tony
+* [x] garret h
+* [x] sarah
+* [x] matt
+
 Given the i-th element of a binary heap (the element at index i),
 
 Can you give a formula for the following?
 
   *  index of left-child : 2*i + 1
   *  index of right-child : 2*i + 2
-  *  index of parent : (i-1)/2
+  *  index of parent : (i-1) / 2 (integer division)
 
 Challenge: Can you generalize these for heaps of degree 3 or degree n?
 
@@ -107,3 +112,39 @@ This gives us the ability to navigate our array-based heap in the same way that 
 ## C++ implementation for Binary Heap
   [[BinaryHeap]]
 
+
+# Class & Diagram
+
+[[examples/binheap-class]]
+<!-- #include [[examples/binheap-class]] -->
+```c++
+template <typename T>
+class MaxBinaryHeap : public ArrayList<T>
+{
+  private:
+    void siftDown(int start_index);
+  public:
+    void push(const T& val);
+    void pop();
+    const T& top();
+}
+```
+<!-- /include -->
+![class diagram](arraylist-diagram.png)
+
+The fast random-access provided by an [[ArrayList]] is sufficient for implementing a heap/priority-queue.
+
+---
+# Operations
+
+## GetMax (top)
+[[examples/binheap-top]]
+<!-- #include [[examples/binheap-top]] -->
+```c++
+template <typename T>
+const T& MaxBinaryHeap<T>::top()
+{
+  return m_data[0];
+}
+```
+<!-- /include -->

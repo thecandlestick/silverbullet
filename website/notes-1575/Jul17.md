@@ -4,7 +4,7 @@ Date: 2023-07-17
 Recording: https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=e4de6687-2ca1-4ecc-a9b7-b04201388236
 
 Reminders:
-* [ ] Quiz 5 due tonight (trees, BST, maps)
+* [x] Quiz 5 due tonight (trees, BST, maps)
 
 Objectives:
 * [x] Finish OOP
@@ -37,9 +37,9 @@ Morph - shape
 
 ## Static vs. Dynamic Type
 
-* [ ] kilian
-* [ ] sarah
-* [ ] tony
+* [x] kilian
+* [x] sarah
+* [x] tony
 
 
 [[examples/poly-static-dyn-type]]
@@ -123,11 +123,11 @@ int main()
 }
 ```
 
-* [ ] garret w
-* [ ] sarah
-* [ ] tony
-* [ ] dheeraj
-* [ ] garret w
+* [x] garret w
+* [x] sarah
+* [x] tony
+* [x] dheeraj
+* [x] garret w
 
 By default, C++ will always consider the _static type_ of an object when determining which version of a member function to call. If you want to change this, you must use the _virtual_ function qualifier.
 
@@ -208,8 +208,8 @@ FarmAnimal myfarmanimal; // Error!
 
 An **abstract class** is a class that has at least one _pure virtual function_. A consequence of a class being abstract is that abstract classes _cannot be instantiated_. 
 
-* [ ] tony
-* [ ] matt
+* [x] tony
+* [x] matt
 
 When inheriting from an abstract class, the derived type will be abstract unless _ALL_ pure virtual functions are redefined.
 

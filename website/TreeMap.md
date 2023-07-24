@@ -14,7 +14,9 @@ class MapNode
   
   public:
     MapNode(K key, V val) : 
-      m_key(key), m_value(value), m_left(nullptr), m_right(nullptr) {}
+      m_key(key), m_value(val), m_left(nullptr), m_right(nullptr) {}
+    MapNode(K key, V val, MapNode<K,V>* left, MapNode<K,V>* right) :
+      m_key(key), m_value(val), m_left(left), m_right(right) {}
 
 };
 ```
@@ -28,7 +30,7 @@ class TreeMap
 
   public:
     MapNode* find(MapNode<K,V>* root, K key);
-    V& at(MapNode<K,V>*& root, K key);
+    V& at(MapNode<K,V>* root, K key);
     MapNode* getMin(MapNode<K,V>* root);
     MapNode* getMax(MapNode<K,V>* root);
     void insert(MapNode<K,V>*& root, K key, V val);

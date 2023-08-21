@@ -1,14 +1,118 @@
 
 |  |  |  |  |
 |----------|----------|----------|----------|
-| [[SS23 CS1575|Home]] | [[Course Calendar|Calendar]] | [[Syllabus]] | [[Lecture Notes]] |
+| [[CS1575|Home]] | [[Course Calendar|Calendar]] | [[Syllabus]] | [[Lecture Notes]] |
 
 ---
 
 
-# Course Calendar / Schedule of Topics
+# Course Calendar
 
-Because the summer session is only 8 weeks, the course will move very fast! Check back here often for deadlines and materials
+Below is the official calendar of assignments. Up-to-date deadlines for all 1575 assignments will be maintained here
+
+| Date | Assignments |
+|----------|----------|
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+| Mon | - |
+| Tue | - |
+| Wed | - |
+| Thu | - |
+| Fri | - |
+
+
+# Schedule of Topics
+
+Below is a loose order for the units covered in this course. Reading relevant textbook sections prior to class is not required, but highly recommended.
+
+* [[C++ Review]]
+* [[Pointers]]
+* [[OOP]]
+* [[Exception Handling]]
+* [[Data Structures]]
+* [[ArrayList]]
+* [[LinkedList]]
+* [[Algorithm Complexity]]
+* [[Stacks & Queues]]
+* [[Recursion]]
+* [[BST]]
+* [[Heaps]]
+* [[HashMap]]
+* [[Graphs]]
+* BONUS!!! 🤑
 
 ## Week 1
 * M(6/5) - [[Syllabus]] ;  [[PA00]] Assigned

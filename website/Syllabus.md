@@ -1,7 +1,7 @@
 
 |  |  |  |  |
 |----------|----------|----------|----------|
-| [[SS23 CS1575|Home]] | [[Course Calendar|Calendar]] | [[Syllabus]] | [[Lecture Notes]] |
+| [[CS1575|Home]] | [[Course Calendar|Calendar]] | [[Syllabus]] | [[Lecture Notes]] |
 
 ---
 
@@ -9,41 +9,26 @@
 email: jackmanhardt@mst.edu
 
 ## Meeting Times
-12:40pm - 1:40pm M-F
-Zoom Link: https://umsystem.zoom.us/j/99894801988?pwd=UzV3U1FXVlJIRXB5U1dVekQ4azhYQT09
-
+1pm - 1:50pm M/W/F (CS 120)
 
 ## Office Hours
-1:40pm - 3:00pm M-F
-Individual meetings by appointment
+2pm - 3pm M/W (CS 213)
+3pm - 4pm T/R (CS 213)
+
+Individual meetings by email appointment
 
 ---
 
-# Grading
-The number and weighting of assignments is tentative and may change
-
-Homework - 700 points
-Weekly Quizzes - 240 points
-Syllabus Quiz - 60 points
-_Total: 1000 points_
-
 ## Assignments
-There will be 8 total homework assignments, primarily C++ coding-based. Your lowest homework score will be dropped.
+Homework will be primarily C++ coding-based, with the amount of assignments dependent on the speed of content covered. Your lowest homework score will be dropped.
+
+Instead of large quizzes or exams, in-class assignments will be spread out to short, daily knowledge-checks. You will need to bring some form of internet-capable device to the lectures for this purpose.
 
 There is _no_ midterm exam and _no_ final exam
 
 ## Extra Credit
-There will be daily opportunities for extra credit, all requiring attendance and participation at the lecture.
 
-You may earn a maximum of 10 extra credit points per week, with no limit on daily or total amount earned. **Two or more unexcused absences during a week will forfeit any extra credit earned**, please email prior to class for exemptions.
-
-The following actions are worth 2 points each:
-* Answering a knowledge-check in class _(don’t have to be correct)_
-* Participating in a discussion question
-* Correctly identifying a mistake with the course material
-* Asking a high-quality question _(must be meaningful and further class understanding on a topic)_
-
-Please stay in the zoom meeting after class to claim extra credit for the day.
+There may be opportunities for extra credit at times throughout the semester, the majority of which will require in-person participation at lectures. These may take the form of discussion questions or small “pop-quizzes”
 
 ## Autograder ([grade.sh](https://gitlab.com/classroomcode/grade-sh/grade-sh))
 Your assignments in this course will be graded by an open-source autograding tool developed right here at S&T. Some exciting features include the ability to receive ==immediate feedback== on your current progress and built-in tools to help you incrementally develop your code.
@@ -61,19 +46,19 @@ Your assignments in this course will be graded by an open-source autograding too
 
 ## Helpful Stuff
 
-[WSL Tutorial](https://learn.microsoft.com/en-us/training/modules/wsl/wsl-introduction/)
-
 [[Assignment Tutorial]]
+
+[[Using a Debugger]]
 
 ---
 
 # Policies
 
 ## Attendance
-This course is online-synchronous, so regular attendance at the lectures is expected. I understand during the Summer session some students juggle work as well, so please contact me _in advance_ about schedule conflicts. Unexcused absences will drop your grade and exclude you from extra credit opportunities.
+
 
 ## Late Work
-No late work will be accepted once the assignment repositories close. Because the summer session is only 8 weeks, there will be no time for resubmissions and make-ups so please keep up with assignments and do not expect extensions.
+No late work will be accepted once the assignment repositories close. It is **highly recommended** that you start your assignments as early as possible. They are designed to be worked on one small unit at a time, with partial credit awarded accordingly.
 
 ## Academic Honesty
 All code submitted must be 100% your own work!

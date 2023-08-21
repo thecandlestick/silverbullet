@@ -1,44 +1,13 @@
 
 |  |  |  |  |
 |----------|----------|----------|----------|
-| [[SS23 CS1575|Home]] | [[Course Calendar|Calendar]] | [[Syllabus]] | [[Lecture Notes]] |
+| [[CS1575|Home]] | [[Course Calendar|Calendar]] | [[Syllabus]] | [[Lecture Notes]] |
 
 ---
 
-## SS23 CS1575
+## CS1575
 
 <!-- #query page where name =~ /notes-1575/ render [[template/basic]] -->
-* [[notes-1575/Jul03]]
-* [[notes-1575/Jul05]]
-* [[notes-1575/Jul06]]
-* [[notes-1575/Jul07]]
-* [[notes-1575/Jul10]]
-* [[notes-1575/Jul11]]
-* [[notes-1575/Jul12]]
-* [[notes-1575/Jul13]]
-* [[notes-1575/Jul14]]
-* [[notes-1575/Jul17]]
-* [[notes-1575/Jul18]]
-* [[notes-1575/Jul19]]
-* [[notes-1575/Jul20]]
-* [[notes-1575/Jul21]]
-* [[notes-1575/Jun05]]
-* [[notes-1575/Jun06]]
-* [[notes-1575/Jun07]]
-* [[notes-1575/Jun08]]
-* [[notes-1575/Jun09]]
-* [[notes-1575/Jun12]]
-* [[notes-1575/Jun13]]
-* [[notes-1575/Jun15]]
-* [[notes-1575/Jun16]]
-* [[notes-1575/Jun20]]
-* [[notes-1575/Jun21]]
-* [[notes-1575/Jun22]]
-* [[notes-1575/Jun23]]
-* [[notes-1575/Jun26]]
-* [[notes-1575/Jun27]]
-* [[notes-1575/Jun28]]
-* [[notes-1575/Jun29]]
-* [[notes-1575/Jun30]]
+
 <!-- /query -->
 

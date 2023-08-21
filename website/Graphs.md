@@ -53,9 +53,10 @@ A **cycle** is a path { v0, v1, ..., vn } where v0 == vn
 
 An _undirected_ graph is **connected** if there is a path from any vertex to any other vertex
 
-There are two definitions of _connected_ used for digraphs:
-  * A graph is **weakly connected** if for every pair of vertices _x, y_, there is either a path from _x_ to _y_ OR there is a path from _y_ to _x_
-  * A graph is **strongly connected** if for every pair of vertices _x, y_, there is a path from _x_ to _y_ AND there is a path from _y_ to _x_ 
+There are three definitions of _connected_ used for digraphs:
+  * A digraph is **weakly connected** if the underlying _undirected_ graph (the graph with edge-directions removed) is connected
+  * A digraph is **unilaterally connected** if for every pair of vertices _x, y_, there is either a path from _x_ to _y_ OR there is a path from _y_ to _x_
+  * A digraph is **strongly connected** if for every pair of vertices _x, y_, there is a path from _x_ to _y_ AND there is a path from _y_ to _x_ 
 
 
 ## Search/Traversals

@@ -26,10 +26,6 @@ Instead of large quizzes or exams, in-class assignments will be spread out to sh
 
 There is _no_ midterm exam and _no_ final exam
 
-## Extra Credit
-
-There may be opportunities for extra credit at times throughout the semester, the majority of which will require in-person participation at lectures. These may take the form of discussion questions or small “pop-quizzes”
-
 ## Autograder ([grade.sh](https://gitlab.com/classroomcode/grade-sh/grade-sh))
 Your assignments in this course will be graded by an open-source autograding tool developed right here at S&T. Some exciting features include the ability to receive ==immediate feedback== on your current progress and built-in tools to help you incrementally develop your code.
 
@@ -55,7 +51,7 @@ Your assignments in this course will be graded by an open-source autograding too
 # Policies
 
 ## Attendance
-
+You are expected to be present for all lectures. Make-ups for in-class assignments will only be considered if you notify me about your absence ahead of time.
 
 ## Late Work
 No late work will be accepted once the assignment repositories close. It is **highly recommended** that you start your assignments as early as possible. They are designed to be worked on one small unit at a time, with partial credit awarded accordingly.

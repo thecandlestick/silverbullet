@@ -1,4 +1,16 @@
 
+
+Date: 2023-08-23
+
+
+Reminders:
+* [ ]  Bring a device to class
+
+Objectives:
+* [ ] Review our C++ knowledge
+
+---
+
 # Quick Review of C++
 
 This course will use the C++ programming language for all coding assignments. _This class is programming intensive_, a strong grasp of C++ basics is expected.
@@ -342,8 +354,6 @@ int main()
   return 0;
 }
 ```
-_KC: What should be the output of the program above?_
-
 default values
 ```c++
 #include <iostream>
@@ -482,7 +492,7 @@ int main()
 }
 ```
 multidimensional arr
-![2D Array](img/two-d-arr.png)
+![2D Array](two-d-arr.png)
 <!-- /include -->
 
 
@@ -541,77 +551,4 @@ void Rectangle::set_values(int x, int y);
 void Rectangle::set_values(int x, int y) const;
 ```
 
----
-## Overloading
 
-<!-- #include [[examples/cpp-overloading]] -->
-```c++
-#include <iostream>
-using namespace std;
-
-int sum(int a, int b)
-{
-  return a+b;
-}
-
-//same function/namespace, different parameters
-double sum(double a, double b)
-{
-  return a+b;
-}
-
-int main()
-{
-  cout << sum(10, 20) << '\n'
-       << sum(1.0, 1.5) << '\n';
-  return 0;
-}
-```
-
-```c++
-//Assignment operator overload
-Fraction& Fraction::operator=(const Fraction &rhs)
-{
-  Numerator = rhs.Numerator;
-  Denominator = rhs.Denominator;
-  return (*this);
-}
-
-Fraction f, g, h;
-f = g = h;
-```
-<!-- /include -->
-
-What is ```this``` and why do we return it?
-
----
-## Templates
-
-<!-- #include [[examples/cpp-templates]] -->
-```c++
-#include <iostream>
-using namespace std;
-
-template <typename T>
-T sum(T a, T b)
-{
-  T result;
-  result = a + b;
-  return result;
-}
-
-int main()
-{
-  int i=5, j=6, k;
-  double f=2.0, g=0.5, h;
-  k=sum<int>(i, j);
-  h=sum<double>(f, g);
-
-  cout << k << endl;
-  cout << h << endl;
-  return 0;
-}
-```
-<!-- /include -->
-
-Is ```<int> / <double>``` necessary?

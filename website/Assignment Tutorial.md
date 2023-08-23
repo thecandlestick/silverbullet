@@ -9,11 +9,11 @@ An SSH key is an important security measure for your git-classes account. You’
 
 Start by opening a terminal, and run the command ```ssh-keygen```. The default options are fine for now.
 
-![broken img 💔](keygen.png)
+![generating ssh key](img/keygen.png)
 
 If you chose the default options, you can view your key with the command ```cat ~/.ssh/id_rsa.pub```
 
-![broken img 💔](key.png)
+![accessing ssh key](img/key.png)
 
 Copy the entire key and add it to your git-classes account
   **(Top Right) -> Edit Profile -> SSH Keys**
@@ -24,11 +24,11 @@ In-depth tutorial for this step [here](https://git-classes.mst.edu/help/user/ssh
 
 Once you have your SSH key added, the next step is to clone the repository. Navigate to the assignment at git-classes and copy the link found via **Clone -> Clone with SSH**
 
-![broken img 💔](clone.png)
+![git repository](img/clone.png)
 
 Now in your terminal, run the command ```git clone <paste link here>```. If all goes well, you’ll now have a folder containing all the relevant files for the assignment. If this step fails, you can try installing Git with ```sudo apt install git``` (on Ubuntu/Debian, the command may differ for other Linux distributions) or refer to the section above.
 
-![broken img 💔](clone2.png)
+![cloning repo](img/clone2.png)
 
 You can now start working on your code!
 
@@ -72,15 +72,15 @@ Once you are ready to submit, follow these steps. You can do this as many times 
 
 Start by running the command ```git status``` , you should see a listing of files that you have modified in red.
 
-![broken img 💔](status.png)
+![checking status](img/status.png)
 
 For the files containing your code, enter the command ```git add <name of file> <name of another file>```. Now when you run ```git status``` they will be marked in green.
 
-![broken img 💔](add.png)
+![adding changes](img/add.png)
 
 Finish by running the command ```git commit -m “<describe your changes>“``` Followed by ```git push```. If you’ve done everything correctly, you should now see your completed assignment in git-classes.
 
-![broken img 💔](commit-push.png)
+![submitting code](img/commit-push.png)
 
 **Notes:**
 * Do not create any additional files, use the files provided

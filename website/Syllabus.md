@@ -42,6 +42,8 @@ Your assignments in this course will be graded by an open-source autograding too
 
 ## Helpful Stuff
 
+**LEAD Session:** Tuesday 5-7pm (location TBA)
+
 [[Assignment Tutorial]]
 
 [[Using a Debugger]]

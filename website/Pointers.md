@@ -37,6 +37,8 @@ A _pointer_ is a variable that stores a memory address
 
 ## Address-of (&) Operator
 
+The & operator is used to obtain the memory address of an existing variable and is commonly used to initialize pointer variables.
+
 <!-- #include [[examples/ptr-addr-of]] -->
 ```c++
 #include <iostream>
@@ -56,6 +58,13 @@ int main()
 
 
 ## Declaration
+
+The standard syntax for declaring a pointer is
+```<type> *<ptr-name>```
+
+Note that pointers are only compatible with the specific type that they were declared for.
+
+Uninitialized pointers are dangerous and a common source of bugs, it is therefore best practice to initialize pointers to the special value **nullptr** until it is ready for use.
 
 <!-- #include [[examples/ptr-declaration]] -->
 ```c++
@@ -84,6 +93,8 @@ int main()
 
 ## De-reference (*) Operator
 
+It is important to remember that a pointer stores _only_ the memory address of an object. If you need to access the value of that object, you must use the _De-reference (*)_ operator on the pointer. 
+
 <!-- #include [[examples/ptr-dereference]] -->
 ```c++
 #include <iostream>
@@ -94,7 +105,7 @@ int main()
   int x=0; z=4;
   float y = 3.14;
 
-  int *q = &x, *s = &z;
+  int *q = &x, *s = &z;  // declaring two int-pointers, q & s 
   float *p = &y;
 
   cout << q << *q;  // <memory-address> 0
@@ -106,6 +117,7 @@ int main()
 }
 <!-- /include -->
 
+_KC: What is the value of z after the code above is executed?_
 
 ## _const_ and Pointers
 

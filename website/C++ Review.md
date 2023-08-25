@@ -14,12 +14,12 @@ This course will use the C++ programming language for all coding assignments. _T
 |examples/cpp-functions   |
 |examples/cpp-scope       |
 |examples/cpp-classes     |
-|examples/cpp-overloading |
 |examples/cpp-templates   |
 |examples/cpp-arrays      |
 |examples/cpp-operators   |
 |examples/cpp-loops       |
 |snippet/cpp-program      |
+|examples/cpp-overloading |
 <!-- /query -->
 
 
@@ -342,8 +342,6 @@ int main()
   return 0;
 }
 ```
-_KC: What should be the output of the program above?_
-
 default values
 ```c++
 #include <iostream>
@@ -482,7 +480,7 @@ int main()
 }
 ```
 multidimensional arr
-![2D Array](img/two-d-arr.png)
+![2D Array](two-d-arr.png)
 <!-- /include -->
 
 
@@ -567,22 +565,7 @@ int main()
   return 0;
 }
 ```
-
-```c++
-//Assignment operator overload
-Fraction& Fraction::operator=(const Fraction &rhs)
-{
-  Numerator = rhs.Numerator;
-  Denominator = rhs.Denominator;
-  return (*this);
-}
-
-Fraction f, g, h;
-f = g = h;
-```
 <!-- /include -->
-
-What is ```this``` and why do we return it?
 
 ---
 ## Templates
@@ -613,5 +596,3 @@ int main()
 }
 ```
 <!-- /include -->
-
-Is ```<int> / <double>``` necessary?

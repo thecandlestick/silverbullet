@@ -20,16 +20,3 @@ int main()
   return 0;
 }
 ```
-
-```c++
-//Assignment operator overload
-Fraction& Fraction::operator=(const Fraction &rhs)
-{
-  Numerator = rhs.Numerator;
-  Denominator = rhs.Denominator;
-  return (*this);
-}
-
-Fraction f, g, h;
-f = g = h;
-```

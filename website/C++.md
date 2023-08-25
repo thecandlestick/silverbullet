@@ -7,5 +7,3 @@
 [[Exception Handling]] 
 
 [[OOP]] 
-
-[[Modern C++]] 

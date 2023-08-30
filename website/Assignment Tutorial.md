@@ -1,7 +1,7 @@
 
 This is a quick-and-dirty tutorial to get you started on your assignments. Those of you in CS1585 will get more familiar with this workflow and the tools involved.
 
-**note:** you will first need access to a linux operating system and _sudo_ rights
+**note:** you will first need access to a Linux operating system and _sudo_ rights. See [[Dev Environment]] if you haven’t already
 
 ## How to obtain an SSH key
 

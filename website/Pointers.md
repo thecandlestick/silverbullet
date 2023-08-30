@@ -90,6 +90,18 @@ int main()
 }
 <!-- /include -->
 
+_KC: Which of the following is valid use of a pointer?_
+```c++
+int var1 = 42;
+char var2 = 'h';
+char *ptr1;
+int *ptr2, *ptr3;
+
+ptr1 = &var1;  // Option A
+ptr1 = &var2;  // Option B
+ptr2 = &ptr3;  // Option C
+ptr3 = var1;   // Option D
+```
 
 ## De-reference (*) Operator
 
@@ -105,7 +117,7 @@ int main()
   int x=0; z=4;
   float y = 3.14;
 
-  int *q = &x, *s = &z;  // declaring two int-pointers, q & s 
+  int *q = &x, *s = &z;
   float *p = &y;
 
   cout << q << *q;  // <memory-address> 0
@@ -120,6 +132,8 @@ int main()
 _KC: What is the value of z after the code above is executed?_
 
 ## _const_ and Pointers
+
+The _const_ keyword can be applied to pointers in two different ways. The _const_ can be applied to the type that the pointer points to, or it can be applied to the pointer itself. This gives, in total, four possible variations.
 
 <!-- #include [[examples/ptr-const]] -->
 ```c++
@@ -325,7 +339,30 @@ Some good rules-of-thumb to avoid pointer problems:
 
 Other issues to watch out for include **double-free** errors (de-allocating the same piece of dynamic memory twice) and **shallow copies** (copying a memory address when you intended to copy the object pointed to).
 
+_KC: The code below has a bug, which of the following best describes the issue?_
+
+```c++
+1. int arr_size = 24;
+2. int *ptr_1 = new int[arr_size];
+3. 
+4. for (int k = 0; k < arr_size; k++)
+5.   ptr_1[k] = k*k;
+6. 
+7. int *ptr_2 = new int[arr_size];
+8. ptr = ptr_2;
+9. delete [] ptr;
+```
+
+* A) Dangling Pointer
+* B) Invalid Assignment
+* C) Memory Leak
+* D) No Issue
+
 ## 2D-Dynamic Array
+
+Pointers can also be used to dynamically allocate multidimensional arrays. To create a NxM array of ints, a pointer-to-int-pointers allocates N int pointers, each of which allocates M ints.
+
+De-allocating a multidimensional array must be done in the opposite order. The deepest pointers have to be de-allocated first, or else memory will be leaked.
 
 <!-- #include [[examples/ptr-2d-array]] -->
 ```c++
@@ -355,9 +392,13 @@ int main()
 
 ## The _this_ pointer
 
-Every member function in C++ has a _hidden_ extra parameter added to it implicitly. It contains the memory address of the _calling object_, and can be accessed by its name, ```this```. It can be used whenever you need a function to refer to the object that called it.
+Every member function in C++ has a _hidden_ extra parameter added to it implicitly. It contains the memory address of the **calling object**, and can be accessed by its name, **this**. It can be used whenever you need a function to refer to the object that called it.
 
-```T* const this```
+```T* const this``` is the type and name of this special pointer
+
+For reference, in the line: ```myClassObj.myClassFunc()```
+
+_myClassObj_ is known as the _calling object_. It’s memory address will be stored in the special pointer _this_ and passed into _myClassFunc()_
 
 # Default Member Functions
 

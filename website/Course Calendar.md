@@ -29,7 +29,7 @@ Below is the official calendar of assignments. Up-to-date deadlines for all 1575
 * Tues - 
 * Wed -
 * Thur - 
-* Fri - 
+* Fri - [[PA00]] Due
 
 ## Week 4 (Sep 11 - Sep 15)
 * Mon -

@@ -18,26 +18,27 @@ If you’re in that situation now, then allow me to convince you to read on. If 
 Why waste time guessing when a debugger can answer that for you?
 If you only know one gdb command, make it ```backtrace```. Observe:
 
-<>
+![compiling debug version](img%2Fdebug-version.png)
+![reading debugger](img%2Fdebugger-output.png)
 
 Here I
 * Compile a debug-version of my program (g++ -g mycode.cpp)
 * Enter the debugger (gdb ./a.out)
 * Run the program (run)
 
-When it crashes, I uncross my hopeful fingers and type ```backtrace```. The debugger then informs me not only the **exact line of code where the crash happened**, but also the steps the program took to arrive there (the _call stack_). That extra context is the cherry-on-top which makes a fix even easier, and this is just one single use for a debugger!
+When it crashes, I uncross my hopeful fingers and type ```backtrace```. The debugger then informs me not only the **exact line of code where the crash happened**, but also the steps the program took to arrive there (the _call stack_). In this specific case, a little extra digging leads me to find that I’ve de-referenced a nullptr, an easy fix! That extra context is the cherry-on-top which makes a fix even easier, and this is just one single use for a debugger!
 
 # The essential commands
 
-```start / run```
+```start / run``` : begin debugging from the first line / run until a stopping point is reached
 
-```next / step```
+```next / step``` : advance one line from a stop / advance into a function on the current line
 
-```break / continue```
+```break / continue``` : set a stopping point / continue running from a stop
 
-```info locals / info args```
+```info locals / info args``` : display the values of local variables / function arguments
 
-```backtrace```
+```backtrace``` : display the call stack
 
 Other useful commands for the experienced debugger include:
 * ```list```

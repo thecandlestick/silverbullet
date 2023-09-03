@@ -30,6 +30,7 @@ Put another way, an ADT is a **mathematical object** together with its **operati
   * [[Stacks & Queues]]
   * [[Maps]]
   * [[Priority Queues]]
+  * [[Graphs]]
 
 # Data Structures
 

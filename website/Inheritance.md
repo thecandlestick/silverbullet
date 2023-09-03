@@ -26,7 +26,7 @@ class 🐩 : public 🐶
 
 _**evilllll**_
 ```c++
-class 🌭 : public 🐶, public 🌡
+class 🌭 : public 🐶, public 🌞
 {
   // multiple inheritance is possible... but ill-advised ⚠️
 };
@@ -38,7 +38,7 @@ Most company coding standards and style guides will advise against _multiple inh
 class 🌭
 {
   🐶 member1;
-  🌡member2;
+  🌞 member2;
 };
 ```
 

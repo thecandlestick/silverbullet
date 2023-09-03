@@ -148,7 +148,7 @@ int main()
   int *p;                   // non-const ptr to non-const var
   const int *q;             // non-const ptr to const var
   int * const r = &x;       // const ptr to non-const var
-  const int const *s = &y;  // const ptr to const var
+  const int * const s = &y;  // const ptr to const var
 
   p = &x;
   // p = &y;  INVALID
@@ -160,6 +160,7 @@ int main()
   
 return 0;
 }
+```
 <!-- /include -->
 
 
@@ -291,7 +292,10 @@ int main()
 
 ## Problems with Pointers
 
-**Dangling Pointers** are pointers that are used with invalid addresses
+**Dangling Pointers** are pointers that are used with invalid addresses. This can happen if the pointer is uninitialized, used after being de-allocated, or if the address being stored is unintentionally changed.
+
+**Invalid Reads/Writes** occur when pointers are used to read or write to memory that doesn’t belong to your program. It is important to note that even if the pointer stores a valid memory address, it can still perform an invalid read/write!
+
 <!-- #include [[examples/ptr-dangling]] -->
 ```c++
 #include <iostream>
@@ -313,7 +317,10 @@ int main()
 }
 <!-- /include -->
 
-**Memory Leaks** occur when dynamic memory becomes unreachable
+**Memory Leaks** occur when dynamic memory becomes unreachable. Any dynamically-allocated variable on the heap must at all times remain _anchored_ to the stack in some way, either directly via a pointer or indirectly through some chain of pointers.
+
+Once that connection is lost, it becomes (nearly) impossible to access or de-allocate that memory until the program ends.
+
 <!-- #include [[examples/ptr-mem-leak]] -->
 ```c++
 #include <iostream>
@@ -337,7 +344,7 @@ Some good rules-of-thumb to avoid pointer problems:
 * pointers should be initialized to a value or ```nullptr```
 * after de-allocating a pointer, it should be set to ```nullptr```
 
-Other issues to watch out for include **double-free** errors (de-allocating the same piece of dynamic memory twice) and **shallow copies** (copying a memory address when you intended to copy the object pointed to).
+Other issues to watch out for include **double-free** errors (de-allocating the same piece of dynamic memory twice) and **shallow copies** (copying a memory address when you intended to copy the object at that memory address).
 
 _KC: The code below has a bug, which of the following best describes the issue?_
 
@@ -349,8 +356,8 @@ _KC: The code below has a bug, which of the following best describes the issue?_
 5.   ptr_1[k] = k*k;
 6. 
 7. int *ptr_2 = new int[arr_size];
-8. ptr = ptr_2;
-9. delete [] ptr;
+8. ptr_1 = ptr_2;
+9. delete [] ptr_1;
 ```
 
 * A) Dangling Pointer

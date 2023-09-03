@@ -10,7 +10,7 @@ int main()
   int *p;                   // non-const ptr to non-const var
   const int *q;             // non-const ptr to const var
   int * const r = &x;       // const ptr to non-const var
-  const int const *s = &y;  // const ptr to const var
+  const int * const s = &y;  // const ptr to const var
 
   p = &x;
   // p = &y;  INVALID
@@ -22,3 +22,4 @@ int main()
   
 return 0;
 }
+```

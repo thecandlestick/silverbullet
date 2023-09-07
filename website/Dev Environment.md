@@ -52,3 +52,16 @@ _Note: CS 1585 students are required to set-up their own VM. If you have not com
 [Docker](https://www.docker.com/) is a tool that allows you to deploy a customized OS environment with no installation required. Provided inside the assignment repository is a _Dockerfile_ which will allow you to deploy and interact with the exact environment that your code will be graded in. This can be helpful if you do not wish to or cannot install the required packages.
 
 Experienced MacOS or WSL users may use this Dockerfile to complete the assignments if they wish, but this process is still experimental and not officially supported yet. It is highly recommended that you set up a Linux VM even if you intend to try using Docker.
+
+### For MacOS users:
+
+The class VM may experience difficulties when run on a MacOS device. In this case, you can use docker to work the assignment.
+
+You will first need to [install git](https://git-scm.com/download/mac). After which, you can follow the steps in the [[Assignment Tutorial]] to get a copy of the assignment on your personal device.
+
+Inside the assignment folder, 3 scripts are provided:
+  _docker_install.sh, docker_build.sh, docker_run.sh_
+
+Execute each of these in order, following the instructions to install docker and create a Linux container. Once successful, you will have terminal access to a Linux environment where you can run the auto-grader, complete your code and submit your assignment.
+
+These scripts will also create a shared folder between the linux environment and your personal device, which you can utilize to edit the code using whatever tools you like.

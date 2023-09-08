@@ -64,4 +64,4 @@ Inside the assignment folder, 3 scripts are provided:
 
 Execute each of these in order, following the instructions to install docker and create a Linux container. Once successful, you will have terminal access to a Linux environment where you can run the auto-grader, complete your code and submit your assignment.
 
-These scripts will also create a shared folder between the linux environment and your personal device, which you can utilize to edit the code using whatever tools you like.
+These scripts will also create a shared folder between the Linux environment and your personal device, which you can utilize to edit the code using whatever tools you like.

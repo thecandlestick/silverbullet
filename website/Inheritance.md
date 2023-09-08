@@ -127,7 +127,9 @@ int main() {
 
 ---
 
-Constructors are not technically inherited from base to derived class, but a constructor for the derived class will implicitly make a call to the constructor for the base class _before_ executing its own. 
+Constructors are not technically inherited from base to derived class, but a constructor for the derived class will implicitly make a call to the constructor for the base class _before_ executing its own. In other words, when creating an object of class GrannySmithApple below, the order of execution is:
+
+```Apple Constr. -> GreenApple Constr. -> GrannySmithApple Constr.```
 
 Which constructor gets called can be specified but defaults to the default constructor.
 
@@ -159,18 +161,23 @@ class GrannySmithApple : public GreenApple
 
 int main()
 {
-  GreenApple a(3);  // 🌳 = ?  🍎 = ?  🍏 = ?
-  GreenApple b();  // 🌳 = ?  🍎 = ?  🍏 = ?
+  GreenApple myApple(3);  // 🌳 = ?  🍎 = ?  🍏 = ?
+  GreenApple myOtherApple();  // 🌳 = ?  🍎 = ?  🍏 = ?
 
-  GrannySmithApple c();  // 🌳 = ?  🍎 = ?  🍏 = ?  👵🏻 = ?
-  GrannySmithApple d(7);  // 🌳 = ?  🍎 = ?  🍏 = ?  👵🏻 = ?
+  GrannySmithApple maternalApple(); // 🌳 = ?  🍎 = ?  🍏 = ?  👵🏻 = ?
+  GrannySmithApple paternalApple(7); // 🌳 = ?  🍎 = ?  🍏 = ?  👵🏻 = ?
 
 }
 ```
 
+_KC: 
+For variable paternalApple, what are the values of 🌳, 🍎, 🍏, 👵🏻?_
+
 ---
 
-Destructors follow a similar rule. The destructor of a derived class will implicitly make a call to the destructor of the base class _after_ executing its own.
+Destructors follow a similar rule. The destructor of a derived class will implicitly make a call to the destructor of the base class _after_ executing its own. In other words, when an object of class GrannySmithApple leaves it’s scope, the order of execution is:
+
+```~GrannySmithApple() -> ~GreenApple() -> ~Apple()```
 
 [[examples/oop-destructors]]
 ```c++

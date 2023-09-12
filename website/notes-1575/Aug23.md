@@ -19,18 +19,18 @@ This course will use the C++ programming language for all coding assignments. _T
 <!-- #query page where name =~ /cpp-/ select name order by lastModified -->
 |name                     |
 |-------------------------|
-|examples/cpp-hello-world |
-|examples/cpp-variables   |
-|examples/cpp-io          |
+|examples/cpp-arrays      |
+|examples/cpp-classes     |
 |examples/cpp-conditionals|
 |examples/cpp-functions   |
-|examples/cpp-scope       |
-|examples/cpp-classes     |
-|examples/cpp-overloading |
-|examples/cpp-templates   |
-|examples/cpp-arrays      |
-|examples/cpp-operators   |
+|examples/cpp-hello-world |
+|examples/cpp-io          |
 |examples/cpp-loops       |
+|examples/cpp-operators   |
+|examples/cpp-overloading |
+|examples/cpp-scope       |
+|examples/cpp-templates   |
+|examples/cpp-variables   |
 |snippet/cpp-program      |
 <!-- /query -->
 

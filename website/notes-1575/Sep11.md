@@ -1,4 +1,124 @@
 
+
+Date: 2023-09-11
+
+
+Reminders:
+* [ ]  pa00 extensio due tonight
+
+Objectives:
+* [ ] Finish [[Inheritance]]
+* [ ] starting [[Polymorphism]]
+
+---
+
+
+Constructors are not technically inherited from base to derived class, but a constructor for the derived class will implicitly make a call to the constructor for the base class _before_ executing its own. In other words, when creating an object of class GrannySmithApple below, the order of execution is:
+
+```Apple Constr. -> GreenApple Constr. -> GrannySmithApple Constr.```
+
+Which constructor gets called can be specified but defaults to the default constructor.
+
+[[examples/oop-constructors]]
+```c++
+class Apple
+{
+  public:
+    int 🌳, 🍎;
+    Apple() : 🌳(0), 🍎(0) {}
+    Apple(int a, int b) : 🌳(a), 🍎(b) {}
+};
+
+class GreenApple : public Apple
+{
+  public:
+    int 🍏;
+    GreenApple(int i) : 🍏(i) {}
+    GreenApple() : Apple(1,1), 🍏(1) {}
+};
+
+class GrannySmithApple : public GreenApple
+{
+  public:
+    int 👵🏻;
+    GrannySmithApple() : 👵🏻(0) {}
+    GrannySmithApple(int c) : GreenApple(c), 👵🏻(c) {}
+};
+
+int main()
+{
+  GreenApple myApple(3);  // 🌳 = ?  🍎 = ?  🍏 = ?
+  GreenApple myOtherApple();  // 🌳 = ?  🍎 = ?  🍏 = ?
+
+  GrannySmithApple maternalApple(); // 🌳 = ?  🍎 = ?  🍏 = ?  👵🏻 = ?
+  GrannySmithApple paternalApple(7); // 🌳 = ?  🍎 = ?  🍏 = ?  👵🏻 = ?
+
+}
+```
+
+_KC: 
+For variable paternalApple, what are the values of 🌳, 🍎, 🍏, 👵🏻?_
+
+---
+
+Destructors follow a similar rule. The destructor of a derived class will implicitly make a call to the destructor of the base class _after_ executing its own. In other words, when an object of class GrannySmithApple leaves it’s scope, the order of execution is:
+
+```~GrannySmithApple() -> ~GreenApple() -> ~Apple()```
+
+[[examples/oop-destructors]]
+```c++
+class Apple
+{
+  public:
+    int *orchard = new int;
+    ~Apple() { delete orchard; }
+};
+
+class GreenApple : public Apple
+{
+  public:
+    char *variety = new char[24];
+    ~GreenApple() { delete [] variety; } 
+};
+
+class GrannySmithApple : public GreenApple
+{
+  public:
+    int *exp_date = new int;
+    float *price = new float;
+    ~GrannySmithApple() { delete exp_date; delete price; }
+};
+```
+---
+
+Templates can be used to create derived classes, a template can be created as an extension of a base class, and a template can extend another template. 
+
+What is important to keep in mind is that a template is _not a class_. In order to use a template for inheritance you _must_ supply a template parameter, even if that parameter is itself a templated type.
+
+[[examples/oop-templates]]
+```c++
+template <typename T>
+class 🐈
+{
+  T cat_template;
+};
+
+class 🐈‍⬛ : public 🐈<double> {};
+
+template <typename T>
+class 🐯 : public 🐈<T>
+{
+  T tiger_template;
+}
+
+template <typename T, typename U>
+class 🦁 : public 🐈<T>
+{
+  U lion_template;
+}
+```
+
+
 # Polymorphism in C++
 
 Poly - many 
@@ -15,7 +135,11 @@ class 🐩 : public 🐶 {};
 
 int main()
 {
-  🐶 *dog_ptr = new 🐩;  // What is the type of (*dog_ptr)?
+  if (a == true_)
+    🐶 *dog_ptr = new 🐩;  // What is the type of (*dog_ptr)?
+  else
+    🐶 *dog_ptr = new 🐶;
+
 }
 ```
 
@@ -38,6 +162,7 @@ class 🐩 : public 🐶
 int main()
 {
   🐶 *dog_ptr = new 🐩;
+    🐶 *dog_ptr = new 🐶;
   dog_ptr -> sit(); // Error! *dog_ptr does not have member sit()
   dynamic_cast<🐩*>(dog_ptr) -> sit(); // Success!
 
@@ -56,12 +181,12 @@ A common use-case for polymorphism is for representing _heterogeneous collection
 ```c++
 class FarmAnimal
 {
-  void speak() { cout << "... "; }
+  virtual void speak() { cout << "... "; }
 };
 
 class 🐄 : public FarmAnimal
 {
-  void speak() { cout << "Mooo "; }
+  virtual void speak() { cout << "Mooo "; }
 };
 
 class 🐖 : public FarmAnimal
@@ -81,7 +206,7 @@ int main()
   farm[1] = new 🐖;
   farm[2] = new 🐎;
 
-  for (int k=0; k < 4; k++)
+  for (int k=0; k < 3; k++)
   {
     farm[k] -> speak();  // output: "... ... ... "
   }
@@ -181,3 +306,4 @@ int main()
 A class that contains _only_ pure virtual functions are known as **interfaces**. These interfaces are a powerful tool for enforcing an organizational structure for large software projects 
 
 (ex. The C++ Standard Library uses polymorphism extensively!)
+<!-- /include -->

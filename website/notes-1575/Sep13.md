@@ -1,4 +1,78 @@
 
+
+Date: 2023-09-13
+
+
+Reminders:
+* [ ]  [[PA01]] released
+
+Objectives:
+* [ ] Finish [[Polymorphism]]
+
+---
+
+
+
+
+### _virtual_ Destructors
+
+When working with polymorphic classes, it is important to always make destructors virtual.
+
+[[examples/poly-virt-destructor]]
+```c++
+class FarmAnimal
+{
+  public:
+    virtual ~FarmAnimal() {}
+}
+
+class 🐔 : pubic FarmAnimal
+{
+  🥚 *nest = new 🥚[3];
+  public:
+    ~🐔() { delete [] nest; }
+}
+
+int main()
+{
+  FarmAnimal *my_chicken = new 🐔;
+  delete my_chicken; // MEMORY LEAK unless ~FarmAnimal() made virtual
+}
+```
+
+## Abstract Classes
+
+Notice that in the examples given, the FarmAnimal class is never meant to be used directly. FarmAnimal::speak() is simply used as a placeholder for each of the derived classes to redefine.
+
+This is a common pattern in OOP design, and the best practice is to make this intention explicit and non-optional through the use of _pure virtual functions_.
+
+A **pure virtual function** is a function with no accompanying code body, it is only a description of a function and cannot be executed.
+
+```c++
+class FarmAnimal
+{
+  virtual void speak() = 0;  // speak is a pure virtual function 
+}
+```
+
+An **abstract class** is a class that has at least one _pure virtual function_. A consequence of a class being abstract is that abstract classes _cannot be instantiated_. 
+
+When inheriting from an abstract class, the derived type will be abstract unless _ALL_ pure virtual functions are redefined.
+
+```c++
+class 🦊 : public FarmAnimal {}
+
+int main()
+{
+  🦊 my_fox; // ERROR! cannot create object of abstract type 🦊
+}
+```
+[[examples/poly-abstract-class]]
+
+A class that contains _only_ pure virtual functions are known as **interfaces**. These interfaces are a powerful tool for enforcing an organizational structure for large software projects 
+
+(ex. The C++ Standard Library uses polymorphism extensively!)
+
 # Exception Handling in C++
 
 As computer scientists, we study and admire elegant and iron-clad algorithms that can be trusted to predictably arrive at the desired result. In reality, code is never so air-tight. There will always be **exceptions**, some foreseeable (_edge cases_) and others... unexpected 🐞.
@@ -129,102 +203,3 @@ Normally, the type of the object thrown and the type of the catch block must mat
     cout << "base class catch blocks catch derived classes too!";
   }
 ```
-
-_KC: What will be the output of the code below?_
-
-```c++
-try {
-  throw "an error has occurred";
-  cout << "A ";
-}
-
-catch( int err )
-{
-  cout << "B ";
-}
-
-catch( const char *err )
-{
-  cout << "C ";
-}
-```
-
----
-## Catch-all
-
-A useful exercise in C++ exception handling is to create a _catch-all_ block that accepts any incoming exception type.
-
-```catch( ... ) { error-handling code here }```
-
-This is commonly used in instances where you want all types of exceptions to be handled in the same way or to define a _default_ error-handling block that will catch any errors unforeseen by the programmer.
-
-**Note:** C++ will stop at the first matching _catch_ block, so if you have multiple you should always place catch( ... ) last.
-
-
----
-## Stack-unwinding
-
-try-catch pairs must be placed in the same scope as each other, but that does not apply to _throw_ statements. It’s possible to, for example, write a function that only throws exceptions and does not specify how they should be caught/handled.
-
-In this case, a throw statement will cause the exception handler to start searching through higher scopes for a corresponding catch block.
-
-[[examples/except-scope]]
-
-<!-- #include [[examples/except-scope]] -->
-```c++
-#include <vector>
-#include <utility>
-using namespace std;
-
-typedef Vector<pair<float,float>> ranges;
-
-ranges partition(float begin, float end, int p)
-{
-  //Returns a vector of p equal partitions in range [begin, end]
-  if (end <= begin) throw "end must be greater than begin!";
-  if (p <= 0) throw p;  // throwing exception, jump to catch block!
-    
-  ranges partitions;
-  float partition_size = (end - begin) / p;
-    
-  pair<float, float> range;
-  range.first = begin;
-  range.second = begin + partition_size;
-  for (int i=0; i < p; i++)
-  {
-    partitions.push_back(pair<float,float>(range));
-    range.first = range.second;
-    range.second += partition_size;
-  }
-  
-  return partitions;
-}
-
-int main()
-{
-
-  try{ // calling a function with possible exceptions
-    ranges myRanges = partition(2.0, 5.0, 4);
-  }
-  catch( ... )  // and deciding how to handle them!
-  {  
-    cout << "something went wrong!" << endl;
-  }
-
-  return 0;
-}
-```
-<!-- /include -->
-
-This is actually the more common approach to exception handling, and useful for code items intended to be used in a variety of different contexts.
-
----
-## Standard Library Exceptions
-
-The C++ standard library provides a number of preset exception types that are used in various places throughout other parts of library code. You can read about each one in more detail [here](https://en.cppreference.com/w/cpp/error/exception)
-
-```#include <exception>```
-
-![cpp standard library exceptions](img%2Fstdexcept.png)
-
-You can structure your code to accept these _exception_ objects, or create custom error objects of your own.

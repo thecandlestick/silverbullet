@@ -1,4 +1,17 @@
 
+
+Date: 2023-09-20
+
+
+Reminders:
+* [ ]  [[PA01]] due midnight
+
+Objectives:
+* [ ] introducing [[Lists]]
+
+---
+
+
 # The List Abstract Data Type
 
 A List is a _sequence_ of elements of the same type
@@ -11,7 +24,7 @@ where:
 a_i \text{ is element i in the sequence}\\
 a_0 \text{ is the \textbf{head} of the List}\\
 a_n \text{ is the \textbf{tail} of the List}\\
-n \text{ is the \textbf{size} of the List}
+n+1 \text{ is the \textbf{size} of the List}
 ```
 
 ## Operations
@@ -30,12 +43,12 @@ We shall define the following operations for the List A.D.T.:
 
 
 _KC: What will be the result of each operation below_
-* Size(L1) -> ?
-* Get(L1, 2) -> ?
-* Set(L1, 1, y) -> ?
-* Insert(L1, 1, y) -> ?
-* Erase(L1, 3) -> ?
-* Find(L1, h) -> ?
+* Size(L1) -> 5
+* Get(L1, 2) -> e
+* Set(L1, 1, y) -> < a, y, e, u, i >
+* Insert(L1, 1, y) -> <a, y, o, e, u, i >
+* Erase(L1, 3) -> < a, o, e, i >
+* Find(L1, h) -> false
 
 _Discussion Questions:_
 * What similarities exist between a List and an Array?
@@ -98,10 +111,92 @@ class List
 ## C++ standard library implementations:
 * Vector
 * List
+* forward_list
 
 ## Our Implementations:
 
 [[ArrayList]] : Array-based implementation
 
 [[LinkedList]] : Pointer-based implementation
+
+
+# ArrayList Class & Diagram
+
+The key idea behind the ArrayList/Vector is to use a dynamically-allocated _storage array_ that can be re-sized as necessary
+
+[[examples/arraylist-class]]
+<!-- #include [[examples/arraylist-class]] -->
+```c++
+#define MIN_CAPACITY 4
+template <typename T>
+class ArrayList
+{
+  private:
+    int num_elems;       // # of elements currently stored
+    int max_elems;   // length of storage array
+    T *data;        // pointer to storage array
+    void reserve(int new_capacity);
+    void shrink_to_fit();
+  public:
+    ArrayList() : num_elems (0), max_elems (MIN_CAPACITY) 
+                { data = new T[max_elems]; } // default constructor
+
+    //OPERATIONS
+    T & operator[](int index);
+    T & at(int index);
+    int size();
+    int capacity();
+    void insert(int index, const T& val);
+    void erase(int index);
+    bool find(const T& val);
+    // ... 
+};
+```
+<!-- /include -->
+
+
+![class diagram](img/arrlist-diagram.png)
+
+
+---
+
+# Operations (member functions)
+
+## Size
+
+```c++
+template <typename T>
+int ArrayList<T>::size()
+{
+  return num_elems;
+}
+
+myArrayList.size();
+```
+
+
+## Get/Set
+
+In C++ classes, Get & Set can be bundled together!
+
+[[examples/arraylist-bracket-op]]
+<!-- #include [[examples/arraylist-bracket-op]] -->
+```c++
+template <typename T>
+T & ArrayList<T>::operator[](int index)
+{
+  // warning! no bounds-checking performed
+  return data[index];
+}
+
+template <typename T>
+T & ArrayList<T>::at(int index)
+{
+  if (0 <= index && index < num_elems)
+    return data[i];
+  else
+    throw std::out_of_range("At: index out of range");
+}
+```
+<!-- /include -->
 

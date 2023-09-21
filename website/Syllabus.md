@@ -12,8 +12,8 @@ email: jackmanhardt@mst.edu
 1pm - 1:50pm M/W/F (CS 120)
 
 ## Office Hours
-2pm - 3pm M/W (CS 213)
-3pm - 4pm T/R (CS 213)
+2pm - 3pm M/W/F (CS 213)
+3pm - 4pm Tues. (CS 213)
 
 Individual meetings by email appointment
 
@@ -42,7 +42,7 @@ Your assignments in this course will be graded by an open-source autograding too
 
 ## Helpful Stuff
 
-**LEAD Session:** Tuesday 5-7pm (location TBA)
+**LEAD Session:** Tuesday 5-7pm (CS 204)
 
 [[Assignment Tutorial]]
 

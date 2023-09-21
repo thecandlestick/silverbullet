@@ -3,4 +3,5 @@ This file lists all plugs that SilverBullet will load. Run the {[Plugs: Update]}
 ```yaml
 - github:silverbulletmd/silverbullet-git/git.plug.js
 - github:silverbulletmd/silverbullet-graphview/graphview.plug.js
+- github:silverbulletmd/silverbullet-katex/katex.plug.js
 ```

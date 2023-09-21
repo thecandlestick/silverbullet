@@ -1,4 +1,4 @@
-
+ 
 {[Editor: Toggle Dark Mode]} {[Editor: Toggle Vim Mode]}
 
 [[Teaching]]
@@ -19,10 +19,16 @@
 |[[PA00]] due tonight!              |false|notes-1575/Sep08|34 |
 |pa00 extensio due tonight          |false|notes-1575/Sep11|34 |
 |[[PA01]] released                  |false|notes-1575/Sep13|34 |
+|[[PA01]] due Monday                |false|notes-1575/Sep15|34 |
+|[[PA01]] due tonight               |false|notes-1575/Sep18|34 |
+|                                   |false|notes-1575/Sep20|34 |
 |Finish C++ Review                  |false|notes-1575/Aug25|55 |
 |Continue pointers                  |false|notes-1575/Aug28|55 |
+|                                   |false|notes-1575/Sep20|55 |
 |Continue Pointers                  |false|notes-1575/Aug30|69 |
 |Finish [[Polymorphism]]            |false|notes-1575/Sep13|72 |
+|Finish Exception Handling          |false|notes-1575/Sep15|74 |
+|actually start data structures     |false|notes-1575/Sep18|75 |
 |Finish Inheritance                 |false|notes-1575/Sep08|76 |
 |Review our C++ knowledge           |false|notes-1575/Aug23|78 |
 |Pointers                           |false|notes-1575/Aug25|79 |

@@ -17,5 +17,8 @@
 * [[notes-1575/Sep08]]
 * [[notes-1575/Sep11]]
 * [[notes-1575/Sep13]]
+* [[notes-1575/Sep15]]
+* [[notes-1575/Sep18]]
+* [[notes-1575/Sep20]]
 <!-- /query -->
 

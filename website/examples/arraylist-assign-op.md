@@ -4,13 +4,13 @@ const ArrayList& ArrayList<T>::operator=(const ArrayList& rhs)
 {
   if (this != &rhs)
   {
-    T *tmp = new T[rhs.capacity];  // allocate enough space
+    T *tmp = new T[rhs.max_elems];  // allocate enough space
 
-    for(int k=0; k < rhs.size; k++)
+    for(int k=0; k < rhs.num_elems; k++)
       tmp[k] = rhs.data[k];  // deep copy
 
-    capacity = rhs.capacity;
-    size = rhs.size;
+    max_elems = rhs.max_elems;
+    num_elems = rhs.num_elems;
     delete [] data;  // de-allocate old data
     data = tmp;  // redirect data pointer
   }

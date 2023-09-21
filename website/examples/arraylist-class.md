@@ -4,19 +4,23 @@ template <typename T>
 class ArrayList
 {
   private:
-    int size;       // # of elements currently stored
-    int capacity;   // length of storage array
+    int num_elems;       // # of elements currently stored
+    int max_elems;   // length of storage array
     T *data;        // pointer to storage array
-    void resize(int new_capacity);
+    void reserve(int new_capacity);
+    void shrink_to_fit();
   public:
-    ArrayList() : size (0), capacity (MIN_CAPACITY) 
-                { data = new T[capacity]; } // default constructor
+    ArrayList() : num_elems (0), max_elems (MIN_CAPACITY) 
+                { data = new T[max_elems]; } // default constructor
 
     //OPERATIONS
-    T & operator[](int i);
-    void insert(int i, const T& x);
-    void erase(int i);
-    bool find(const T& x);
+    T & operator[](int index);
+    T & at(int index);
+    int size();
+    int capacity();
+    void insert(int index, const T& val);
+    void erase(int index);
+    bool find(const T& val);
     // ... 
 };
 ```

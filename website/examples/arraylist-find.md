@@ -1,11 +1,11 @@
 ```c++
 template <typename T>
-bool ArrayList<T>::find(const T &x)
+bool ArrayList<T>::find(const T &val)
 {
-  for(int k=0; k < size; k++)
-    if ( data[k] == x )
-      return true; // x has been found
+  for(int k=0; k < num_elems; k++)
+    if ( data[k] == val )
+      return true; // val has been found
   
-  return false;  // list does not contain x
+  return false;  // list does not contain val
 }
 ```

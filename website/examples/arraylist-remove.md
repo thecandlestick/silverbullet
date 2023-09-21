@@ -1,17 +1,17 @@
 ```c++
 template <typename T>
-void ArrayList<T>::remove(int i)
+void ArrayList<T>::erase(int index)
 {  
-  if ( 0 <= i && i < size )
+  // Bounds-checking
+  if ( 0 <= index && index < num_elems )
   {
-    for(int k=i; k < size-1 ; k++)
+    // Left-shift data to overwrite unwanted data
+    for(int k=index; k < num_elems-1 ; k++)
       data[k] = data[k+1];
     
-    size--;
-    if( size < capacity / 4 )
-      resize(capacity / 2);
+    num_elems--;
   }
   else
-    // ...
+    throw std::out_of_range("Erase: index out of range");
 }
 ```

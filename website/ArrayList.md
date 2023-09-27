@@ -47,7 +47,7 @@ These functions change the size of the storage array pointed to by _data_. They 
 
 ## Erase
 
-[[examples/arraylist-remove]]
+[[examples/arraylist-erase]]
 
 
 

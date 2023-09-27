@@ -13,7 +13,7 @@ void ArrayList<T>::insert(int index, const T& val)
       data[k] = data[k-1];
 
     // Inserting desired value
-    data[index] = x;
+    data[index] = val;
     num_elems++:
   }
   else

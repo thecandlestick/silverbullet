@@ -75,10 +75,10 @@ These functions change the size of the storage array pointed to by _data_. They 
 ```c++
 // Allocates a larger storage array
 template <typename T>
-void ArrayList<T>::reserve(int new_capacity)
+void ArrayList<T>::reserve(int new_max_elems)
 {
   //Allocate new storage array
-  T* temp = new T[new_capacity];
+  T* temp = new T[new_max_elems];
   //Perform a deep copy of the data
   for(int k=0; k < num_elems; k++)
     temp[k] = data[k];
@@ -87,7 +87,7 @@ void ArrayList<T>::reserve(int new_capacity)
   //Redirect data pointer
   data = tmp;
   //Update capacity
-  max_elems = new_capacity;
+  max_elems = new_max_elems;
 }
 
 // Releases ALL unused memory
@@ -129,7 +129,7 @@ void ArrayList<T>::insert(int index, const T& val)
       data[k] = data[k-1];
 
     // Inserting desired value
-    data[index] = val;
+    data[index] = x;
     num_elems++:
   }
   else
@@ -141,29 +141,6 @@ void ArrayList<T>::insert(int index, const T& val)
 
 ## Erase
 
-[[examples/arraylist-remove]]
+[[examples/arraylist-erase]]
 
 
-
-## Find
-
-[[examples/arraylist-find]]
-
-
-
----
-
-# Default Member Functions
-
-## Destructor
-
-[[examples/arraylist-destructor]]
-
-## Operator=
-
-[[examples/arraylist-assign-op]]
-
-## Copy Constructor
-
-[[examples/arraylist-copy-constructor]]
-<!-- /include -->

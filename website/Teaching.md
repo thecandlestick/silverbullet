@@ -15,4 +15,4 @@
 
 
 ## Past Course Archives
-![SS23 Data Structures](./archives/ss23-1575-archive.tar)
+![SS23 Data Structures](archives/ss23-1575-archive.tar)

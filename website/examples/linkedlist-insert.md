@@ -1,12 +1,12 @@
 ```c++
 template <typename T>
-void LinkedList<T>::insert(ListNode<T> *p, const T& x)
+void LinkedList<T>::insert(LinkedListIterator<T> it, const T& value)
 {
   ListNode<T> *tmp = new ListNode<T>;
-  tmp -> m_data = p -> m_data;
-  tmp -> m_next = p -> m_next;
-  p -> m_data = x;
-  p -> m_next = tmp;
-  m_size++;
+  tmp -> data = it -> data;
+  tmp -> next = it -> next;
+  it -> data = value;
+  it -> next = tmp;
+  size++;
 }
 ```

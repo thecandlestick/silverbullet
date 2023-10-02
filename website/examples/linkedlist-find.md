@@ -1,13 +1,13 @@
 ```c++
 template <typename T>
-ListNode<T>* find( const T& x )
+ListNode<T>* find( const T& value )
 {
-  ListNode<T> *p = m_head;
-  while( p -> m_next != nullptr )
+  ListNode<T> *runner = head;
+  while( runner -> next != nullptr )
   {
-    if (x == p -> m_data )
-      return p;
-    p = p -> m_next;
+    if (value == runner -> data )
+      return runner;
+    runner = runner -> next;
   }
   return nullptr;
 }

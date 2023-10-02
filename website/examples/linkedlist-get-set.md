@@ -1,13 +1,13 @@
 ```c++
 template <typename T>
-const T& LinkedList<T>::get( ListNode<T> *p )
+const T& LinkedList<T>::get( LinkedListIterator<T> it )
 {
-  return p -> m_data;
+  return it -> data;
 }
 
 template <typename T>
-void LinkedList<T>::set( ListNode<T> *p, const T& x )
+void LinkedList<T>::set( LinkedListIterator<T> it, const T& value )
 {
-  p -> m_data = x;
+  it -> data = value;
 }
 ```

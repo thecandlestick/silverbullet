@@ -3,13 +3,13 @@ template <typename T>
 const LinkedList<T>& operator=( const LinkedList<T> &rhs )
 {
   clear(); //start by emptying list
-  ListNode<T>* p = m_head;
-  ListNode<T>* q = rhs.m_head;
-  while ( q -> m_next != nullptr ) //use two pointers to deep copy
+  ListNode<T>* pos_ptr = head;
+  ListNode<T>* data_ptr = rhs.head;
+  while ( data_ptr->next != nullptr ) //use two pointers to deep copy
   {
-    insert(p, q -> m_data);
-    p = p -> m_next;
-    q = q -> m_next;
+    insert(pos_ptr, data_ptr->data);
+    pos_ptr = pos_ptr -> next;
+    data_ptr = data_ptr -> next;
   }
 }
 ```

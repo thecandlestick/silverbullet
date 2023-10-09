@@ -1,5 +1,7 @@
-Claim: **n^2 is O(3n^2 + n)**
-
+**Claim:**
+```latex
+n^2 \text{ is } O(3n^2 + n)
+```
 **Proof:**
 
 Let C = 1, n0 = 1
@@ -9,8 +11,10 @@ Let C = 1, n0 = 1
 
 _but now..._
 
-Claim: **3n^2 is O(n^2)**
-
+**Claim:**
+```latex
+3n^2 \text{ is } O(n^2)
+```
 **Proof:**
 
 Let C = 4, n0 = 1

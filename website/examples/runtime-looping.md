@@ -1,10 +1,10 @@
 ```c++
 template <typename T>
-bool ArrayList<T>::find( const T &x )
+bool ArrayList<T>::find( const T &value )
 {
   //     Init ; Test ; Update
-  for(int k=0; k < size; k++)
-    if ( data[k] == x ) // Loop Body
+  for(int k=0; k < num_elements; k++)
+    if ( data[k] == value ) // Loop Body
       return true; 
   
   return false;
@@ -15,14 +15,14 @@ RTF : Init + Σ(Body + Test + Update) = ?
 
 ```c++
 template <typename T>
-ListNode<T>* LinkedList<T>::find( const T& x )
+ListNode<T>* LinkedList<T>::find( const T& value )
 {
-  ListNode<T> *p = m_head; // 1 op
-  while( p -> m_next != nullptr )  // Test
+  ListNode<T> *p = head; // 1 op
+  while( p -> next != nullptr )  // Test
   {  // Loop Body
-    if (x == p -> m_data )
+    if (value == p -> data )
       return p;
-    p = p -> m_next;
+    p = p -> next;
   }
   return nullptr;
 }

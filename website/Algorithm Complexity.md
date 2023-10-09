@@ -24,7 +24,7 @@ One approach that we could take is **empirical testing**, in terms of speed this
 
 In order to make this a fair and objective comparison, what factors would you need to hold constant?
 
-Some of these things aren’t so easy to ensure, and empirical testing in general is prone to producing skewed results. **Analytical testing** gives us an often more useful method of ranking the two algorithms with mathematical certainty. To do so, we first need to convert the algorithms into functions representing their performance.
+Some of these things aren’t so easy to ensure, and empirical testing in general is prone to producing biased results. **Analytical testing** gives us an often more useful method of ranking the two algorithms with mathematical certainty. To do so, we first need to convert the algorithms into functions representing their performance.
 
 ---
 ## Runtime Functions
@@ -36,10 +36,14 @@ By operations, we mean any sufficiently small procedure that performs a single l
 
 For instance, we may have the following runtime functions for Algo A and Algo B:
 
-  **Ta(n) = 3n^2 + 6** operations where n is the size of the input
-  **Tb(n) = 0.05n^3 + 2**
+```latex
+  T_a(n) = 3n^2 + 6 \\
+  T_b(n) = 0.05n^3 + 2
+```
+Measuring the number of operations where _n_ is the size of the input.
 
-_size of input_ in this context is sometimes a bit of a misnomer. What we really mean by it is anything that affects the number of operations required. This is can refer things such as the amount of data currently contained in a data structure or the number of bits in an integer input, for instance. Another consideration is that _size_ of input is not the only factor affecting runtime, two inputs of the same size can give drastically different results.
+_size of input_ in this context can represent several things. What we really mean by it is anything that affects the number of operations required. This is can refer things such as the amount of data currently contained in a data structure or the number of bits in an integer input, for instance. Another consideration is that _size_ of input is not the only factor affecting runtime, two inputs of the same size can give drastically different results.
+
 
 It’s for this reason that we typically disregard the _best-case scenario_ for inputs in favor of an _average-case_ or _worst-case_.
 
@@ -71,34 +75,45 @@ The essential characteristic we need to extract from these functions is their **
 
 **Definition: (Big-O Notation)**
 
-```
-Given functions f(x) and g(x), we say that f(x) is O(g(x)) if and only if there exist positive constants C and n0 such that for every n > n0, f(n) <= C*g(n)
+```latex
+\text{Given functions f(x) and g(x),}\\
+\text{we say that f(x) is O(g(x)) if and only if there exist positive constants C and }n_0\\
+\text{such that for every }n > n_0, f(n) \leq C*g(n)
 ```
 
 Human-readable format:
 
+```latex
+\text{"f(x) is O(g(x))" means that the rate-of-growth of g(x) is}\\ \text{greater than or equal to the rate of growth of f(x),}\\ \text{when ignoring constant factors}
 ```
-"f(x) is O(g(x))" means that the rate-of-growth of g(x) is greater than or equal to the rate of growth of f(x), ignoring constant factors
-```
+
+The key to proving these properties is to remember that you can choose any positive constants that make the inequality true for a sufficiently large n value.
+
+The key to disproving these properties is to let C represent some arbitrarily high number, and then show that the inequality always becomes false for a sufficiently large n value.
 
 [[examples/big-oh-basics]]
 
 **Definition: (Big-theta Notation)**
 
-```
-Given functions f(x) and g(x), we say that f(x) is Θ(g(x)) if and only if there exist positive constants C1, C2 and n0 such that for every n > n0, C1*g(n) <= f(n) <= C2*g(n)
+```latex
+\text{Given functions f(x) and g(x),}\\
+\text{we say that f(x) is Θ(g(x)) if and only if there exist positive constants}\\
+C_1, C_2, n_0\text{ such that for every }n > n_0, C_1*g(n) \leq f(n) \leq C_2*g(n)
 ```
 
 Equivalently:
 
-```
-If f(x) is O(g(x)) and g(x) is O(f(x)), then f(x) is Θ(g(x)) and g(x) is Θ(f(x))
+```latex
+\text{If f(x) is O(g(x)) and g(x) is O(f(x)),}\\
+\Rightarrow \text{f(x) is Θ(g(x)) and g(x) is Θ(f(x))}
 ```
 
 Human-readable format:
 
-```
-"f(x) is Θ(g(x))" means that the rate-of-growth of g(x) is equal to the rate of growth of f(x), ignoring constant factors
+```latex
+\text{"f(x) is Θ(g(x))" means that the rate-of-growth of g(x) is}\\
+\text{equal to the rate of growth of f(x),}\\
+\text{when ignoring constant factors}
 ```
 
 ---

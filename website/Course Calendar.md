@@ -62,7 +62,7 @@ Below is the official calendar of assignments. Up-to-date deadlines for all 1575
 ## Week 8 (Oct 9 - Oct 13)
 * Mon -
 * Tues - 
-* Wed -
+* Wed - [[PA03]] assigned
 * Thur - 
 * Fri - 
 
@@ -71,7 +71,7 @@ Below is the official calendar of assignments. Up-to-date deadlines for all 1575
 * Tues - 
 * Wed -
 * Thur - 
-* Fri - 
+* Fri - [[PA03]] due
 
 ## Week 10 (Oct 23 - Oct 27)
 * Mon -

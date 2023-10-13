@@ -15,6 +15,7 @@
 |                                   |false|notes-1575/Aug28|34 |
 |Set up Dev Env                     |false|notes-1575/Aug30|34 |
 |                                   |false|notes-1575/Oct02|34 |
+|look for pa03                      |false|notes-1575/Oct11|34 |
 |Get [[Dev Environment]] set up asap|false|notes-1575/Sep01|34 |
 |Work on [[PA00]] due Friday        |false|notes-1575/Sep06|34 |
 |[[PA00]] due tonight!              |false|notes-1575/Sep08|34 |
@@ -32,6 +33,7 @@
 |Finish LinkedList                  |false|notes-1575/Oct02|55 |
 |Continue [[ArrayList]]             |false|notes-1575/Sep25|55 |
 |introduce [[LinkedList]]           |false|notes-1575/Sep27|55 |
+|continuing algorithm complexity    |false|notes-1575/Oct11|68 |
 |Continue Pointers                  |false|notes-1575/Aug30|69 |
 |Finish [[Polymorphism]]            |false|notes-1575/Sep13|72 |
 |continuing [[ArrayList]]           |false|notes-1575/Sep22|73 |

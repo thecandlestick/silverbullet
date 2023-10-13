@@ -80,8 +80,8 @@ ranges partition(float begin, float end, int p)
 
 It is also possible to have multiple catch statements for handling different exceptions in different ways.
 
-[[examples/except-mult-catch]]
-<!-- #include [[examples/except-mult-catch]] -->
+[[examples/except-multiple-catch]]
+<!-- #include [[examples/except-multiple-catch]] -->
 ```c++
 ranges partition(float begin, float end, int p)
 {

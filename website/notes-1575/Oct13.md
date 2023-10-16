@@ -1,4 +1,18 @@
 
+
+Date: 2023-10-13
+
+
+Reminders:
+* [ ]  [[PA03]] due next friday
+
+Objectives:
+* [ ] finish Algo Complexity
+* [ ] introduce Stack
+
+---
+
+
 # Intro to Algorithm Complexity
 
 ## Motivation
@@ -159,14 +173,45 @@ For the following comparison, assume that both lists accept a ListIterator to ac
 
 For get, insert, erase, assume that you have a valid ListIterator
 
+![ArrayList diagram](img/arrlist-diagram.png)![linked list](img/LL-diagram.png)
+<!-- #include [[examples/linkedlist-insert]] -->
+```c++
+template <typename T>
+void LinkedList<T>::insert(LinkedListIterator<T> it, const T& value)
+{
+  ListNode<T> *tmp = new ListNode<T>;
+  tmp -> data = it -> data;
+  tmp -> next = it -> next;
+  it -> data = value;
+  it -> next = tmp;
+  size++;
+}
+```
+<!-- /include -->
+
+<!-- #include [[examples/linkedlist-erase]] -->
+```c++
+template <typename T>
+void erase( LinkedListIterator<T> it )
+{
+  ListNode<T> *tmp = it -> next;
+  it -> data = tmp -> data;
+  it -> next = tmp -> next;
+  delete tmp;
+  size--;
+}
+```
+<!-- /include -->
+
+
 | Operation | ArrayList | LinkedList |
 |----------|----------|----------|
 | get | O(1) | O(1) |
-| prev | O(?) | O(?) |
-| next | O(?) | O(?) |
-| moveTo | O(?) | O(?) |
-| insert | O(?) | O(?) |
-| erase | O(?) | O(?) |
+| prev | O(1) | O(n) |
+| next | O(1) | O(1) |
+| moveTo | O(1) | O(n) |
+| insert | O(n) | O(1) |
+| erase | O(n) | O(1) |
 
 
 What conclusions can you draw about which list to use?
@@ -175,3 +220,24 @@ _KC:
 Fill in the table above for a Doubly-LinkedList. A Doubly-LinkedList uses nodes that store the memory address of the next and the previous node_
 
 
+In this section we’ll see how some limited, minimal data structures can still be a powerful tool. We’ll also see how having fewer operations can lead to enhanced performance through clever engineering
+
+# Stacks
+
+## The Abstract Data Type Stack
+
+A stack is a _sequence_ of elements of the same type
+
+One end of the sequence is designated the _top_. A stack follows a strategy of _first-in, last-out_ (FILO) where the newest data in the sequence is always the first to be removed.
+
+### Operations:
+
+_Let S1 =  **top ->** < a, o, e, u, i >_
+* top(S) -> the top element of S
+  * top(S1) -> a
+    
+* push(S, x) -> S’ with new top element, x
+  * push(S1, y) -> < y, a, o, e, u, i >
+    
+* pop(S) -> S’ with top element removed
+  * pop(S1) -> < o, e, u, i >

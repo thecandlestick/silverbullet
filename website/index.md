@@ -20,6 +20,7 @@
 |                                   |false|notes-1575/Oct09|34 |
 |look for pa03                      |false|notes-1575/Oct11|34 |
 |[[PA03]] due next friday           |false|notes-1575/Oct13|34 |
+|[[PA03]] due Friday                |false|notes-1575/Oct16|34 |
 |Get [[Dev Environment]] set up asap|false|notes-1575/Sep01|34 |
 |Work on [[PA00]] due Friday        |false|notes-1575/Sep06|34 |
 |[[PA00]] due tonight!              |false|notes-1575/Sep08|34 |
@@ -43,6 +44,7 @@
 |Continue Pointers                  |false|notes-1575/Aug30|69 |
 |Finish [[Polymorphism]]            |false|notes-1575/Sep13|72 |
 |continuing [[ArrayList]]           |false|notes-1575/Sep22|73 |
+|continue [[Stacks & Queues]]       |false|notes-1575/Oct16|74 |
 |Finish Exception Handling          |false|notes-1575/Sep15|74 |
 |actually start data structures     |false|notes-1575/Sep18|75 |
 |continue linkedlists               |false|notes-1575/Sep29|75 |

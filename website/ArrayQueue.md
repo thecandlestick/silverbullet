@@ -5,6 +5,8 @@ Consider the following queue:
 
 Can [[ArrayList]] operations efficiently implement _front, enqueue, dequeue?_ 
 
+![ArrayList diagram](img/arrlist-diagram.png)
+
 How might we re-engineer the ArrayQueue to make all 3 operations into constant-time algorithms?
 
   _front / head_ -> **< a0, a1, a2, ... , an >** <- _back / tail_ 
@@ -68,8 +70,24 @@ void ArrayQueue<T>::dequeue()
     m_front = (m_front+1) % m_capacity; //wrap around if necessary
     m_size--;
   }
-  if (m_size < 0.25*m_capacity)
+  if (m_size < 0.25*m_capacity) // free memory if nearly empty
     resize(0.5*m_capacity);
 }
 ```
 <!-- /include -->
+
+
+Consider the following queue:
+
+  _front_ -> **< a0, a1, a2, ... , an >** <- back
+
+Can [[LinkedList]] operations efficiently implement _front, enqueue, dequeue?_ 
+
+![linked list](img/LL-diagram.png)
+
+How might we re-engineer the LinkedQueue to make all 3 operations into constant-time algorithms?
+
+[[examples/linkedqueue-class]]
+
+[[examples/linkedqueue-ops]]
+

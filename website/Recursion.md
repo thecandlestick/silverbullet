@@ -66,7 +66,7 @@ int factorial(int n)
 We can also think of execution with some helpful rules-of-thumb:
 
 * Code _before_ a recursive call will resolve before anything else
-* Code _after_ a recursive call will resolve only **after all recursive calls** have returned. This means lines of code in the _initial_ call can actually be the _last_ to be executed.
+* Code _after_ a recursive call will resolve only **after all recursive calls** have returned. This means that the return statement of the _initial_ call is actually be the _last_ to be executed.
 
 ---
 # Classifying Recursion

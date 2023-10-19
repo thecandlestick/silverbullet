@@ -11,7 +11,7 @@ template <typename T>
 class LinkedQueue
 {
   private:
-    ListQueue<T> *m_sentinel;  // ptr to sentinel node
+    QueueNode<T> *m_sentinel;  // ptr to sentinel node
     int m_size;
   public:
   //OPERATIONS

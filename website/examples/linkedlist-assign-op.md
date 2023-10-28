@@ -11,5 +11,7 @@ const LinkedList<T>& operator=( const LinkedList<T> &rhs )
     pos_ptr = pos_ptr -> next;
     data_ptr = data_ptr -> next;
   }
+
+  return *this; // return calling obj
 }
 ```

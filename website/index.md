@@ -21,6 +21,10 @@
 |look for pa03                      |false|notes-1575/Oct11|34 |
 |[[PA03]] due next friday           |false|notes-1575/Oct13|34 |
 |[[PA03]] due Friday                |false|notes-1575/Oct16|34 |
+|[[PA03]] due friday                |false|notes-1575/Oct18|34 |
+|[[PA03]] due tonight               |false|notes-1575/Oct20|34 |
+|                                   |false|notes-1575/Oct23|34 |
+|                                   |false|notes-1575/Oct25|34 |
 |Get [[Dev Environment]] set up asap|false|notes-1575/Sep01|34 |
 |Work on [[PA00]] due Friday        |false|notes-1575/Sep06|34 |
 |[[PA00]] due tonight!              |false|notes-1575/Sep08|34 |
@@ -38,6 +42,8 @@
 |Finish LinkedList                  |false|notes-1575/Oct02|55 |
 |intro to Algo Complexity           |false|notes-1575/Oct04|55 |
 |Continue Algo Complexity           |false|notes-1575/Oct09|55 |
+|Continue recursion                 |false|notes-1575/Oct23|55 |
+|continue recursion                 |false|notes-1575/Oct25|55 |
 |Continue [[ArrayList]]             |false|notes-1575/Sep25|55 |
 |introduce [[LinkedList]]           |false|notes-1575/Sep27|55 |
 |continuing algorithm complexity    |false|notes-1575/Oct11|68 |
@@ -45,7 +51,9 @@
 |Finish [[Polymorphism]]            |false|notes-1575/Sep13|72 |
 |continuing [[ArrayList]]           |false|notes-1575/Sep22|73 |
 |continue [[Stacks & Queues]]       |false|notes-1575/Oct16|74 |
+|finish Queues                      |false|notes-1575/Oct18|74 |
 |Finish Exception Handling          |false|notes-1575/Sep15|74 |
+|finish queues                      |false|notes-1575/Oct20|75 |
 |actually start data structures     |false|notes-1575/Sep18|75 |
 |continue linkedlists               |false|notes-1575/Sep29|75 |
 |Finish Inheritance                 |false|notes-1575/Sep08|76 |

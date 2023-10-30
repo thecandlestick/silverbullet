@@ -1,4 +1,39 @@
 
+
+Date: 2023-10-30
+
+
+Reminders:
+  * [ ]  [[PA04]] released!
+
+Objectives:
+* [ ] introduce [[Trees]]
+
+---
+
+The **N-Queens problem** is as follows:
+  _Given a n-by-n chessboard, place n queen pieces such that no two queens can attack each other_
+
+Pseudocode for the _n-Queens_ problem:
+```
+1. try-queen(int row):
+2.   int col <- first valid column
+3.   while valid columns remaining
+4.     place i-th queen at `col`
+5.     if no more queens
+6.       return success
+7.     trial <- try-queen(i+1)
+8.     if trial is success
+9.       return success
+10.     else
+11.       retract i-th queen placement
+12.      col <- next valid column
+13.   return failure
+```
+
+Try to follow the algorithm yourself [here](http://eightqueen.becher-sundstroem.de/). Visualize each row as it’s own recursive function call and picture the call stack as you go.
+
+
 Trees are a very special mathematical object that have inspired many data structures and algorithms. Trees appear all throughout the field of computer science in the most unexpected of places.
 
 # 🌲 and Me: an introduction
@@ -37,44 +72,18 @@ There are many ways of defining the properties of Trees, but for this class we a
   * a single node is a tree
   * two trees joined by a single edge is also a tree
 
-What does this tell us? _Any_ node in a tree forms a **sub-tree** with its descendants... recursion ensues!
+What does this tell us? ==Any_ node in a tree forms a **sub-tree** with its descendants... recursion ensues!==
 
 # Applications for Trees
 
 **Expression trees**
 
-[](img%2Fexpression-tree.png)
+![](img%2Fexpression-tree.png)
 
 **File systems**
 
-[](img%2Fdirectory-tree.png)
+![](img%2Fdirectory-tree.png)
 
 **Data structures & Algorithms!**
 
 _honorable mentions:_ parse trees(Theory), spanning trees(Networks), decision trees(AI)
-
-# Trees and Data Structures
-
-Instead of a _linear ordering_ of the data like that of the _sequence-based_ abstract data types we’ve seen before (stack, queue, list), tree-based ADT make use of a _hierarchical_ relationship. 
-
-It is common to define a general-purpose _Tree_ Abstract Data Type for interacting with data that has an inherent hierarchical structure (see: Applications for Trees). For this course, however, we will focus on _Tree-inspired_ ADT and Data Structures that can be applied to any collection of data but utilize a hierarchy for efficiency purposes
-
-## Working with unordered data
-
-Because there is no linear ordering to a tree, we need to devise algorithms for _enumerating_ the data whenever we want to traverse through it. There are a number of ways to do this and each one gives us a different _order_. 
-
-[[examples/pre-order-traversal]]
-
-
-[[examples/post-order-traversal]]
-
-
-You can experiment with these algorithms for binary trees [here](https://tree-visualizer.netlify.app/)
-
-## Special Trees
-
-A tree for optimizing _search/find_ operations
-[[BST]]
-
-A tree for optimizing _getMax/getMin_ operations
-[[Heaps]]

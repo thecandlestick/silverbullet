@@ -25,6 +25,7 @@
 |[[PA03]] due tonight               |false|notes-1575/Oct20|34 |
 |                                   |false|notes-1575/Oct23|34 |
 |                                   |false|notes-1575/Oct25|34 |
+|[[PA04]] assigned                  |false|notes-1575/Oct27|34 |
 |Get [[Dev Environment]] set up asap|false|notes-1575/Sep01|34 |
 |Work on [[PA00]] due Friday        |false|notes-1575/Sep06|34 |
 |[[PA00]] due tonight!              |false|notes-1575/Sep08|34 |
@@ -49,6 +50,7 @@
 |continuing algorithm complexity    |false|notes-1575/Oct11|68 |
 |Continue Pointers                  |false|notes-1575/Aug30|69 |
 |Finish [[Polymorphism]]            |false|notes-1575/Sep13|72 |
+|finish [[Recursion]]               |false|notes-1575/Oct27|73 |
 |continuing [[ArrayList]]           |false|notes-1575/Sep22|73 |
 |continue [[Stacks & Queues]]       |false|notes-1575/Oct16|74 |
 |finish Queues                      |false|notes-1575/Oct18|74 |

@@ -38,6 +38,7 @@
 |                                   |false|notes-1575/Sep25|34 |
 |                                   |false|notes-1575/Sep27|34 |
 |PA02 due next friday               |false|notes-1575/Sep29|34 |
+|[[PA04]] released!                 |false|notes-1575/Oct30|36 |
 |Finish C++ Review                  |false|notes-1575/Aug25|55 |
 |Continue pointers                  |false|notes-1575/Aug28|55 |
 |Finish LinkedList                  |false|notes-1575/Oct02|55 |
@@ -56,6 +57,7 @@
 |finish Queues                      |false|notes-1575/Oct18|74 |
 |Finish Exception Handling          |false|notes-1575/Sep15|74 |
 |finish queues                      |false|notes-1575/Oct20|75 |
+|introduce [[Trees]]                |false|notes-1575/Oct30|75 |
 |actually start data structures     |false|notes-1575/Sep18|75 |
 |continue linkedlists               |false|notes-1575/Sep29|75 |
 |Finish Inheritance                 |false|notes-1575/Sep08|76 |

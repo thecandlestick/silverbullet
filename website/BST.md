@@ -11,7 +11,7 @@ A BST is a **binary tree** that possesses the **search property**
     * _N_ is _lesser than_ every node in the _right-subtree_
     * _N_ is _greater than_ every node in the _left-subtree_
 
-**Test yourself:** _Which of the following are valid Binary Search Trees?_
+_KC: Which of the following are valid Binary Search Trees?_
 
 ![](img%2Ftree1.png)
 

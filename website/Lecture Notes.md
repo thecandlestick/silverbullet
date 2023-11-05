@@ -12,6 +12,7 @@
 * [[notes-1575/Aug25]]
 * [[notes-1575/Aug28]]
 * [[notes-1575/Aug30]]
+* [[notes-1575/Nov03]]
 * [[notes-1575/Oct02]]
 * [[notes-1575/Oct04]]
 * [[notes-1575/Oct09]]

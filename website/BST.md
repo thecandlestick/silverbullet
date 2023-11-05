@@ -11,6 +11,7 @@ A BST is a **binary tree** that possesses the **search property**
     * _N_ is _lesser than_ every node in the _right-subtree_
     * _N_ is _greater than_ every node in the _left-subtree_
 
+
 _KC: Which of the following are valid Binary Search Trees?_
 
 ![](img%2Ftree1.png)
@@ -83,3 +84,5 @@ O(height) = O(?), where n is the number of nodes.
 
 
 When operating on a BST in a data structure, we have the opportunity to strategically add and remove nodes in a way that will maintain the balance of the tree. There are many methods of building these _self-balancing_ trees (randomized BST, scapegoat trees, treaps, Red-Black Trees, AVL trees, etc.). We will therefore make the assumption of a roughly balanced tree when utilizing a BST in our data structures.
+
+[[Honors Project]]

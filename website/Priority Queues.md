@@ -5,7 +5,7 @@ A Prioriry Queue is a collection of data, together with a _function_ mapping eac
 
 { <val1>, <val2>, ... , <val_n> }
 
-A Priority Queue differs from the standard Queue ADT follows a strategy where only the element with the **highest priority** is accessible. Since elements can be added to a Priority Queue in any order, a [[Heaps|Heap]] structure is most often used to avoid expensive searching for the highest priority.
+A Priority Queue differs from the standard Queue ADT follows a strategy where only the element with the **highest priority** is accessible. Since elements can be added to a Priority Queue in any order, a [[Heaps|Heap]] structure is most often used to organize the elements and avoid expensive searching for the highest priority.
 
 ## Operations
 

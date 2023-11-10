@@ -1,43 +1,7 @@
 # TreeMap Class & Diagram
 
 [[examples/treemap-class]]
-<!-- #include [[examples/treemap-class]] -->
-```c++
-template <typename K, typename V>
-class MapNode
-{
-  private:
-    K m_key;
-    V m_value;
-    MapNode<K,V> *m_left;
-    MapNode<K,V> *m_right;
-  
-  public:
-    MapNode(K key, V val) : 
-      m_key(key), m_value(val), m_left(nullptr), m_right(nullptr) {}
-    MapNode(K key, V val, MapNode<K,V>* left, MapNode<K,V>* right) :
-      m_key(key), m_value(val), m_left(left), m_right(right) {}
 
-};
-```
-
-```c++
-template <typename K, typename V>
-class TreeMap
-{
-  private:
-    MapNode<K,V> *m_root;
-
-  public:
-    MapNode* find(MapNode<K,V>* root, K key);
-    V& at(MapNode<K,V>* root, K key);
-    MapNode* getMin(MapNode<K,V>* root);
-    MapNode* getMax(MapNode<K,V>* root);
-    void insert(MapNode<K,V>*& root, K key, V val);
-    void erase(MapNode<K,V>*& root, K key);
-}
-```
-<!-- /include -->
 
 ![](img%2Ftreemap-diagram.png)
 
@@ -53,7 +17,7 @@ class TreeMap
 
 ## Find
 
-It makes sense to start with _find_ because we don’t directly know where everything is in a BST
+We start with _find_. We don’t directly know where everything is in a BST, so we may need this operation for other tasks as well
 
 [[examples/treemap-find]]
 
@@ -63,7 +27,7 @@ It makes sense to start with _find_ because we don’t directly know where every
 
 ## Insert
 
-KC: For args passed to functions, what is the difference between: 
+DQ: For args passed to functions, what is the difference between: 
   * MapNode *
   * MapNode *&
 
@@ -88,7 +52,7 @@ Erasing a node with 2 children:
 
 ## Destructor
 
-KC: Is pre-order or post-order traversal better for clearing all data?
+_DQ: Is pre-order or post-order traversal better for clearing all data?_
 
 [[examples/treemap-destructor]]
 

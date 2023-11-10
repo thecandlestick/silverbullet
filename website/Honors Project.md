@@ -1,7 +1,7 @@
 
 # Objective
 
-When discussing [[BST|Binary Search Trees]], we saw how they can be used to build data structures with O(lg(n)) Find, Insert, and Remove operations. This assumes, however, that the height of the tree is also O(lg(n)). This can be achieved by modifying the operations to ensure that the tree remains relatively _balanced_.
+When discussing [[BST|Binary Search Trees]], we saw how they can be used to build data structures with O(lg(n)) Find, Insert, and Erase operations. This assumes, however, that the height of the tree is also O(lg(n)). This can be achieved by modifying the operations to ensure that the tree remains relatively _balanced_.
 
 Your objective is to research and implement a method of building a _Balanced BST_
 

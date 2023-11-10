@@ -1,4 +1,18 @@
 
+
+Date: 2023-11-06
+
+
+Reminders:
+* [ ]  [[PA04]] due wednesday
+
+Objectives:
+* [ ] continue [[BST]]
+* [ ] Introduce [[Maps]]
+
+---
+
+
 # Binary Search Trees
 
 A BST is a **binary tree** that possesses the **search property**
@@ -60,8 +74,8 @@ Every subtree in a BST is a smaller but still valid BST, so at each level we con
 
 What is the time complexity of this search algorithm? In other words, how many recursive calls will we have to make in the worst case scenario?
 
-* What determines the _Worst-Case_ scenario?
-* What kind of BST have an ideal _Worst-Case_ (for a size of n nodes)?
+* What determines the _Worst-Case_ scenario? ==height of tree==
+* What kind of BST have an ideal _Worst-Case_ (for a size of n nodes)? ==balanced BST==
 
 ## Building a BST
 
@@ -80,9 +94,45 @@ For a _degenerate_ BST like the one above, the cost of search is O(height) = O(n
 
 ![](img%2Fbalanced-tree.png)
 For a _perfect_ BST like the one above, the cost of search is
-O(height) = O(?), where n is the number of nodes.
+O(height) = O(lg n), where n is the number of nodes.
 
 
-When operating on a BST in a data structure, we have the opportunity to strategically add and remove nodes in a way that will maintain the balance of the tree. There are many methods of building these _self-balancing_ trees (scapegoat trees, treaps, Red-Black Trees, AVL trees, etc.). We will therefore make the assumption of a roughly balanced tree when utilizing a BST in our data structures.
+When operating on a BST in a data structure, we have the opportunity to strategically add and remove nodes in a way that will maintain the balance of the tree. There are many methods of building these _self-balancing_ trees (randomized BST, scapegoat trees, treaps, Red-Black Trees, AVL trees, etc.). We will therefore make the assumption of a roughly balanced tree when utilizing a BST in our data structures.
 
 [[Honors Project]]
+
+
+# The Map Abstract Data Type
+
+A Map is an _unordered collection(set)_ of pairs. Each pair consists of a **key** and a **value**. 
+
+{ <key1, val1>, <key2, val2>, ... , <keyn, valn> }
+
+Keys in a Map must be _unique_ so that no two pairs have the same _key_, but there is no such restriction on _values_.
+
+## Operations
+
+- getValue(M, key) -> the value paired with _key_, if _key_ is in M
+- setValue(M, key, value) -> M’ with updated pair _<key, value>_
+- insert(M, key, value) ->  M’ with new pair _<key, value>_
+- erase(M, key) -> M’ without pair identified by _key_
+- find(M, key) -> true if _key_ in M, false otherwise
+
+
+The motivation behind the Map is that unlike the List we do not need to maintain the order of the data. This allows us to strategically structure the data to optimize our operations as much as possible. This ADT also commonly goes by the name of _Dictionary_
+
+---
+
+
+# Map Data Structures
+
+## C++ standard library implementations:
+* [std::map](https://en.cppreference.com/w/cpp/container/map)
+* [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map)
+
+## Our Implementations:
+
+[[TreeMap]] - Memory-efficient implementation based on [[BST]]
+
+[[HashMap]] - Time-efficient implementation based on associative arrays
+

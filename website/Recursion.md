@@ -20,6 +20,8 @@ You finally decide to use a **recursive definition**:
   * _n_ is a natural number if and only if _n-1_ is a natural number
 And the mathematicians nod in approval
 
+_Recursion_ is a means of defining something in terms of itself.
+
 Every recursive definition will have two components:
 * One or more **Base Cases** - statements that give a direct answer/result
 * One or more **Recursive Cases** - statements that give an indirect answer in terms of the object in question
@@ -31,11 +33,11 @@ So why do we care? Well as computer scientists, our particular flavor of “prob
 
 In a recursive algorithm, we take the _global_ problem to be solved and formulate it in terms of smaller _sub-problems_ that are easier to solve but still have the same structure as the global. It relates to the classic problem-solving strategy of _Divide-and-Conquer_. 
 
-For this we give very similar definitions to mathematical recursion:
+A _recursive algorithm_ consists of the following components:
 * **Base Case** - an instance of the problem that can be solved directly
 * **Recursive Case** - a _Decomposition_ of the problem into smaller instances, along with a complete solution _Composed_ from the smaller solutions
 
-Here, _smaller_ means that it must make some amount of progress toward a directly solvable _Base Case_, otherwise our algorithm would never end!
+Here, _smaller_ means that it must make some amount of progress toward a directly solvable _Base Case_
 
 Let’s write a recursive algorithm for computing exponents
 - What is our _Base Case(s)?_
@@ -47,7 +49,22 @@ Let’s write a recursive algorithm for computing exponents
 ---
 # Tracing Recursion
 
-It can be sometimes be difficult to envision where your code will go in a recursive algorithm, but we can easily keep track by remembering our good friend the call stack!
+It can be sometimes be difficult to envision where your code will go in a recursive algorithm, but we can easily keep track by remembering the call-stack.
+
+This example uses the [[examples/recursion-exponentiation]] algorithm
+```c++
+int main()
+{
+  int n;
+  n = recursive_exp(2, 7);
+  std::cout<< n << std::endl;
+
+  return 0;
+}
+```
+
+![tracing recursion](img/tracing-recursion.png)
+Here is another example using a recursive _factorial_ algorithm:
 
 ```c++
 int factorial(int n)
@@ -60,7 +77,6 @@ int factorial(int n)
 ```
 
 ![](img/factorial_trace.png)
-```CS = []```
 
 We can also think of execution with some helpful rules-of-thumb:
 

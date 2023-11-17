@@ -90,9 +90,9 @@ Below is the official calendar of assignments. Up-to-date deadlines for all 1575
 ## Week 12 (Nov 6 - Nov 10)
 * Mon -
 * Tues - 
-* Wed - [[PA04]] due; [[PA05]] assigned
+* Wed - [[PA04]] due;
 * Thur - 
-* Fri - 
+* Fri -  [[PA05]] assigned
 
 ## Week 13 (Nov 13 - Nov 17)
 * Mon -
@@ -102,16 +102,12 @@ Below is the official calendar of assignments. Up-to-date deadlines for all 1575
 * Fri - 
 
 ## Week 14 (Nov 20 - Nov 24)
-* Mon -
-* Tues - 
-* Wed -
-* Thur - 
-* Fri - [[PA05]] due
+Thanksgiving Break
 
 ## Week 15 (Nov 27 - Dec 1)
-* Mon -
+* Mon - [[PA05]] due
 * Tues - 
-* Wed -
+* Wed - [[PA06]] assigned
 * Thur - 
 * Fri - 
 
@@ -120,7 +116,7 @@ Below is the official calendar of assignments. Up-to-date deadlines for all 1575
 * Tues - 
 * Wed -
 * Thur - 
-* Fri - 
+* Fri - [[PA06]] due
 
 ---
 # Schedule of Topics

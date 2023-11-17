@@ -7,7 +7,8 @@ int main()
   int *p;
 
   for( int r=0; r < 10; r++ )
-    p = new int[10];  // AAAA! Memory Leak!
+    p = new int[10];
 
   return 0;
 }
+````

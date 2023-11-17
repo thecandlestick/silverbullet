@@ -15,6 +15,9 @@
 * [[notes-1575/Nov03]]
 * [[notes-1575/Nov06]]
 * [[notes-1575/Nov08]]
+* [[notes-1575/Nov10]]
+* [[notes-1575/Nov13]]
+* [[notes-1575/Nov17]]
 * [[notes-1575/Oct02]]
 * [[notes-1575/Oct04]]
 * [[notes-1575/Oct09]]
@@ -39,4 +42,5 @@
 * [[notes-1575/Sep25]]
 * [[notes-1575/Sep27]]
 * [[notes-1575/Sep29]]
+* [[notes-1575/demo]]
 <!-- /query -->

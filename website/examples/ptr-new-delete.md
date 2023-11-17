@@ -8,7 +8,7 @@ int main()
   int *p = new int;
   cin >> x;
   int *q = new int[x];
-  Fish *f = new Fish;
+  Fish *f = new Fish; // user-defined class, Fish
 
   delete p;     // p = nullptr;
   delete [] q;  // q = nullptr;

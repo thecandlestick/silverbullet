@@ -2,21 +2,21 @@
 template <typename T>
 void MaxBinaryHeap<T>::push(const T& val)
 {
-  if (m_size == m_capacity)
-    resize(m_capacity*2);
+  if (num_elems == max_elems)
+    resize(max_elems*2);
 
-  m_data[m_size] = val;
-  int curr = m_size;
+  data[num_elems] = val;
+  int curr = num_elems;
   while(curr > 0 && ((curr - 1) / 2) < curr)
   {
-      if(m_data[curr] > m_data[(curr - 1) / 2])
+      if(data[curr] > data[(curr - 1) / 2])
       {
-          T temp = m_data[curr];
-          m_data[curr] = m_data[(curr - 1) / 2];
-          m_data[(curr - 1) / 2] = temp;
+          T temp = data[curr];
+          data[curr] = data[(curr - 1) / 2];
+          data[(curr - 1) / 2] = temp;
       }
       curr = (curr-1)/2;
   }
-  m_size++;
+  num_elems++;
 }
 ```

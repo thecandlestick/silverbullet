@@ -2,14 +2,14 @@
 template <typename T>
 void MaxBinaryHeap<T>::pop()
 {
-  if(m_size == 0)
+  if(num_elems == 0)
     throw std::out_of_range("Can't pop empty heap");
   
-  m_data[0] = m_data[m_size - 1]; // Swap root with last element
-  m_size--; // Remove last element
+  data[0] = data[num_elems - 1]; // Swap root with last element
+  num_elems--; // Remove last element
   siftdown(0); // Restore heap property
 
-  if (m_size < m_capacity / 4)
+  if (num_elems < m_capacity / 4)
     shrink();
 }
 ```

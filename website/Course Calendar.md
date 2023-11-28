@@ -114,7 +114,7 @@ Thanksgiving Break
 ## Week 16 (Dec 4 - Dec 8)
 * Mon -
 * Tues - 
-* Wed -
+* Wed - [[Honors Project]]
 * Thur - 
 * Fri - [[PA06]] due
 

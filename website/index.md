@@ -21,6 +21,7 @@
 |notes-1575/Nov06@34 |task|[[PA04]] due wednesday             |false|notes-1575/Nov06|34 | |
 |notes-1575/Nov10@34 |task|                                   |false|notes-1575/Nov10|34 | |
 |notes-1575/Nov13@34 |task|[[PA05]] released                  |false|notes-1575/Nov13|34 | |
+|notes-1575/Nov17@34 |task|[[PA05]] due after break           |false|notes-1575/Nov17|34 | |
 |notes-1575/Oct02@34 |task|                                   |false|notes-1575/Oct02|34 | |
 |notes-1575/Oct04@34 |task|                                   |false|notes-1575/Oct04|34 | |
 |notes-1575/Oct09@34 |task|                                   |false|notes-1575/Oct09|34 | |
@@ -77,6 +78,7 @@
 |notes-1575/Nov06@77 |task|continue [[BST]]                   |false|notes-1575/Nov06|77 | |
 |notes-1575/Aug23@78 |task|Review our C++ knowledge           |false|notes-1575/Aug23|78 | |
 |notes-1575/Aug25@79 |task|Pointers                           |false|notes-1575/Aug25|79 | |
+|notes-1575/Nov17@79 |task|continue with [[Heaps]]            |false|notes-1575/Nov17|79 | |
 |notes-1575/Oct13@79 |task|finish Algo Complexity             |false|notes-1575/Oct13|79 | |
 |notes-1575/Sep11@80 |task|Finish [[Inheritance]]             |false|notes-1575/Sep11|80 | |
 |notes-1575/Sep06@82 |task|Finish Pointers                    |false|notes-1575/Sep06|82 | |

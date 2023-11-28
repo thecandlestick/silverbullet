@@ -2,6 +2,6 @@
 template <typename T>
 const T& MaxBinaryHeap<T>::top()
 {
-  return m_data[0];
+  return data[0];
 }
 ```

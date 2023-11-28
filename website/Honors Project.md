@@ -3,7 +3,7 @@
 
 When discussing [[BST|Binary Search Trees]], we saw how they can be used to build data structures with O(lg(n)) Find, Insert, and Erase operations. This assumes, however, that the height of the tree is also O(lg(n)). This can be achieved by modifying the operations to ensure that the tree remains relatively _balanced_.
 
-Your objective is to research and implement a method of building a _Balanced BST_
+Your objective is to research and implement a method of building a _Self-Balancing BST_, one that always maintains a height of O(lg(n)) where n is the number of nodes in the tree.
 
 # Requirements
 
@@ -16,7 +16,7 @@ In this section of your report, describe the theory behind your choice of balanc
 ### Code Implementation
 
 In this section of your report, you will document your process of implementing a balanced BST in C++. You **must** use the un-balanced BST from [[PA05]] as a starting point, and your work must be well commented.
-Describe what aspects of the original code you changed, and show your final source code. (Preferably, link to a git repository)
+Describe what aspects of the original code you changed (hint: at minimum, insert and erase should be changed to maintain the balance of the tree), and show your final source code. (Preferably, link to a git repository)
 
 ### Performance Analysis
 

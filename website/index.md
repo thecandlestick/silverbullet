@@ -9,6 +9,7 @@
 |ref                 |tags|name                               |done |page            |pos|state|
 |--|--|--|--|--|--|--|
 |notes-1575/Nov06@100|task|Introduce [[Maps]]                 |false|notes-1575/Nov06|100| |
+|notes-1575/Nov27@100|task|[[BinaryHeap]]                     |false|notes-1575/Nov27|100| |
 |notes-1575/Sep06@104|task|OOP                                |false|notes-1575/Sep06|104| |
 |notes-1575/Oct13@108|task|introduce Stack                    |false|notes-1575/Oct13|108| |
 |notes-1575/Sep11@109|task|starting [[Polymorphism]]          |false|notes-1575/Sep11|109| |
@@ -22,6 +23,7 @@
 |notes-1575/Nov10@34 |task|                                   |false|notes-1575/Nov10|34 | |
 |notes-1575/Nov13@34 |task|[[PA05]] released                  |false|notes-1575/Nov13|34 | |
 |notes-1575/Nov17@34 |task|[[PA05]] due after break           |false|notes-1575/Nov17|34 | |
+|notes-1575/Nov27@34 |task|[[PA05]] due tonight               |false|notes-1575/Nov27|34 | |
 |notes-1575/Oct02@34 |task|                                   |false|notes-1575/Oct02|34 | |
 |notes-1575/Oct04@34 |task|                                   |false|notes-1575/Oct04|34 | |
 |notes-1575/Oct09@34 |task|                                   |false|notes-1575/Oct09|34 | |
@@ -68,6 +70,7 @@
 |notes-1575/Oct16@74 |task|continue [[Stacks & Queues]]       |false|notes-1575/Oct16|74 | |
 |notes-1575/Oct18@74 |task|finish Queues                      |false|notes-1575/Oct18|74 | |
 |notes-1575/Sep15@74 |task|Finish Exception Handling          |false|notes-1575/Sep15|74 | |
+|notes-1575/Nov27@75 |task|continue [[Heaps]]                 |false|notes-1575/Nov27|75 | |
 |notes-1575/Oct20@75 |task|finish queues                      |false|notes-1575/Oct20|75 | |
 |notes-1575/Oct30@75 |task|introduce [[Trees]]                |false|notes-1575/Oct30|75 | |
 |notes-1575/Sep18@75 |task|actually start data structures     |false|notes-1575/Sep18|75 | |

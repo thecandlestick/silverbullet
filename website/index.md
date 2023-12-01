@@ -11,6 +11,7 @@
 |notes-1575/Nov06@100|task|Introduce [[Maps]]                 |false|notes-1575/Nov06|100| |
 |notes-1575/Nov27@100|task|[[BinaryHeap]]                     |false|notes-1575/Nov27|100| |
 |notes-1575/Sep06@104|task|OOP                                |false|notes-1575/Sep06|104| |
+|notes-1575/Nov29@105|task|introduce [[BinaryHeap]]           |false|notes-1575/Nov29|105| |
 |notes-1575/Oct13@108|task|introduce Stack                    |false|notes-1575/Oct13|108| |
 |notes-1575/Sep11@109|task|starting [[Polymorphism]]          |false|notes-1575/Sep11|109| |
 |notes-1575/Nov08@33 |task|[[PA04]] due tonight               |false|notes-1575/Nov08|33 | |
@@ -24,6 +25,7 @@
 |notes-1575/Nov13@34 |task|[[PA05]] released                  |false|notes-1575/Nov13|34 | |
 |notes-1575/Nov17@34 |task|[[PA05]] due after break           |false|notes-1575/Nov17|34 | |
 |notes-1575/Nov27@34 |task|[[PA05]] due tonight               |false|notes-1575/Nov27|34 | |
+|notes-1575/Nov29@34 |task|[[pa06]] assigned                  |false|notes-1575/Nov29|34 | |
 |notes-1575/Oct02@34 |task|                                   |false|notes-1575/Oct02|34 | |
 |notes-1575/Oct04@34 |task|                                   |false|notes-1575/Oct04|34 | |
 |notes-1575/Oct09@34 |task|                                   |false|notes-1575/Oct09|34 | |
@@ -59,6 +61,7 @@
 |notes-1575/Oct25@55 |task|continue recursion                 |false|notes-1575/Oct25|55 | |
 |notes-1575/Sep25@55 |task|Continue [[ArrayList]]             |false|notes-1575/Sep25|55 | |
 |notes-1575/Sep27@55 |task|introduce [[LinkedList]]           |false|notes-1575/Sep27|55 | |
+|notes-1575/Nov29@59 |task|IT RSS hiring (handshake)          |false|notes-1575/Nov29|59 | |
 |notes-1575/demo@65  |task|recursion                          |false|notes-1575/demo |65 | |
 |notes-1575/Oct11@68 |task|continuing algorithm complexity    |false|notes-1575/Oct11|68 | |
 |notes-1575/Aug30@69 |task|Continue Pointers                  |false|notes-1575/Aug30|69 | |

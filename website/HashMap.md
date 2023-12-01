@@ -1,7 +1,7 @@
 
 We’ve seen how to implement a map that runs in logarithmic-time as a [[TreeMap]]. This already scales extremely well, but can we do even better?
 
-The _Hash Map_ (or _Hash Table_) is one of the most widely used data structures in existence, as it offers the unique ability to perform constant-time lookup of the data. This means that regardless of the size of your collection, a _find_ operation will take (roughly) the same amount of time!
+The _Hash Map_ (or _Hash Table_) is one of the most widely used data structures in existence, as it offers the unique ability to perform constant-time lookup of the data (in the average case). This means that regardless of the size of your collection, a _find_ operation will take (roughly) the same amount of time!
 
 How will we achieve this best-possible speed? Trade-offs, of course!
 
@@ -42,7 +42,7 @@ The method of assigning hash codes is known as the _hash function_, and there ar
 * **If X != Y, then Probability( Hash(X) = Hash(Y) ) must be small**
   In general, we can’t always give each key a unique hash code. The range of possible values for keys may be much larger than we have space for in the hash table. A good hash function, however, will minimize the chances of this happening as much as possible.
   
-* **Hash() must run in constant time**
+* **Hash() must be cheap to compute**
   If the hash function is too expensive to compute, then it defeats the purpose of providing O(1) lookup.
   
 ### Collisions
@@ -51,7 +51,7 @@ In the event that X != Y and Hash(X) = _c_ = Hash(Y), a _collision_ has occurred
 
 Ideally our hash function would have no collisions, but in reality what most Hash Maps strive for is an even **distribution** of the hash codes. Essentially, the more spread-out the generated hash codes are among the possible values, the less likely it is that we will encounter two keys with the same code.
 
-KC: For the student ID# example, which hash function would provide a better distribution? _First four digits_ or _Last four digits_?
+DQ: For the student ID# example, which hash function would provide a better distribution? _First four digits_ or _Last four digits_?
 
 ### Examples
 
@@ -128,7 +128,7 @@ This process terminates when either the record is found or an empty index is enc
 | 8 | - |
 | 9 | - |
 
-_KC: how would search work for an open-hashing Hash Map?_
+_DQ: how would search work for an open-hashing Hash Map?_
 
 ## Deletion
 
@@ -167,7 +167,7 @@ As calls to insertion/deletion are made, the number of placeholder records (_tom
 
 * **Fix 2**: Periodically, all records are _re-hashed_ into a brand new hash table.
 
-_KC: What would be the time complexity of a re-hash operation?_
+_DQ: What would be the time complexity of a re-hash operation?_
 
 ### Load Factor
 

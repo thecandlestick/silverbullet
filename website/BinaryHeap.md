@@ -38,6 +38,12 @@ The fast random-access provided by an [[ArrayList]] is sufficient for implementi
 ## Heapify (Constructor from array)
 [[examples/binheap-heapify]]
 
+_KC: Use the heapify constructor with the following array of data.
+    Give the new ordering of the data after it is finished_
+
+**ARRAY: << 5 , 10, 2, 23, 1, 12 >>**
+
+
 ---
 # Default Member Functions
 

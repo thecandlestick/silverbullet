@@ -2,13 +2,13 @@
 template <typename T>
 MaxBinaryHeap<T>::MaxBinaryHeap(T *newData, int len)
 {
-  m_data = nullptr;
-  m_size = 0;
-  m_capacity = 0;
-  resize(len);
-  m_size = len;
+  data = nullptr;
+  num_elems = 0;
+  max_elems = 0;
+  reserve(len);
+  num_elems = len;
 
-  for(int i = 0; i < m_size; i++)  // load data into heap
+  for(int i = 0; i < num_elems; i++)  // load data into storage array
   {
       data[i] = newData[i];
   }

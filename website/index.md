@@ -12,6 +12,7 @@
 |notes-1575/Nov27@100|task|[[BinaryHeap]]                     |false|notes-1575/Nov27|100| |
 |notes-1575/Sep06@104|task|OOP                                |false|notes-1575/Sep06|104| |
 |notes-1575/Nov29@105|task|introduce [[BinaryHeap]]           |false|notes-1575/Nov29|105| |
+|notes-1575/Dec01@107|task|introduce [[HashMap]]              |false|notes-1575/Dec01|107| |
 |notes-1575/Oct13@108|task|introduce Stack                    |false|notes-1575/Oct13|108| |
 |notes-1575/Sep11@109|task|starting [[Polymorphism]]          |false|notes-1575/Sep11|109| |
 |notes-1575/Nov08@33 |task|[[PA04]] due tonight               |false|notes-1575/Nov08|33 | |
@@ -19,6 +20,8 @@
 |notes-1575/Aug25@34 |task|                                   |false|notes-1575/Aug25|34 | |
 |notes-1575/Aug28@34 |task|                                   |false|notes-1575/Aug28|34 | |
 |notes-1575/Aug30@34 |task|Set up Dev Env                     |false|notes-1575/Aug30|34 | |
+|notes-1575/Dec01@34 |task|[[PA06]] due next friday           |false|notes-1575/Dec01|34 | |
+|notes-1575/Dec04@34 |task|[[PA06]] due friday                |false|notes-1575/Dec04|34 | |
 |notes-1575/Nov03@34 |task|[[PA04]] due wednesday             |false|notes-1575/Nov03|34 | |
 |notes-1575/Nov06@34 |task|[[PA04]] due wednesday             |false|notes-1575/Nov06|34 | |
 |notes-1575/Nov10@34 |task|                                   |false|notes-1575/Nov10|34 | |
@@ -69,6 +72,7 @@
 |notes-1575/Sep13@72 |task|Finish [[Polymorphism]]            |false|notes-1575/Sep13|72 | |
 |notes-1575/Oct27@73 |task|finish [[Recursion]]               |false|notes-1575/Oct27|73 | |
 |notes-1575/Sep22@73 |task|continuing [[ArrayList]]           |false|notes-1575/Sep22|73 | |
+|notes-1575/Dec04@74 |task|introduce [[HashMap]]              |false|notes-1575/Dec04|74 | |
 |notes-1575/Nov08@74 |task|introduce [[TreeMap]]              |false|notes-1575/Nov08|74 | |
 |notes-1575/Oct16@74 |task|continue [[Stacks & Queues]]       |false|notes-1575/Oct16|74 | |
 |notes-1575/Oct18@74 |task|finish Queues                      |false|notes-1575/Oct18|74 | |
@@ -84,6 +88,7 @@
 |notes-1575/Nov06@77 |task|continue [[BST]]                   |false|notes-1575/Nov06|77 | |
 |notes-1575/Aug23@78 |task|Review our C++ knowledge           |false|notes-1575/Aug23|78 | |
 |notes-1575/Aug25@79 |task|Pointers                           |false|notes-1575/Aug25|79 | |
+|notes-1575/Dec01@79 |task|finish [[BinaryHeap]]              |false|notes-1575/Dec01|79 | |
 |notes-1575/Nov17@79 |task|continue with [[Heaps]]            |false|notes-1575/Nov17|79 | |
 |notes-1575/Oct13@79 |task|finish Algo Complexity             |false|notes-1575/Oct13|79 | |
 |notes-1575/Sep11@80 |task|Finish [[Inheritance]]             |false|notes-1575/Sep11|80 | |

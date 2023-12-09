@@ -1,5 +1,5 @@
 
-## Adjacency Matrix Representation
+## Adjacency List Representation
 
 General idea: each vertex maintains a list of its neighbors
 

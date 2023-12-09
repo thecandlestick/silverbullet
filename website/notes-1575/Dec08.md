@@ -1,4 +1,18 @@
 
+
+Date: 2023-12-08
+
+
+Reminders:
+* [ ]  fill out CET survey
+* [ ]  [[PA06]] due tonight
+
+Objectives:
+* [ ] intro to graphs
+
+---
+
+
 A Graph is a collection of **vertices** (or _nodes_), and **edges** between them. The previously introduced [[Trees]] are a special case of graphs with restrictions placed on the edges to enforce a _hierarchical_ relationship between nodes. Graphs generalize this concept by having no such restrictions, allowing us to represent any arbitrary relationship for the nodes. 
 
 ## Terminology
@@ -147,9 +161,9 @@ Suppose you are writing a navigational software (think google maps) for the city
 
 ![](img%2Froad-graph.png)
 
-What would the _degree_ of such a graph be?
+What would the _degree_ of such a graph be? 6
 
-If extended to cover the entire city, how many vertices?
+If extended to cover the entire city, how many vertices? 1000
 
 Is this a _sparse_ graph, or a _dense_ graph?
 

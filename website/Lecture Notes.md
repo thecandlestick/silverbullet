@@ -15,6 +15,7 @@
 * [[notes-1575/Dec01]]
 * [[notes-1575/Dec04]]
 * [[notes-1575/Dec06]]
+* [[notes-1575/Dec08]]
 * [[notes-1575/Nov03]]
 * [[notes-1575/Nov06]]
 * [[notes-1575/Nov08]]

@@ -10,10 +10,10 @@ import {
   Strikethrough,
   styleTags,
   tags as t,
-  TaskList,
   yamlLanguage,
 } from "../deps.ts";
 import * as ct from "./customtags.ts";
+import { TaskList } from "./extended_task.ts";
 import {
   MDExt,
   mdExtensionStyleTags,
@@ -68,13 +68,15 @@ const WikiLink: MarkdownConfig = {
   ],
 };
 
-export const commandLinkRegex = /^\{\[([^\]\|]+)(\|([^\]]+))?\]\}/;
+export const commandLinkRegex =
+  /^\{\[([^\]\|]+)(\|([^\]]+))?\](\(([^\)]+)\))?\}/;
 
 const CommandLink: MarkdownConfig = {
   defineNodes: [
     { name: "CommandLink", style: { "CommandLink/...": ct.CommandLinkTag } },
     { name: "CommandLinkName", style: ct.CommandLinkNameTag },
     { name: "CommandLinkAlias", style: ct.CommandLinkNameTag },
+    { name: "CommandLinkArgs", style: ct.CommandLinkArgsTag },
     { name: "CommandLinkMark", style: t.processingInstruction },
   ],
   parseInline: [
@@ -88,7 +90,7 @@ const CommandLink: MarkdownConfig = {
         ) {
           return -1;
         }
-        const [fullMatch, command, pipePart, label] = match;
+        const [fullMatch, command, pipePart, label, argsPart, args] = match;
         const endPos = pos + fullMatch.length;
 
         let aliasElts: any[] = [];
@@ -103,11 +105,27 @@ const CommandLink: MarkdownConfig = {
             ),
           ];
         }
+
+        let argsElts: any[] = [];
+        if (argsPart) {
+          const argsStartPos = pos + 2 + command.length +
+            (pipePart?.length ?? 0);
+          argsElts = [
+            cx.elt("CommandLinkMark", argsStartPos, argsStartPos + 2),
+            cx.elt(
+              "CommandLinkArgs",
+              argsStartPos + 2,
+              argsStartPos + 2 + args.length,
+            ),
+          ];
+        }
+
         return cx.addElement(
           cx.elt("CommandLink", pos, endPos, [
             cx.elt("CommandLinkMark", pos, pos + 2),
             cx.elt("CommandLinkName", pos + 2, pos + 2 + command.length),
             ...aliasElts,
+            ...argsElts,
             cx.elt("CommandLinkMark", endPos - 2, endPos),
           ]),
         );
@@ -136,6 +154,81 @@ export const Highlight: MarkdownConfig = {
       parse(cx, next, pos) {
         if (next != 61 /* '=' */ || cx.char(pos + 1) != 61) return -1;
         return cx.addDelimiter(HighlightDelim, pos, pos + 2, true, true);
+      },
+      after: "Emphasis",
+    },
+  ],
+};
+
+export const attributeStartRegex = /^\[([\w\$]+)(::?\s*)/;
+
+export const Attribute: MarkdownConfig = {
+  defineNodes: [
+    { name: "Attribute", style: { "Attribute/...": ct.AttributeTag } },
+    { name: "AttributeName", style: ct.AttributeNameTag },
+    { name: "AttributeValue", style: ct.AttributeValueTag },
+    { name: "AttributeMark", style: t.processingInstruction },
+    { name: "AttributeColon", style: t.processingInstruction },
+  ],
+  parseInline: [
+    {
+      name: "Attribute",
+      parse(cx, next, pos) {
+        let match: RegExpMatchArray | null;
+        const textFromPos = cx.slice(pos, cx.end);
+        if (
+          next != 91 /* '[' */ ||
+          // and match the whole thing
+          !(match = attributeStartRegex.exec(textFromPos))
+        ) {
+          return -1;
+        }
+        const [fullMatch, attributeName, attributeColon] = match;
+        let bracketNestingDepth = 1;
+        let valueLength = fullMatch.length;
+        loopLabel:
+        for (; valueLength < textFromPos.length; valueLength++) {
+          switch (textFromPos[valueLength]) {
+            case "[":
+              bracketNestingDepth++;
+              break;
+            case "]":
+              bracketNestingDepth--;
+              if (bracketNestingDepth === 0) {
+                // Done!
+                break loopLabel;
+              }
+              break;
+          }
+        }
+        if (bracketNestingDepth !== 0) {
+          console.log("Failed to parse attribute", fullMatch, textFromPos);
+          return -1;
+        }
+
+        if (textFromPos[valueLength + 1] === "(") {
+          console.log("Link", fullMatch, textFromPos);
+          // This turns out to be a link, back out!
+          return -1;
+        }
+
+        return cx.addElement(
+          cx.elt("Attribute", pos, pos + valueLength + 1, [
+            cx.elt("AttributeMark", pos, pos + 1), // [
+            cx.elt("AttributeName", pos + 1, pos + 1 + attributeName.length),
+            cx.elt(
+              "AttributeColon",
+              pos + 1 + attributeName.length,
+              pos + 1 + attributeName.length + attributeColon.length,
+            ),
+            cx.elt(
+              "AttributeValue",
+              pos + 1 + attributeName.length + attributeColon.length,
+              pos + valueLength,
+            ),
+            cx.elt("AttributeMark", pos + valueLength, pos + valueLength + 1), // [
+          ]),
+        );
       },
       after: "Emphasis",
     },
@@ -177,16 +270,20 @@ const directiveStart = /^\s*<!--\s*#([a-z]+)\s*(.*?)-->\s*/;
 const directiveEnd = /^\s*<!--\s*\/(.*?)-->\s*/;
 
 import { parser as directiveParser } from "./parse-query.js";
+import { parser as expressionParser } from "./parse-expression.js";
 import { Table } from "./table_parser.ts";
+import { foldNodeProp } from "@codemirror/language";
+import { lezerToParseTree } from "./parse_tree.ts";
 
-const highlightingDirectiveParser = directiveParser.configure({
+export const highlightingDirectiveParser = directiveParser.configure({
   props: [
     styleTags({
       "Name": t.variableName,
       "String": t.string,
       "Number": t.number,
       "PageRef": ct.WikiLinkTag,
-      "Where Limit Select Render Order OrderDirection And": t.keyword,
+      "where limit select render Order OrderKW and or as InKW each all":
+        t.keyword,
     }),
   ],
 });
@@ -218,6 +315,14 @@ export const Directive: MarkdownConfig = {
           cx.parsedPos,
           cx.parsedPos + line.text.length + 1,
           [cx.elt(queryParseTree, frontStart + fullMatch.indexOf(arg))],
+        ));
+      } else if (directive === "eval") {
+        const expressionParseTree = expressionParser.parse(arg);
+        elts.push(cx.elt(
+          "DirectiveStart",
+          cx.parsedPos,
+          cx.parsedPos + line.text.length + 1,
+          [cx.elt(expressionParseTree, frontStart + fullMatch.indexOf(arg))],
         ));
       } else {
         elts.push(cx.elt(
@@ -343,6 +448,7 @@ export default function buildMarkdown(mdExtensions: MDExt[]): Language {
     extensions: [
       WikiLink,
       CommandLink,
+      Attribute,
       FrontMatter,
       Directive,
       TaskList,
@@ -351,12 +457,22 @@ export default function buildMarkdown(mdExtensions: MDExt[]): Language {
       Strikethrough,
       Table,
       ...mdExtensions.map(mdExtensionSyntaxConfig),
-
       {
         props: [
+          foldNodeProp.add({
+            // Don't fold at the list level
+            BulletList: () => null,
+            OrderedList: () => null,
+            // Fold list items
+            ListItem: (tree, state) => ({
+              from: state.doc.lineAt(tree.from).to,
+              to: tree.to,
+            }),
+          }),
+
           styleTags({
             Task: ct.TaskTag,
-            TaskMarker: ct.TaskMarkerTag,
+            TaskMark: ct.TaskMarkTag,
             Comment: ct.CommentTag,
             "TableDelimiter SubscriptMark SuperscriptMark StrikethroughMark":
               t.processingInstruction,

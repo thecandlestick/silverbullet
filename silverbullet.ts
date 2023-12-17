@@ -7,6 +7,8 @@ import { upgradeCommand } from "./cmd/upgrade.ts";
 import { versionCommand } from "./cmd/version.ts";
 import { serveCommand } from "./cmd/server.ts";
 import { plugCompileCommand } from "./cmd/plug_compile.ts";
+import { plugRunCommand } from "./cmd/plug_run.ts";
+import { syncCommand } from "./cmd/sync.ts";
 
 await new Command()
   .name("silverbullet")
@@ -25,7 +27,7 @@ await new Command()
   .option("-p, --port <port:number>", "Port to listen on")
   .option(
     "--user <user:string>",
-    "'username:password' combo for BasicAuth authentication",
+    "'username:password' combo for authentication",
   )
   .option(
     "--cert <certFile:string>",
@@ -36,15 +38,27 @@ await new Command()
     "Path to TLS key",
   )
   .option(
-    "--maxFileSize [type:number]",
-    "Do not sync/expose files larger than this (in MB)",
+    "--sync-only",
+    "Run the server as a pure space (file) store only without any backend processing (this disables 'online mode' in the client)",
+  )
+  .option(
+    "--client-encryption",
+    "Enable client-side encryption for spaces",
+  )
+  .option(
+    "--reindex",
+    "Reindex space on startup",
+  )
+  .option(
+    "--db <db:string>",
+    "Path to database file",
   )
   .action(serveCommand)
   // plug:compile
   .command("plug:compile", "Bundle (compile) one or more plug manifests")
   .arguments("<...name.plug.yaml:string>")
-  .option("--debug [type:boolean]", "Do not minifiy code", { default: false })
-  .option("--info [type:boolean]", "Print out size info per function", {
+  .option("--debug", "Do not minifiy code", { default: false })
+  .option("--info", "Print out size info per function", {
     default: false,
   })
   .option("--watch, -w [type:boolean]", "Watch for changes and rebuild", {
@@ -58,10 +72,32 @@ await new Command()
   .option("--importmap <path:string>", "Path to import map file to use")
   .option("--runtimeUrl <url:string>", "URL to worker_runtime.ts to use")
   .action(plugCompileCommand)
+  // plug:run
+  .command("plug:run", "Run a PlugOS function from the CLI")
+  .arguments("<spacePath> [function] [...args:string]")
+  .option(
+    "--hostname, -L <hostname:string>",
+    "Hostname or address to listen on",
+  )
+  .option("-p, --port <port:number>", "Port to listen on")
+  .action(plugRunCommand)
   // upgrade
   .command("upgrade", "Upgrade SilverBullet")
   .action(upgradeCommand)
+  // sync
+  .command("sync", "Synchronize two spaces")
+  .option(
+    "--snapshot <snapshot:string>",
+    "Path to state file to use",
+  )
+  .option(
+    "--wipe-secondary",
+    "Wipe secondary and perform a full sync",
+  )
+  .arguments("<primary:string> <secondary:string>")
+  .action(syncCommand)
   // version
   .command("version", "Get current version")
   .action(versionCommand)
   .parse(Deno.args);
+Deno.exit(0);

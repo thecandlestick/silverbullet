@@ -98,11 +98,11 @@ setupMessageListener(functionMapping, manifest);
     metafile: options.info,
     treeShaking: true,
     plugins: [
-      {
-        name: "json",
-        setup: (build) =>
-          build.onLoad({ filter: /\.json$/ }, () => ({ loader: "json" })),
-      },
+      // {
+      //   name: "json",
+      //   setup: (build) =>
+      //     build.onLoad({ filter: /\.json$/ }, () => ({ loader: "json" })),
+      // },
       ...denoPlugins({
         // TODO do this differently
         importMapURL: options.importMap ||
@@ -165,12 +165,14 @@ export async function compileManifests(
     const watcher = Deno.watchFs(manifestFiles.map((p) => path.dirname(p)));
     for await (const event of watcher) {
       if (event.paths.length > 0) {
-        if (event.paths[0].endsWith(".json")) {
+        if (
+          event.paths[0].endsWith(".json") || event.paths[0].startsWith(dist)
+        ) {
           continue;
         }
       }
       console.log("Change detected, rebuilding...");
-      buildAll();
+      await buildAll();
     }
   }
 }

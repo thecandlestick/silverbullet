@@ -1,19 +1,21 @@
 import { WidgetContent } from "../../plug-api/app_event.ts";
-import { panelHtml } from "../components/panel.tsx";
 import { Decoration, EditorState, syntaxTree, WidgetType } from "../deps.ts";
-import type { Editor } from "../editor.tsx";
-import { CodeWidgetCallback } from "../hooks/code_widget.ts";
+import type { Client } from "../client.ts";
 import {
   decoratorStateField,
   invisibleDecoration,
   isCursorInRange,
 } from "./util.ts";
+import { createWidgetSandboxIFrame } from "../components/widget_sandbox_iframe.ts";
+import type { CodeWidgetCallback } from "$sb/types.ts";
 
 class IFrameWidget extends WidgetType {
+  iframe?: HTMLIFrameElement;
+
   constructor(
     readonly from: number,
     readonly to: number,
-    readonly editor: Editor,
+    readonly client: Client,
     readonly bodyText: string,
     readonly codeWidgetCallback: CodeWidgetCallback,
   ) {
@@ -21,70 +23,48 @@ class IFrameWidget extends WidgetType {
   }
 
   toDOM(): HTMLElement {
-    console.log("toDOM");
-    const iframe = document.createElement("iframe");
-    iframe.srcdoc = panelHtml;
-    // iframe.style.height = "0";
-
-    const messageListener = (evt: any) => {
-      if (evt.source !== iframe.contentWindow) {
-        return;
-      }
-      const data = evt.data;
-      if (!data) {
-        return;
-      }
-      switch (data.type) {
-        case "event":
-          this.editor.dispatchAppEvent(data.name, ...data.args);
-          break;
-        case "setHeight":
-          iframe.style.height = data.height + "px";
-          break;
-        case "setBody":
-          this.editor.editorView!.dispatch({
-            changes: {
-              from: this.from,
-              to: this.to,
-              insert: data.body,
-            },
-          });
-          break;
-        case "blur":
-          this.editor.editorView!.dispatch({
-            selection: { anchor: this.from },
-          });
-          this.editor.focus();
-          break;
-      }
-    };
-
-    iframe.onload = () => {
-      // Subscribe to message event on global object (to receive messages from iframe)
-      globalThis.addEventListener("message", messageListener);
-      // Only run this code once
-      iframe.onload = null;
-      this.codeWidgetCallback(this.bodyText).then(
-        (widgetContent: WidgetContent) => {
-          if (widgetContent.html) {
-            iframe.contentWindow!.postMessage({
-              type: "html",
-              html: widgetContent.html,
-              script: widgetContent.script,
+    const from = this.from;
+    const iframe = createWidgetSandboxIFrame(
+      this.client,
+      this.bodyText,
+      this.codeWidgetCallback(this.bodyText, this.client.currentPage!),
+      (message) => {
+        switch (message.type) {
+          case "blur":
+            this.client.editorView.dispatch({
+              selection: { anchor: from },
             });
-          } else if (widgetContent.url) {
-            iframe.contentWindow!.location.href = widgetContent.url;
-            if (widgetContent.height) {
-              iframe.style.height = widgetContent.height + "px";
-            }
-            if (widgetContent.width) {
-              iframe.style.width = widgetContent.width + "px";
-            }
-          }
-        },
-      );
-    };
+            this.client.focus();
+
+            break;
+          case "reload":
+            this.codeWidgetCallback(this.bodyText, this.client.currentPage!)
+              .then(
+                (widgetContent: WidgetContent) => {
+                  iframe.contentWindow!.postMessage({
+                    type: "html",
+                    html: widgetContent.html,
+                    script: widgetContent.script,
+                    theme:
+                      document.getElementsByTagName("html")[0].dataset.theme,
+                  });
+                },
+              );
+            break;
+        }
+      },
+    );
+
+    const estimatedHeight = this.estimatedHeight;
+    iframe.height = `${estimatedHeight}px`;
+
     return iframe;
+  }
+
+  get estimatedHeight(): number {
+    const cachedHeight = this.client.space.getCachedWidgetHeight(this.bodyText);
+    // console.log("Calling estimated height", cachedHeight);
+    return cachedHeight > 0 ? cachedHeight : 150;
   }
 
   eq(other: WidgetType): boolean {
@@ -95,7 +75,7 @@ class IFrameWidget extends WidgetType {
   }
 }
 
-export function fencedCodePlugin(editor: Editor) {
+export function fencedCodePlugin(editor: Client) {
   return decoratorStateField((state: EditorState) => {
     const widgets: any[] = [];
     syntaxTree(state).iterate({
@@ -104,7 +84,8 @@ export function fencedCodePlugin(editor: Editor) {
           if (isCursorInRange(state, [from, to])) return;
           const text = state.sliceDoc(from, to);
           const [_, lang] = text.match(/^```(\w+)?/)!;
-          const codeWidgetCallback = editor.codeWidgetHook.codeWidgetCallbacks
+          const codeWidgetCallback = editor.system.codeWidgetHook
+            .codeWidgetCallbacks
             .get(lang);
           if (codeWidgetCallback) {
             // We got a custom renderer!

@@ -12,38 +12,42 @@ import { MiniEditor } from "./mini_editor.tsx";
 export type ActionButton = {
   icon: FunctionalComponent<FeatherProps>;
   description: string;
+  class?: string;
   callback: () => void;
+  href?: string;
 };
 
 export function TopBar({
   pageName,
   unsavedChanges,
-  synced,
+  syncFailures,
   isLoading,
   notifications,
   onRename,
   actionButtons,
   darkMode,
   vimMode,
+  progressPerc,
   completer,
   lhs,
+  onClick,
   rhs,
 }: {
   pageName?: string;
   unsavedChanges: boolean;
-  synced: boolean;
+  syncFailures: number;
   isLoading: boolean;
   notifications: Notification[];
   darkMode: boolean;
   vimMode: boolean;
+  progressPerc?: number;
   onRename: (newName?: string) => Promise<void>;
+  onClick: () => void;
   completer: (context: CompletionContext) => Promise<CompletionResult | null>;
   actionButtons: ActionButton[];
   lhs?: ComponentChildren;
   rhs?: ComponentChildren;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
   // Another one of my less proud moments:
   // Somehow I cannot seem to proerply limit the width of the page name, so I'm doing
   // it this way. If you have a better way to do this, please let me know!
@@ -62,7 +66,7 @@ export function TopBar({
 
         // Then calculate a new width
         currentPageElement.style.width = `${
-          Math.min(editorWidth - 150, innerDiv.clientWidth - 150)
+          Math.min(editorWidth - 170, innerDiv.clientWidth - 170)
         }px`;
       }
     }
@@ -75,7 +79,11 @@ export function TopBar({
   }, []);
 
   return (
-    <div id="sb-top" className={synced ? undefined : "sb-sync-error"}>
+    <div
+      id="sb-top"
+      className={syncFailures > 1 ? "sb-sync-error" : undefined}
+      onClick={onClick}
+    >
       {lhs}
       <div className="main">
         <div className="inner">
@@ -118,17 +126,36 @@ export function TopBar({
               </div>
             )}
             <div className="sb-actions">
-              {actionButtons.map((actionButton) => (
-                <button
-                  onClick={(e) => {
-                    actionButton.callback();
-                    e.stopPropagation();
-                  }}
-                  title={actionButton.description}
-                >
-                  <actionButton.icon size={18} />
-                </button>
-              ))}
+              {progressPerc !== undefined &&
+                (
+                  <div className="progress-wrapper" title={`${progressPerc}%`}>
+                    <div
+                      className="progress-bar"
+                      style={`background: radial-gradient(closest-side, white 79%, transparent 80% 100%), conic-gradient(#282828 ${progressPerc}%, #adadad 0);`}
+                    >
+                      {progressPerc}%
+                    </div>
+                  </div>
+                )}
+              {actionButtons.map((actionButton) => {
+                const button = (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      actionButton.callback();
+                      e.stopPropagation();
+                    }}
+                    title={actionButton.description}
+                    className={actionButton.class}
+                  >
+                    <actionButton.icon size={18} />
+                  </button>
+                );
+
+                return actionButton.href !== undefined
+                  ? <a href={actionButton.href}>{button}</a>
+                  : button;
+              })}
             </div>
           </div>
         </div>

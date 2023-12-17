@@ -14,7 +14,7 @@ export type CommandDef = {
 
 export type AppCommand = {
   command: CommandDef;
-  run: () => Promise<void>;
+  run: (args?: string[]) => Promise<void>;
 };
 
 export type CommandHookT = {
@@ -43,8 +43,8 @@ export class CommandHook extends EventEmitter<CommandHookEvents>
         const cmd = functionDef.command;
         this.editorCommands.set(cmd.name, {
           command: cmd,
-          run: () => {
-            return plug.invoke(name, [cmd]);
+          run: (args?: string[]) => {
+            return plug.invoke(name, [cmd, ...args??[]]);
           },
         });
       }
@@ -53,11 +53,14 @@ export class CommandHook extends EventEmitter<CommandHookEvents>
   }
 
   apply(system: System<CommandHookT>): void {
-    this.buildAllCommands(system);
     system.on({
       plugLoaded: () => {
         this.buildAllCommands(system);
       },
+    });
+    // On next tick
+    setTimeout(() => {
+      this.buildAllCommands(system);
     });
   }
 

@@ -1,31 +1,23 @@
 import { SpacePrimitives } from "../../common/spaces/space_primitives.ts";
-import { FileMeta } from "../../common/types.ts";
+import { FileMeta } from "$sb/types.ts";
 import {
   NamespaceOperation,
-  PageNamespaceHook,
-} from "../hooks/page_namespace.ts";
-import {
-  base64DecodeDataUrl,
-  base64EncodedDataUrl,
-} from "../../plugos/asset_bundle/base64.ts";
-import { mime } from "../deps.ts";
+  PlugNamespaceHook,
+} from "../hooks/plug_namespace.ts";
 
 export class PlugSpacePrimitives implements SpacePrimitives {
   constructor(
     private wrapped: SpacePrimitives,
-    private hook: PageNamespaceHook,
+    private hook: PlugNamespaceHook,
     private env?: string,
   ) {}
 
   // Used e.g. by the sync engine to see if it should sync a certain path (likely not the case when we have a plug space override)
   public isLikelyHandled(path: string): boolean {
     for (
-      const { pattern, env } of this.hook.spaceFunctions
+      const { pattern } of this.hook.spaceFunctions
     ) {
-      if (
-        path.match(pattern) &&
-        (!this.env || (env && env === this.env))
-      ) {
+      if (path.match(pattern)) {
         return true;
       }
     }
@@ -40,6 +32,7 @@ export class PlugSpacePrimitives implements SpacePrimitives {
     for (
       const { operation, pattern, plug, name, env } of this.hook.spaceFunctions
     ) {
+      // console.log("Going to match agains pattern", pattern, path);
       if (
         operation === type && path.match(pattern) &&
         (!this.env || (env && env === this.env))
@@ -52,14 +45,19 @@ export class PlugSpacePrimitives implements SpacePrimitives {
 
   async fetchFileList(): Promise<FileMeta[]> {
     const allFiles: FileMeta[] = [];
-    for (const { plug, name, operation } of this.hook.spaceFunctions) {
-      if (operation === "listFiles") {
+    for (const { plug, name, operation, env } of this.hook.spaceFunctions) {
+      if (
+        operation === "listFiles" && (!this.env || (env && env === this.env))
+      ) {
         try {
           for (const pm of await plug.invoke(name, [])) {
             allFiles.push(pm);
           }
-        } catch (e) {
-          console.error("Error listing files", e);
+        } catch (e: any) {
+          if (!e.message.includes("not available")) {
+            // Don't report "not available in" environments errors
+            console.error("Error listing files", e);
+          }
         }
       }
     }
@@ -73,16 +71,13 @@ export class PlugSpacePrimitives implements SpacePrimitives {
   async readFile(
     name: string,
   ): Promise<{ data: Uint8Array; meta: FileMeta }> {
-    const result: { data: string; meta: FileMeta } | false = await this
+    const result: { data: Uint8Array; meta: FileMeta } | false = await this
       .performOperation(
         "readFile",
         name,
       );
     if (result) {
-      return {
-        data: base64DecodeDataUrl(result.data),
-        meta: result.meta,
-      };
+      return result;
     }
     return this.wrapped.readFile(name);
   }
@@ -99,16 +94,14 @@ export class PlugSpacePrimitives implements SpacePrimitives {
     name: string,
     data: Uint8Array,
     selfUpdate?: boolean,
-    lastModified?: number,
+    meta?: FileMeta,
   ): Promise<FileMeta> {
     const result = this.performOperation(
       "writeFile",
       name,
-      base64EncodedDataUrl(
-        mime.getType(name) || "application/octet-stream",
-        data,
-      ),
+      data,
       selfUpdate,
+      meta,
     );
     if (result) {
       return result;
@@ -118,7 +111,7 @@ export class PlugSpacePrimitives implements SpacePrimitives {
       name,
       data,
       selfUpdate,
-      lastModified,
+      meta,
     );
   }
 

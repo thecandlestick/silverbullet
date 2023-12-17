@@ -1,13 +1,14 @@
-import Handlebars from "handlebars";
-
-import { space } from "$sb/silverbullet-syscall/mod.ts";
-import { niceDate } from "$sb/lib/dates.ts";
-
-const maxWidth = 70;
+import { handlebars, space } from "$sb/syscalls.ts";
+import { handlebarHelpers } from "../../common/syscalls/handlebar_helpers.ts";
+import { PageMeta } from "$sb/types.ts";
+import { cleanTemplate } from "../template/plug_api.ts";
 
 export function defaultJsonTransformer(_k: string, v: any) {
   if (v === undefined) {
     return "";
+  }
+  if (typeof v === "string") {
+    return v.replaceAll("\n", " ").replaceAll("|", "\\|");
   }
   return "" + v;
 }
@@ -17,33 +18,20 @@ export function jsonToMDTable(
   jsonArray: any[],
   valueTransformer: (k: string, v: any) => string = defaultJsonTransformer,
 ): string {
-  const fieldWidths = new Map<string, number>();
+  const headers = new Set<string>();
   for (const entry of jsonArray) {
     for (const k of Object.keys(entry)) {
-      let fieldWidth = fieldWidths.get(k);
-      if (!fieldWidth) {
-        fieldWidth = valueTransformer(k, entry[k]).length;
-      } else {
-        fieldWidth = Math.max(valueTransformer(k, entry[k]).length, fieldWidth);
-      }
-      fieldWidths.set(k, fieldWidth);
+      headers.add(k);
     }
   }
 
-  let fullWidth = 0;
-  for (const v of fieldWidths.values()) {
-    fullWidth += v + 1;
-  }
-
-  const headerList = [...fieldWidths.keys()];
+  const headerList = [...headers];
   const lines = [];
   lines.push(
     "|" +
       headerList
         .map(
-          (headerName) =>
-            headerName +
-            charPad(" ", fieldWidths.get(headerName)! - headerName.length),
+          (headerName) => headerName,
         )
         .join("|") +
       "|",
@@ -51,7 +39,7 @@ export function jsonToMDTable(
   lines.push(
     "|" +
       headerList
-        .map((title) => charPad("-", fieldWidths.get(title)!))
+        .map(() => "--")
         .join("|") +
       "|",
   );
@@ -59,67 +47,31 @@ export function jsonToMDTable(
     const el = [];
     for (const prop of headerList) {
       const s = valueTransformer(prop, val[prop]);
-      el.push(s + charPad(" ", fieldWidths.get(prop)! - s.length));
+      el.push(s);
     }
     lines.push("|" + el.join("|") + "|");
   }
   return lines.join("\n");
-
-  function charPad(ch: string, length: number) {
-    if (fullWidth > maxWidth && ch === "") {
-      return "";
-    } else if (fullWidth > maxWidth && ch === "-") {
-      return "--";
-    }
-    if (length < 1) {
-      return "";
-    }
-    return new Array(length + 1).join(ch);
-  }
 }
 
-export async function renderTemplate(
-  renderTemplate: string,
+export async function renderQueryTemplate(
+  pageMeta: PageMeta,
+  templatePage: string,
   data: any[],
+  renderAll: boolean,
 ): Promise<string> {
-  registerHandlebarsHelpers();
+  let templateText = await space.readPage(templatePage);
+  templateText = await cleanTemplate(templateText);
 
-  // Handlebars.registerHelper("yaml", (v: any, prefix: string) => {
-  //   if (typeof prefix === "string") {
-  //     let yaml = (await YAML.stringify(v))
-  //       .split("\n")
-  //       .join("\n" + prefix)
-  //       .trim();
-  //     if (Array.isArray(v)) {
-  //       return "\n" + prefix + yaml;
-  //     } else {
-  //       return yaml;
-  //     }
-  //   } else {
-  //     return YAML.stringify(v).trim();
-  //   }
-  // });
-  let templateText = await space.readPage(renderTemplate);
-  templateText = `{{#each .}}\n${templateText}\n{{/each}}`;
-  const template = Handlebars.compile(templateText, { noEscape: true });
-  return template(data);
+  if (!renderAll) {
+    templateText = `{{#each .}}\n${templateText}\n{{/each}}`;
+  }
+  return handlebars.renderTemplate(templateText, data, { page: pageMeta });
 }
 
-export function registerHandlebarsHelpers() {
-  Handlebars.registerHelper("json", (v: any) => JSON.stringify(v));
-  Handlebars.registerHelper("niceDate", (ts: any) => niceDate(new Date(ts)));
-  Handlebars.registerHelper("escapeRegexp", (ts: any) => {
-    return ts.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
-  });
-  Handlebars.registerHelper("prefixLines", (v: string, prefix: string) =>
-    v
-      .split("\n")
-      .map((l) => prefix + l)
-      .join("\n"));
-
-  Handlebars.registerHelper(
-    "substring",
-    (s: string, from: number, to: number, elipsis = "") =>
-      s.length > to - from ? s.substring(from, to) + elipsis : s,
-  );
+export function buildHandebarOptions(pageMeta: PageMeta) {
+  return {
+    helpers: handlebarHelpers(),
+    data: { page: pageMeta },
+  };
 }

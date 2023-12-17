@@ -1,5 +1,5 @@
 import { syscall } from "./syscall.ts";
-import type { AttachmentMeta, PageMeta } from "../../web/types.ts";
+import { AttachmentMeta, FileMeta, PageMeta } from "$sb/types.ts";
 
 export function listPages(unfiltered = false): Promise<PageMeta[]> {
   return syscall("space.listPages", unfiltered);
@@ -23,11 +23,11 @@ export function deletePage(name: string): Promise<void> {
   return syscall("space.deletePage", name);
 }
 
-export function listPlugs(): Promise<string[]> {
+export function listPlugs(): Promise<FileMeta[]> {
   return syscall("space.listPlugs");
 }
 
-export function listAttachments(): Promise<PageMeta[]> {
+export function listAttachments(): Promise<AttachmentMeta[]> {
   return syscall("space.listAttachments");
 }
 
@@ -42,7 +42,7 @@ export function getAttachmentMeta(name: string): Promise<AttachmentMeta> {
  */
 export function readAttachment(
   name: string,
-): Promise<{ data: Uint8Array; meta: AttachmentMeta }> {
+): Promise<Uint8Array> {
   return syscall("space.readAttachment", name);
 }
 
@@ -65,4 +65,28 @@ export function writeAttachment(
  */
 export function deleteAttachment(name: string): Promise<void> {
   return syscall("space.deleteAttachment", name);
+}
+
+// FS
+export function listFiles(): Promise<FileMeta[]> {
+  return syscall("space.listFiles");
+}
+
+export function readFile(name: string): Promise<Uint8Array> {
+  return syscall("space.readFile", name);
+}
+
+export function getFileMeta(name: string): Promise<FileMeta> {
+  return syscall("space.getFileMeta", name);
+}
+
+export function writeFile(
+  name: string,
+  data: Uint8Array,
+): Promise<FileMeta> {
+  return syscall("space.writeFile", name, data);
+}
+
+export function deleteFile(name: string): Promise<void> {
+  return syscall("space.deleteFile", name);
 }

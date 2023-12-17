@@ -1,7 +1,8 @@
-import { Hook, RuntimeEnvironment } from "./types.ts";
+import { Hook } from "./types.ts";
 import { EventEmitter } from "./event.ts";
 import type { SandboxFactory } from "./sandbox.ts";
 import { Plug } from "./plug.ts";
+import { InMemoryManifestCache, ManifestCache } from "./manifest_cache.ts";
 
 export interface SysCallMapping {
   [key: string]: (ctx: SyscallContext, ...args: any) => Promise<any> | any;
@@ -27,13 +28,27 @@ type Syscall = {
   callback: SyscallSignature;
 };
 
+export type SystemOptions = {
+  manifestCache?: ManifestCache<any>;
+  plugFlushTimeout?: number;
+};
+
 export class System<HookT> extends EventEmitter<SystemEvents<HookT>> {
   protected plugs = new Map<string, Plug<HookT>>();
   protected registeredSyscalls = new Map<string, Syscall>();
   protected enabledHooks = new Set<Hook<HookT>>();
 
-  constructor(readonly env?: RuntimeEnvironment) {
+  /**
+   * @param env either an environment or undefined for hybrid mode
+   */
+  constructor(
+    readonly env: string | undefined,
+    readonly options: SystemOptions = {},
+  ) {
     super();
+    if (!options.manifestCache) {
+      options.manifestCache = new InMemoryManifestCache();
+    }
   }
 
   get loadedPlugs(): Map<string, Plug<HookT>> {
@@ -85,8 +100,7 @@ export class System<HookT> extends EventEmitter<SystemEvents<HookT>> {
     args: any[],
   ): Promise<any> {
     return this.syscallWithContext(
-      // Mock the plug
-      { plug: { name: contextPlugName } as any },
+      { plug: this.plugs.get(contextPlugName)! },
       syscallName,
       args,
     );
@@ -94,12 +108,15 @@ export class System<HookT> extends EventEmitter<SystemEvents<HookT>> {
 
   async load(
     workerUrl: URL,
+    name: string,
+    hash: number,
     sandboxFactory: SandboxFactory<HookT>,
   ): Promise<Plug<HookT>> {
-    const plug = new Plug(this, workerUrl, sandboxFactory);
+    const plug = new Plug(this, workerUrl, name, hash, sandboxFactory);
 
     // Wait for worker to boot, and pass back its manifest
     await plug.ready;
+
     // and there it is!
     const manifest = plug.manifest!;
 
@@ -114,7 +131,7 @@ export class System<HookT> extends EventEmitter<SystemEvents<HookT>> {
     if (this.plugs.has(manifest.name)) {
       this.unload(manifest.name);
     }
-    console.log("Loaded plug", manifest.name);
+    console.log("Activated plug", manifest.name);
     this.plugs.set(manifest.name, plug);
 
     await this.emit("plugLoaded", plug);
@@ -122,7 +139,6 @@ export class System<HookT> extends EventEmitter<SystemEvents<HookT>> {
   }
 
   unload(name: string) {
-    // console.log("Unloading", name);
     const plug = this.plugs.get(name);
     if (!plug) {
       return;

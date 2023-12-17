@@ -1,3 +1,4 @@
+.env
 .DS_Store
 dist_client_bundle
 dist_plug_bundle
@@ -11,3 +12,9 @@ fly.toml
 env.sh
 deno_cache/
 dist_bundle/
+node_modules
+*.db*
+test_space
+silverbullet
+deploy.json
+

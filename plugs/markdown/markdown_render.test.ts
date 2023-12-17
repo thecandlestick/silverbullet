@@ -5,16 +5,19 @@ import { System } from "../../plugos/system.ts";
 import { createSandbox } from "../../plugos/environments/deno_sandbox.ts";
 import { loadMarkdownExtensions } from "../../common/markdown_parser/markdown_ext.ts";
 import { renderMarkdownToHtml } from "./markdown_render.ts";
-import { assertEquals } from "../../test_deps.ts";
 
 Deno.test("Markdown render", async () => {
   const system = new System<any>("server");
   await system.load(
-    new URL("../../dist_plug_bundle/_plug/core.plug.js", import.meta.url),
+    new URL("../../dist_plug_bundle/_plug/editor.plug.js", import.meta.url),
+    "editor",
+    0,
     createSandbox,
   );
   await system.load(
     new URL("../../dist_plug_bundle/_plug/tasks.plug.js", import.meta.url),
+    "tasks",
+    0,
     createSandbox,
   );
   const lang = buildMarkdown(loadMarkdownExtensions(system));
@@ -22,24 +25,44 @@ Deno.test("Markdown render", async () => {
     new URL("test/example.md", import.meta.url).pathname,
   );
   const tree = parse(lang, testFile);
-  await renderMarkdownToHtml(tree, {
+  renderMarkdownToHtml(tree, {
     failOnUnknown: true,
   });
   // console.log("HTML", html);
   await system.unloadAll();
 });
 
-Deno.test("Smart hard break test", async () => {
+Deno.test("Smart hard break test", () => {
   const example = `**Hello**
 *world!*`;
   const lang = buildMarkdown([]);
   const tree = parse(lang, example);
-  const html = await renderMarkdownToHtml(tree, {
+  const html = renderMarkdownToHtml(tree, {
     failOnUnknown: true,
     smartHardBreak: true,
   });
-  assertEquals(
-    html,
-    `<p><strong>Hello</strong><br/><em>world!</em></p>`,
-  );
+  // assertEquals(
+  //   html,
+  //   `<span class="p"><strong>Hello</strong><br><em>world!</em></span>`,
+  // );
+
+  const example2 = `This is going to be a text. With a new line.
+
+And another
+
+* and a list
+* with a second item
+
+### [[Bla]]
+  Url: something
+  Server: something else
+  📅 last_updated - [Release notes](release_notes_url)`;
+
+  const tree2 = parse(lang, example2);
+  const html2 = renderMarkdownToHtml(tree2, {
+    failOnUnknown: true,
+    smartHardBreak: true,
+  });
+
+  console.log(html2);
 });

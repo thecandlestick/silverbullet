@@ -9,11 +9,8 @@ import { FilterOption } from "../types.ts";
 import { FunctionalComponent } from "https://esm.sh/v99/preact@10.11.3/src/index";
 import { FeatherProps } from "https://esm.sh/v99/preact-feather@4.2.1/dist/types";
 import { MiniEditor } from "./mini_editor.tsx";
-import { fuzzySearchAndSort } from "./fuzzy_search.ts";
-
-type FilterResult = FilterOption & {
-  result?: any;
-};
+import { fuzzySearchAndSort } from "./fuse_search.ts";
+import { deepEqual } from "$sb/lib/json.ts";
 
 export function FilterList({
   placeholder,
@@ -64,8 +61,11 @@ export function FilterList({
       });
     }
 
-    setMatchingOptions(results);
-    setSelectionOption(0);
+    if (!deepEqual(matchingOptions, results)) {
+      // Only do this (=> rerender of UI) if the results have changed
+      setMatchingOptions(results);
+      setSelectionOption(0);
+    }
   }
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export function FilterList({
 
   useEffect(() => {
     function closer() {
-      console.log("Invoking closer");
+      // console.log("Invoking closer");
       onSelect(undefined);
     }
 
@@ -88,7 +88,13 @@ export function FilterList({
   const returnEl = (
     <div className="sb-modal-wrapper">
       <div className="sb-modal-box">
-        <div className="sb-header">
+        <div
+          className="sb-header"
+          onClick={(e) => {
+            // Allow tapping/clicking the header without closing it
+            e.stopPropagation();
+          }}
+        >
           <label>{label}</label>
           <MiniEditor
             text={text}
@@ -98,8 +104,10 @@ export function FilterList({
             darkMode={darkMode}
             completer={completer}
             placeholderText={placeholder}
-            onEnter={() => {
-              onSelect(matchingOptions[selectedOption]);
+            onEnter={(_newText, shiftDown) => {
+              onSelect(
+                shiftDown ? { name: text } : matchingOptions[selectedOption],
+              );
               return true;
             }}
             onEscape={() => {
@@ -107,7 +115,6 @@ export function FilterList({
             }}
             onChange={(text) => {
               setText(text);
-              // updateFilter(text);
             }}
             onKeyUp={(view, e) => {
               // This event is triggered after the key has been processed by CM already

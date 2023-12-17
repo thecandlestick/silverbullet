@@ -1,12 +1,12 @@
-import { FileMeta } from "../types.ts";
 import { SpacePrimitives } from "./space_primitives.ts";
 import { flushCachesAndUnregisterServiceWorker } from "../sw_util.ts";
+import { FileMeta } from "$sb/types.ts";
 
 export class HttpSpacePrimitives implements SpacePrimitives {
   constructor(
     readonly url: string,
     readonly expectedSpacePath?: string,
-    readonly syncMode = false,
+    private bearerToken?: string,
   ) {
   }
 
@@ -17,32 +17,68 @@ export class HttpSpacePrimitives implements SpacePrimitives {
     if (!options.headers) {
       options.headers = {};
     }
-    if (this.syncMode) {
-      options.headers = { ...options.headers, ...{ "X-Sync-Mode": "true" } };
+    options.headers = {
+      ...options.headers,
+      "X-Sync-Mode": "true",
+    };
+    if (this.bearerToken) {
+      options.headers = {
+        ...options.headers,
+        "Authorization": `Bearer ${this.bearerToken}`,
+      };
     }
 
-    const result = await fetch(url, { ...options });
-    if (
-      result.status === 401
-    ) {
-      // Invalid credentials, reloading the browser should trigger authentication
-      console.log("Going to redirect after", url);
-      location.href = "/.auth?refer=" + location.pathname;
-      throw new Error("Invalid credentials");
+    try {
+      const result = await fetch(url, options);
+      if (result.status === 503) {
+        throw new Error("Offline");
+      }
+      if (result.redirected) {
+        // Got a redirect, we'll assume this is due to invalid credentials and redirecting to an auth page
+        console.log(
+          "Got a redirect via the API so will redirect to URL",
+          result.url,
+        );
+        alert("You are not authenticated, redirecting to login page...");
+        location.href = result.url;
+        throw new Error("Not authenticated");
+      }
+      return result;
+    } catch (e: any) {
+      // Errors when there is no internet connection:
+      //
+      // * Firefox: NetworkError when attempting to fetch resource (with SW and without)
+      // * Safari (service worker enabled): FetchEvent.respondWith received an error: TypeError: Load failed
+      // * Safari (no service worker): Load failed
+      // * Chrome: Failed to fetch
+      //
+      // Common substrings: "fetch" "load failed"
+      const errorMessage = e.message.toLowerCase();
+      if (
+        errorMessage.includes("fetch") || errorMessage.includes("load failed")
+      ) {
+        throw new Error("Offline");
+      }
+      throw e;
     }
-    return result;
   }
 
   async fetchFileList(): Promise<FileMeta[]> {
-    const resp = await this.authenticatedFetch(this.url, {
+    const resp = await this.authenticatedFetch(`${this.url}/index.json`, {
       method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
     });
 
     if (
       resp.status === 200 &&
       this.expectedSpacePath &&
+      resp.headers.get("X-Space-Path") &&
       resp.headers.get("X-Space-Path") !== this.expectedSpacePath
     ) {
+      console.log("Expected space path", this.expectedSpacePath);
+      console.log("Got space path", resp.headers.get("X-Space-Path"));
       await flushCachesAndUnregisterServiceWorker();
       alert("Space folder path different on server, reloading the page");
       location.reload();
@@ -73,13 +109,15 @@ export class HttpSpacePrimitives implements SpacePrimitives {
     name: string,
     data: Uint8Array,
     _selfUpdate?: boolean,
-    lastModified?: number,
+    meta?: FileMeta,
   ): Promise<FileMeta> {
     const headers: Record<string, string> = {
       "Content-Type": "application/octet-stream",
     };
-    if (lastModified) {
-      headers["X-Last-Modified"] = "" + lastModified;
+    if (meta) {
+      headers["X-Created"] = "" + meta.created;
+      headers["X-Last-Modified"] = "" + meta.lastModified;
+      headers["X-Perm"] = "" + meta.perm;
     }
 
     const res = await this.authenticatedFetch(
@@ -109,12 +147,20 @@ export class HttpSpacePrimitives implements SpacePrimitives {
   async getFileMeta(name: string): Promise<FileMeta> {
     const res = await this.authenticatedFetch(
       `${this.url}/${encodeURI(name)}`,
+      // This used to use HEAD, but it seems that Safari on iOS is blocking cookies/credentials to be sent along with HEAD requests
+      // so we'll use GET instead with a magic header which the server may or may not use to omit the body.
       {
-        method: "OPTIONS",
+        method: "GET",
+        headers: {
+          "X-Get-Meta": "true",
+        },
       },
     );
     if (res.status === 404) {
       throw new Error(`Not found`);
+    }
+    if (!res.ok) {
+      throw new Error(`Failed to get file meta: ${res.statusText}`);
     }
     return this.responseToMeta(name, res);
   }
@@ -122,10 +168,25 @@ export class HttpSpacePrimitives implements SpacePrimitives {
   private responseToMeta(name: string, res: Response): FileMeta {
     return {
       name,
-      size: +res.headers.get("X-Content-Length")!,
+      // The server may set a custom X-Content-Length header in case a GET request was sent with X-Get-Meta, in which case the body may be omitted
+      size: res.headers.has("X-Content-Length")
+        ? +res.headers.get("X-Content-Length")!
+        : +res.headers.get("Content-Length")!,
       contentType: res.headers.get("Content-type")!,
+      created: +(res.headers.get("X-Created") || "0"),
       lastModified: +(res.headers.get("X-Last-Modified") || "0"),
-      perm: (res.headers.get("X-Permission") as "rw" | "ro") || "rw",
+      perm: (res.headers.get("X-Permission") as "rw" | "ro") || "ro",
     };
+  }
+
+  // Used to check if the server is reachable and the user is authenticated
+  // If not: throws an error or invokes a redirect
+  async ping() {
+    await this.authenticatedFetch(`${this.url}/index.json`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
   }
 }

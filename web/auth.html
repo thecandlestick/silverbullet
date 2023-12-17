@@ -57,8 +57,7 @@
   <header>
     <h1>Login to <img src="/.client/logo.png" style="height: 1ch;" /> SilverBullet</h1>
   </header>
-  <form action="/.auth" method="POST">
-    <input type="hidden" name="refer" value="" />
+  <form action="/.auth" method="POST" id="login">
     <div class="error-message"></div>
     <div>
       <input type="text" name="username" id="username" autocomplete="off" autocorrect="off" autocapitalize="off"
@@ -77,13 +76,8 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
-
-    const refer = params.get('refer');
-    if (refer) {
-      document.querySelector('input[name="refer"]').value = refer;
-    }
-
-    if (params.get('error')) {
+    const error = params.get('error');
+    if (error === "1") {
       document.querySelector('.error-message').innerText = "Invalid username or password";
     }
   </script>

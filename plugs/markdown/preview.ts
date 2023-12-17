@@ -1,23 +1,26 @@
-import { editor, space, system } from "$sb/silverbullet-syscall/mod.ts";
-import { asset, store } from "$sb/plugos-syscall/mod.ts";
-import { parseMarkdown } from "$sb/silverbullet-syscall/markdown.ts";
+import { asset, clientStore, editor, markdown, system } from "$sb/syscalls.ts";
 import { renderMarkdownToHtml } from "./markdown_render.ts";
+import { resolvePath } from "$sb/lib/resolve.ts";
+import { expandCodeWidgets } from "./api.ts";
 
 export async function updateMarkdownPreview() {
-  if (!(await store.get("enableMarkdownPreview"))) {
+  if (!(await clientStore.get("enableMarkdownPreview"))) {
     return;
   }
+  const currentPage = await editor.getCurrentPage();
   const text = await editor.getText();
-  const mdTree = await parseMarkdown(text);
+  const mdTree = await markdown.parseMarkdown(text);
   // const cleanMd = await cleanMarkdown(text);
-  const css = await asset.readAsset("assets/styles.css");
-  const js = await asset.readAsset("assets/handler.js");
+  const css = await asset.readAsset("assets/preview.css");
+  const js = await asset.readAsset("assets/preview.js");
+
+  await expandCodeWidgets(mdTree, currentPage);
   const html = renderMarkdownToHtml(mdTree, {
     smartHardBreak: true,
     annotationPositions: true,
-    inlineAttachments: (url) => {
+    translateUrls: (url) => {
       if (!url.includes("://")) {
-        return `/.fs/${url}`;
+        url = resolvePath(currentPage, decodeURI(url), true);
       }
       return url;
     },

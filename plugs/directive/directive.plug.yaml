@@ -6,65 +6,35 @@ functions:
     path: ./command.ts:updateDirectivesOnPageCommand
     command:
       name: "Directives: Update"
-      key: "Alt-q"
     events:
       - editor:pageLoaded
-  indexData:
-    path: ./data.ts:indexData
-    events:
-      - page:index
-  dataQueryProvider:
-    path: ./data.ts:queryProvider
-    events:
-      - query:data
+  updateDirectivesInSpace:
+    path: ./command.ts:updateDirectivesInSpace
+  updateDirectivesInSpaceCommand:
+    path: ./command.ts:updateDirectivesInSpaceCommand
+    command:
+      name: "Directives: Update Entire Space"
+  processUpdateQueue:
+    path: ./command.ts:processUpdateQueue
+    mqSubscriptions:
+    - queue: directiveUpdateQueue
+      batchSize: 3
   queryComplete:
     path: ./complete.ts:queryComplete
     events:
       - editor:complete
+  handlebarHelperComplete:
+    path: ./complete.ts:templateVariableComplete
+    events:
+      - editor:complete
 
-  # Templates
-  insertQuery:
-    redirect: core.insertTemplateText
-    slashCommand:
-      name: query
-      description: Insert a query
-      value: |
-        <!-- #query |^| -->
+  # Conversion
+  convertToLiveQuery:
+    path: command.ts:convertToLive
+    command:
+      name: "Directive: Convert to Live Query/Template"
 
-        <!-- /query -->
-  insertInclude:
-    redirect: core.insertTemplateText
-    slashCommand:
-      name: include
-      description: Include another page
-      value: |
-        <!-- #include [[|^|]] -->
-
-        <!-- /include -->
-  insertUseTemplate:
-    redirect: core.insertTemplateText
-    slashCommand:
-      name: use
-      description: Use a template
-      value: |
-        <!-- #use [[|^|]] {} -->
-
-        <!-- /use -->
-  insertUseVerboseTemplate:
-    redirect: core.insertTemplateText
-    slashCommand:
-      name: use-verbose
-      description: Use a template (verbose mode)
-      value: |
-        <!-- #use-verbose [[|^|]] {} -->
-
-        <!-- /use-verbose -->
-  insertEvalTemplate:
-    redirect: core.insertTemplateText
-    slashCommand:
-      name: eval
-      description: Evaluate a JavaScript expression
-      value: |
-        <!-- #eval |^| -->
-
-        <!-- /eval -->
+  convertSpaceToLive:
+    path: command.ts:convertSpaceToLive
+    command:
+      name: "Directive: Convert Entire Space to Live/Templates"

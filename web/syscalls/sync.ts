@@ -1,13 +1,19 @@
 import { SysCallMapping } from "../../plugos/system.ts";
-import { SyncService } from "../sync_service.ts";
+import type { Client } from "../client.ts";
 
-export function syncSyscalls(syncService: SyncService): SysCallMapping {
+export function syncSyscalls(editor: Client): SysCallMapping {
   return {
     "sync.isSyncing": (): Promise<boolean> => {
-      return syncService.isSyncing();
+      return editor.syncService.isSyncing();
     },
     "sync.hasInitialSyncCompleted": (): Promise<boolean> => {
-      return syncService.hasInitialSyncCompleted();
+      return editor.syncService.hasInitialSyncCompleted();
+    },
+    "sync.scheduleFileSync": (_ctx, path: string): Promise<void> => {
+      return editor.syncService.scheduleFileSync(path);
+    },
+    "sync.scheduleSpaceSync": () => {
+      return editor.syncService.scheduleSpaceSync();
     },
   };
 }

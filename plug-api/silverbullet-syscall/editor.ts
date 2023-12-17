@@ -1,4 +1,5 @@
 import type { FilterOption } from "../../web/types.ts";
+import { UploadFile } from "../types.ts";
 import { syscall } from "./syscall.ts";
 
 export function getCurrentPage(): Promise<string> {
@@ -42,13 +43,24 @@ export function reloadPage(): Promise<void> {
   return syscall("editor.reloadPage");
 }
 
-export function openUrl(url: string): Promise<void> {
-  return syscall("editor.openUrl", url);
+export function reloadUI(): Promise<void> {
+  return syscall("editor.reloadUI");
+}
+
+export function openUrl(url: string, existingWindow = false): Promise<void> {
+  return syscall("editor.openUrl", url, existingWindow);
 }
 
 // Force the client to download the file in dataUrl with filename as file name
 export function downloadFile(filename: string, dataUrl: string): Promise<void> {
   return syscall("editor.downloadFile", filename, dataUrl);
+}
+
+export function uploadFile(
+  accept?: string,
+  capture?: string,
+): Promise<UploadFile> {
+  return syscall("editor.uploadFile", accept, capture);
 }
 
 export function flashNotification(
@@ -68,7 +80,7 @@ export function filterBox(
 }
 
 export function showPanel(
-  id: "lhs" | "rhs" | "bhs" | "modal",
+  id: "lhs" | "rhs" | "bhs" | "modal" | "bottom" | "top",
   mode: number,
   html: string,
   script = "",
@@ -76,7 +88,9 @@ export function showPanel(
   return syscall("editor.showPanel", id, mode, html, script);
 }
 
-export function hidePanel(id: "lhs" | "rhs" | "bhs" | "modal"): Promise<void> {
+export function hidePanel(
+  id: "lhs" | "rhs" | "bhs" | "modal" | "bottom" | "top",
+): Promise<void> {
   return syscall("editor.hidePanel", id);
 }
 
@@ -127,4 +141,26 @@ export function setUiOption(key: string, value: any): Promise<void> {
 // Vim specific
 export function vimEx(exCommand: string): Promise<any> {
   return syscall("editor.vimEx", exCommand);
+}
+
+// Folding
+
+export function fold() {
+  return syscall("editor.fold");
+}
+
+export function unfold() {
+  return syscall("editor.unfold");
+}
+
+export function toggleFold() {
+  return syscall("editor.toggleFold");
+}
+
+export function foldAll() {
+  return syscall("editor.foldAll");
+}
+
+export function unfoldAll() {
+  return syscall("editor.unfoldAll");
 }

@@ -1,4 +1,4 @@
-import { FileMeta } from "../types.ts";
+import { FileMeta } from "$sb/types.ts";
 import { SpacePrimitives } from "./space_primitives.ts";
 
 export class FilteredSpacePrimitives implements SpacePrimitives {
@@ -25,9 +25,9 @@ export class FilteredSpacePrimitives implements SpacePrimitives {
     name: string,
     data: Uint8Array,
     selfUpdate?: boolean | undefined,
-    lastModified?: number | undefined,
+    meta?: FileMeta,
   ): Promise<FileMeta> {
-    return this.wrapped.writeFile(name, data, selfUpdate, lastModified);
+    return this.wrapped.writeFile(name, data, selfUpdate, meta);
   }
   deleteFile(name: string): Promise<void> {
     return this.wrapped.deleteFile(name);

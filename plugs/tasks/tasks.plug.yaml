@@ -19,8 +19,13 @@ syntax:
     styles:
       backgroundColor: "rgba(22,22,22,0.07)"
 functions:
+  # API
+  updateTaskState:
+    path: task.ts:updateTaskState
+
+
   turnIntoTask:
-    redirect: core.applyLineReplace
+    redirect: template.applyLineReplace
     slashCommand:
       name: task
       description: Turn into task
@@ -35,17 +40,15 @@ functions:
     path: "./task.ts:taskToggle"
     events:
       - page:click
-  itemQueryProvider:
-    path: ./task.ts:queryProvider
-    events:
-      - query:task
+  # itemQueryProvider:
+  #   path: ./task.ts:queryProvider
+  #   events:
+  #     - query:task
   taskToggleCommand:
-    path: ./task.ts:taskToggleCommand
+    path: ./task.ts:taskCycleCommand
     command:
-      name: "Task: Toggle"
+      name: "Task: Cycle State"
       key: Alt-t
-      contexts:
-        - Task
   taskPostponeCommand:
     path: ./task.ts:postponeCommand
     command:
@@ -57,3 +60,8 @@ functions:
     path: ./task.ts:previewTaskToggle
     events:
       - preview:click
+
+  taskComplete:
+    path: ./complete.ts:completeTaskState
+    events:
+    - editor:complete

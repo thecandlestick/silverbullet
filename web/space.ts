@@ -1,39 +1,49 @@
 import { SpacePrimitives } from "../common/spaces/space_primitives.ts";
-import { FileMeta } from "../common/types.ts";
-import { EventEmitter } from "../plugos/event.ts";
 import { plugPrefix } from "../common/spaces/constants.ts";
 import { safeRun } from "../common/util.ts";
-import { AttachmentMeta, PageMeta } from "./types.ts";
-import { DexieKVStore } from "../plugos/lib/kv_store.dexie.ts";
-import { throttle } from "../common/async_util.ts";
 
-export type SpaceEvents = {
-  pageCreated: (meta: PageMeta) => void;
-  pageChanged: (meta: PageMeta) => void;
-  pageDeleted: (name: string) => void;
-  pageListUpdated: (pages: PageMeta[]) => void;
-};
+import { AttachmentMeta, FileMeta, PageMeta } from "$sb/types.ts";
+import { EventHook } from "../plugos/hooks/event.ts";
+import { throttle } from "$sb/lib/async.ts";
+import { DataStore } from "../plugos/lib/datastore.ts";
+import { LimitedMap } from "../common/limited_map.ts";
 
 const pageWatchInterval = 5000;
 
-export class Space extends EventEmitter<SpaceEvents> {
-  pageMetaCache = new Map<string, PageMeta>();
+export class Space {
+  imageHeightCache = new LimitedMap<number>(100); // url -> height
+  widgetHeightCache = new LimitedMap<number>(100); // bodytext -> height
+  cachedPageList: PageMeta[] = [];
 
-  imageHeightCache: Record<string, number> = {};
-
-  debouncedCacheFlush = throttle(() => {
-    this.kvStore.set("imageHeightCache", this.imageHeightCache).catch(
+  debouncedImageCacheFlush = throttle(() => {
+    this.ds.set(["cache", "imageHeight"], this.imageHeightCache).catch(
       console.error,
     );
     console.log("Flushed image height cache to store");
   }, 5000);
 
   setCachedImageHeight(url: string, height: number) {
-    this.imageHeightCache[url] = height;
-    this.debouncedCacheFlush();
+    this.imageHeightCache.set(url, height);
+    this.debouncedImageCacheFlush();
   }
   getCachedImageHeight(url: string): number {
-    return this.imageHeightCache[url] ?? -1;
+    return this.imageHeightCache.get(url) ?? -1;
+  }
+
+  debouncedWidgetCacheFlush = throttle(() => {
+    this.ds.set(["cache", "widgetHeight"], this.widgetHeightCache.toJSON())
+      .catch(
+        console.error,
+      );
+    // console.log("Flushed widget height cache to store");
+  }, 5000);
+
+  setCachedWidgetHeight(bodyText: string, height: number) {
+    this.widgetHeightCache.set(bodyText, height);
+    this.debouncedWidgetCacheFlush();
+  }
+  getCachedWidgetHeight(bodyText: string): number {
+    return this.widgetHeightCache.get(bodyText) ?? -1;
   }
 
   // We do watch files in the background to detect changes
@@ -41,107 +51,73 @@ export class Space extends EventEmitter<SpaceEvents> {
   watchedPages = new Set<string>();
   watchInterval?: number;
 
-  private initialPageListLoad = true;
+  // private initialPageListLoad = true;
   private saving = false;
 
   constructor(
     readonly spacePrimitives: SpacePrimitives,
-    private kvStore: DexieKVStore,
+    private ds: DataStore,
+    private eventHook: EventHook,
   ) {
-    super();
-    this.kvStore.get("imageHeightCache").then((cache) => {
-      if (cache) {
-        console.log("Loaded image height cache from KV store", cache);
-        this.imageHeightCache = cache;
+    // super();
+    this.ds.batchGet([["cache", "imageHeight"], ["cache", "widgetHeight"]])
+      .then(([imageCache, widgetCache]) => {
+        if (imageCache) {
+          this.imageHeightCache = new LimitedMap(100, imageCache);
+        }
+        if (widgetCache) {
+          // console.log("Loaded widget cache from store", widgetCache);
+          this.widgetHeightCache = new LimitedMap(100, widgetCache);
+        }
+      });
+    eventHook.addLocalListener("file:listed", (files: FileMeta[]) => {
+      // console.log("Files listed", files);
+      this.cachedPageList = files.filter(this.isListedPage).map(
+        fileMetaToPageMeta,
+      );
+    });
+    eventHook.addLocalListener("page:deleted", (pageName: string) => {
+      if (this.watchedPages.has(pageName)) {
+        // Stop watching deleted pages already
+        this.watchedPages.delete(pageName);
       }
     });
   }
 
   public async updatePageList() {
-    const newPageList = await this.fetchPageList();
-    const deletedPages = new Set<string>(this.pageMetaCache.keys());
-    newPageList.forEach((meta) => {
-      const pageName = meta.name;
-      const oldPageMeta = this.pageMetaCache.get(pageName);
-      const newPageMeta: PageMeta = { ...meta };
-      if (
-        !oldPageMeta &&
-        (pageName.startsWith(plugPrefix) || !this.initialPageListLoad)
-      ) {
-        this.emit("pageCreated", newPageMeta);
-      } else if (
-        oldPageMeta &&
-        oldPageMeta.lastModified !== newPageMeta.lastModified
-      ) {
-        this.emit("pageChanged", newPageMeta);
-      }
-      // Page found, not deleted
-      deletedPages.delete(pageName);
-
-      // Update in cache
-      this.pageMetaCache.set(pageName, newPageMeta);
-    });
-
-    for (const deletedPage of deletedPages) {
-      this.pageMetaCache.delete(deletedPage);
-      this.emit("pageDeleted", deletedPage);
-    }
-
-    this.emit("pageListUpdated", this.listPages());
-    this.initialPageListLoad = false;
+    // This will trigger appropriate events automatically
+    await this.fetchPageList();
   }
 
   async deletePage(name: string): Promise<void> {
     await this.getPageMeta(name); // Check if page exists, if not throws Error
     await this.spacePrimitives.deleteFile(`${name}.md`);
-
-    this.pageMetaCache.delete(name);
-    this.emit("pageDeleted", name);
-    this.emit("pageListUpdated", [...this.pageMetaCache.values()]);
   }
 
   async getPageMeta(name: string): Promise<PageMeta> {
-    const oldMeta = this.pageMetaCache.get(name);
-    const newMeta = fileMetaToPageMeta(
+    return fileMetaToPageMeta(
       await this.spacePrimitives.getFileMeta(`${name}.md`),
     );
-    if (oldMeta) {
-      if (oldMeta.lastModified !== newMeta.lastModified) {
-        // Changed on disk, trigger event
-        this.emit("pageChanged", newMeta);
-      }
-    }
-    return this.metaCacher(name, newMeta);
   }
 
   listPages(): PageMeta[] {
-    return [...new Set(this.pageMetaCache.values())];
+    return this.cachedPageList;
   }
 
-  async listPlugs(): Promise<string[]> {
-    const files = await this.spacePrimitives.fetchFileList();
+  async listPlugs(): Promise<FileMeta[]> {
+    const files = await this.deduplicatedFileList();
     return files
       .filter((fileMeta) =>
         fileMeta.name.startsWith(plugPrefix) &&
         fileMeta.name.endsWith(".plug.js")
-      )
-      .map((fileMeta) => fileMeta.name);
+      );
   }
 
   async readPage(name: string): Promise<{ text: string; meta: PageMeta }> {
     const pageData = await this.spacePrimitives.readFile(`${name}.md`);
-    const previousMeta = this.pageMetaCache.get(name);
-    const newMeta = fileMetaToPageMeta(pageData.meta);
-    if (previousMeta) {
-      if (previousMeta.lastModified !== newMeta.lastModified) {
-        // Page changed since last cached metadata, trigger event
-        this.emit("pageChanged", newMeta);
-      }
-    }
-    const meta = this.metaCacher(name, newMeta);
     return {
       text: new TextDecoder().decode(pageData.data),
-      meta: meta,
+      meta: fileMetaToPageMeta(pageData.meta),
     };
   }
 
@@ -159,27 +135,50 @@ export class Space extends EventEmitter<SpaceEvents> {
           selfUpdate,
         ),
       );
-      if (!selfUpdate) {
-        this.emit("pageChanged", pageMeta);
+      if (!this.cachedPageList.find((page) => page.name === pageMeta.name)) {
+        // New page, let's cache it
+        this.cachedPageList.push(pageMeta);
       }
-      return this.metaCacher(name, pageMeta);
+      // Note: we don't do very elaborate cache invalidation work here, quite quickly the cache will be flushed anyway
+      return pageMeta;
     } finally {
       this.saving = false;
     }
   }
 
+  // We're listing all pages that don't start with a _
+  isListedPage(fileMeta: FileMeta): boolean {
+    return fileMeta.name.endsWith(".md") && !fileMeta.name.startsWith("_");
+  }
+
   async fetchPageList(): Promise<PageMeta[]> {
-    return (await this.spacePrimitives.fetchFileList())
-      .filter((fileMeta) => fileMeta.name.endsWith(".md"))
+    return (await this.deduplicatedFileList())
+      .filter(this.isListedPage)
       .map(fileMetaToPageMeta);
   }
 
   async fetchAttachmentList(): Promise<AttachmentMeta[]> {
-    return (await this.spacePrimitives.fetchFileList()).filter(
+    return (await this.deduplicatedFileList()).filter(
       (fileMeta) =>
-        !fileMeta.name.endsWith(".md") &&
+        !this.isListedPage(fileMeta) &&
         !fileMeta.name.endsWith(".plug.js"),
     );
+  }
+
+  async deduplicatedFileList(): Promise<FileMeta[]> {
+    const files = await this.spacePrimitives.fetchFileList();
+    const fileMap = new Map<string, FileMeta>();
+    for (const file of files) {
+      if (fileMap.has(file.name)) {
+        const existing = fileMap.get(file.name)!;
+        if (existing.lastModified < file.lastModified) {
+          fileMap.set(file.name, file);
+        }
+      } else {
+        fileMap.set(file.name, file);
+      }
+    }
+    return [...fileMap.values()];
   }
 
   /**
@@ -200,13 +199,9 @@ export class Space extends EventEmitter<SpaceEvents> {
   writeAttachment(
     name: string,
     data: Uint8Array,
-    selfUpdate?: boolean | undefined,
+    selfUpdate?: boolean,
   ): Promise<AttachmentMeta> {
-    return this.spacePrimitives.writeFile(
-      name,
-      data as Uint8Array,
-      selfUpdate,
-    );
+    return this.spacePrimitives.writeFile(name, data, selfUpdate);
   }
 
   deleteAttachment(name: string): Promise<void> {
@@ -225,13 +220,6 @@ export class Space extends EventEmitter<SpaceEvents> {
           return;
         }
         for (const pageName of this.watchedPages) {
-          const oldMeta = this.pageMetaCache.get(pageName);
-          if (!oldMeta) {
-            // No longer in cache, meaning probably deleted let's unwatch
-            this.watchedPages.delete(pageName);
-            continue;
-          }
-          // This seems weird, but simply fetching it will compare to local cache and trigger an event if necessary
           await this.getPageMeta(pageName);
         }
       });
@@ -252,19 +240,21 @@ export class Space extends EventEmitter<SpaceEvents> {
   unwatchPage(pageName: string) {
     this.watchedPages.delete(pageName);
   }
-
-  private metaCacher(name: string, meta: PageMeta): PageMeta {
-    if (meta.lastModified !== 0) {
-      // Don't cache metadata for pages with a 0 lastModified timestamp (usualy dynamically generated pages)
-      this.pageMetaCache.set(name, meta);
-    }
-    return meta;
-  }
 }
 
-function fileMetaToPageMeta(fileMeta: FileMeta): PageMeta {
-  return {
-    ...fileMeta,
-    name: fileMeta.name.substring(0, fileMeta.name.length - 3),
-  } as PageMeta;
+export function fileMetaToPageMeta(fileMeta: FileMeta): PageMeta {
+  const name = fileMeta.name.substring(0, fileMeta.name.length - 3);
+  try {
+    return {
+      ...fileMeta,
+      ref: name,
+      tags: ["page"],
+      name,
+      created: new Date(fileMeta.created).toISOString(),
+      lastModified: new Date(fileMeta.lastModified).toISOString(),
+    } as PageMeta;
+  } catch (e) {
+    console.error("Failed to convert fileMeta to pageMeta", fileMeta, e);
+    throw e;
+  }
 }

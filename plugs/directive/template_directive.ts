@@ -1,20 +1,20 @@
 import { queryRegex } from "$sb/lib/query.ts";
 import { ParseTree, renderToText } from "$sb/lib/tree.ts";
-import { replaceAsync } from "$sb/lib/util.ts";
-import { markdown, space } from "$sb/silverbullet-syscall/mod.ts";
-import Handlebars from "handlebars";
+import { handlebars, markdown, space } from "$sb/syscalls.ts";
 
-import { replaceTemplateVars } from "../core/template.ts";
+import { replaceTemplateVars } from "../template/template.ts";
 import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
 import { directiveRegex } from "./directives.ts";
 import { updateDirectives } from "./command.ts";
-import { registerHandlebarsHelpers } from "./util.ts";
+import { resolvePath, rewritePageRefs } from "$sb/lib/resolve.ts";
+import { PageMeta } from "$sb/types.ts";
+import { renderTemplate } from "../template/plug_api.ts";
 
 const templateRegex = /\[\[([^\]]+)\]\]\s*(.*)\s*/;
 
 export async function templateDirectiveRenderer(
   directive: string,
-  pageName: string,
+  pageMeta: PageMeta,
   arg: string | ParseTree,
 ): Promise<string> {
   if (typeof arg !== "string") {
@@ -24,75 +24,77 @@ export async function templateDirectiveRenderer(
   if (!match) {
     throw new Error(`Invalid template directive: ${arg}`);
   }
-  const template = match[1];
+  let templatePath = match[1];
   const args = match[2];
   let parsedArgs = {};
   if (args) {
     try {
-      parsedArgs = JSON.parse(args);
+      parsedArgs = JSON.parse(await replaceTemplateVars(args, pageMeta));
     } catch {
-      throw new Error(`Failed to parse template instantiation args: ${arg}`);
+      throw new Error(
+        `Failed to parse template instantiation arg: ${
+          replaceTemplateVars(args, pageMeta)
+        }`,
+      );
     }
   }
   let templateText = "";
-  if (template.startsWith("http://") || template.startsWith("https://")) {
+  if (
+    templatePath.startsWith("http://") || templatePath.startsWith("https://")
+  ) {
     try {
-      const req = await fetch(template);
+      const req = await fetch(templatePath);
       templateText = await req.text();
     } catch (e: any) {
       templateText = `ERROR: ${e.message}`;
     }
   } else {
-    templateText = await space.readPage(template);
+    templatePath = resolvePath(pageMeta.name, templatePath);
+    templateText = await space.readPage(templatePath);
   }
-  let newBody = templateText;
+  const tree = await markdown.parseMarkdown(templateText);
+  await extractFrontmatter(tree, { removeFrontmatterSection: true }); // Remove entire frontmatter section, if any
+
+  // Resolve paths in the template
+  rewritePageRefs(tree, templatePath);
+
+  let newBody = renderToText(tree);
+
+  // console.log("Rewritten template:", newBody);
+
   // if it's a template injection (not a literal "include")
   if (directive === "use") {
-    const tree = await markdown.parseMarkdown(templateText);
-    await extractFrontmatter(tree, ["$disableDirectives"]);
-    templateText = renderToText(tree);
-    registerHandlebarsHelpers();
-    const templateFn = Handlebars.compile(
-      replaceTemplateVars(templateText, pageName),
-      { noEscape: true },
-    );
-    if (typeof parsedArgs !== "string") {
-      (parsedArgs as any).page = pageName;
-    }
-    newBody = templateFn(parsedArgs);
+    newBody = (await renderTemplate(newBody, pageMeta, parsedArgs)).text;
 
     // Recursively render directives
-    newBody = await updateDirectives(pageName, newBody);
+    const tree = await markdown.parseMarkdown(newBody);
+    newBody = await updateDirectives(pageMeta, tree, newBody);
   }
   return newBody.trim();
 }
 
-export function cleanTemplateInstantiations(text: string): Promise<string> {
-  return replaceAsync(
-    text,
-    directiveRegex,
-    (
-      _fullMatch,
-      startInst,
-      type,
-      _args,
-      body,
-      endInst,
-    ): Promise<string> => {
-      if (type === "use") {
-        body = body.replaceAll(
-          queryRegex,
-          (
-            _fullMatch: string,
-            _startQuery: string,
-            _query: string,
-            body: string,
-          ) => {
-            return body.trim();
-          },
-        );
-      }
-      return Promise.resolve(`${startInst}${body}${endInst}`);
-    },
-  );
+export function cleanTemplateInstantiations(text: string) {
+  return text.replaceAll(directiveRegex, (
+    _fullMatch,
+    startInst,
+    type,
+    _args,
+    body,
+    endInst,
+  ): string => {
+    if (type === "use") {
+      body = body.replaceAll(
+        queryRegex,
+        (
+          _fullMatch: string,
+          _startQuery: string,
+          _query: string,
+          body: string,
+        ) => {
+          return body.trim();
+        },
+      );
+    }
+    return `${startInst}${body}${endInst}`;
+  });
 }

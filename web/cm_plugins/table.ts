@@ -8,12 +8,13 @@ import {
 import { renderMarkdownToHtml } from "../../plugs/markdown/markdown_render.ts";
 import { ParseTree } from "$sb/lib/tree.ts";
 import { lezerToParseTree } from "../../common/markdown_parser/parse_tree.ts";
-import type { Editor } from "../editor.tsx";
+import type { Client } from "../client.ts";
+import { resolvePath } from "$sb/lib/resolve.ts";
 
 class TableViewWidget extends WidgetType {
   constructor(
     readonly pos: number,
-    readonly editor: Editor,
+    readonly editor: Client,
     readonly t: ParseTree,
   ) {
     super();
@@ -26,7 +27,7 @@ class TableViewWidget extends WidgetType {
       // Pulling data-pos to put the cursor in the right place, falling back
       // to the start of the table.
       const dataAttributes = (e.target as any).dataset;
-      this.editor.editorView!.dispatch({
+      this.editor.editorView.dispatch({
         selection: {
           anchor: dataAttributes.pos ? +dataAttributes.pos : this.pos,
         },
@@ -37,18 +38,19 @@ class TableViewWidget extends WidgetType {
       // Annotate every element with its position so we can use it to put
       // the cursor there when the user clicks on the table.
       annotationPositions: true,
-      inlineAttachments: (url) => {
+      translateUrls: (url) => {
         if (!url.includes("://")) {
-          return `/.fs/${url}`;
+          url = resolvePath(this.editor.currentPage!, decodeURI(url), true);
         }
         return url;
       },
+      preserveAttributes: true,
     });
     return dom;
   }
 }
 
-export function tablePlugin(editor: Editor) {
+export function tablePlugin(editor: Client) {
   return decoratorStateField((state: EditorState) => {
     const widgets: any[] = [];
     syntaxTree(state).iterate({

@@ -1,5 +1,11 @@
-import { ParseTree, renderToText } from "$sb/lib/tree.ts";
-import { sync } from "../../plug-api/silverbullet-syscall/mod.ts";
+import {
+  addParentPointers,
+  findParentMatching,
+  ParseTree,
+  renderToText,
+} from "$sb/lib/tree.ts";
+import { PageMeta } from "$sb/types.ts";
+import { editor, markdown } from "$sb/syscalls.ts";
 
 import { evalDirectiveRenderer } from "./eval_directive.ts";
 import { queryDirectiveRenderer } from "./query_directive.ts";
@@ -7,6 +13,25 @@ import {
   cleanTemplateInstantiations,
   templateDirectiveRenderer,
 } from "./template_directive.ts";
+
+/** An error that occurs while a directive is being rendered.
+ * Mostly annotates the underlying error with page metadata.
+ */
+export class RenderDirectiveError extends Error {
+  pageMeta: PageMeta;
+  directive: string;
+  cause: Error;
+
+  constructor(pageMeta: PageMeta, directive: string, cause: Error) {
+    super(`In directive "${directive}" from "${pageMeta.name}": ${cause}`, {
+      cause: cause,
+    });
+
+    this.pageMeta = pageMeta;
+    this.directive = directive;
+    this.cause = cause;
+  }
+}
 
 export const directiveStartRegex =
   /<!--\s*#(use|use-verbose|include|eval|query)\s+(.*?)-->/i;
@@ -17,13 +42,13 @@ export const directiveRegex =
  * Looks for directives in the text dispatches them based on name
  */
 export async function directiveDispatcher(
-  pageName: string,
+  pageMeta: PageMeta,
   directiveTree: ParseTree,
   directiveRenderers: Record<
     string,
     (
       directive: string,
-      pageName: string,
+      pageMeta: PageMeta,
       arg: string | ParseTree,
     ) => Promise<string>
   >,
@@ -34,8 +59,29 @@ export async function directiveDispatcher(
   const directiveStartText = renderToText(directiveStart).trim();
   const directiveEndText = renderToText(directiveEnd).trim();
 
-  if (directiveStart.children!.length === 1) {
-    // Everything not #query
+  const firstPart = directiveStart.children![0].text!;
+  if (firstPart?.includes("#query")) {
+    // #query
+    const newBody = await directiveRenderers["query"](
+      "query",
+      pageMeta,
+      directiveStart.children![1].children![0], // The query ParseTree
+    );
+    const result =
+      `${directiveStartText}\n${newBody.trim()}\n${directiveEndText}`;
+    return result;
+  } else if (firstPart?.includes("#eval")) {
+    console.log("Eval stuff", directiveStart.children![1].children![0]);
+    const newBody = await directiveRenderers["eval"](
+      "eval",
+      pageMeta,
+      directiveStart.children![1].children![0],
+    );
+    const result =
+      `${directiveStartText}\n${newBody.trim()}\n${directiveEndText}`;
+    return result;
+  } else {
+    // Everything not #query and #eval
     const match = directiveStartRegex.exec(directiveStart.children![0].text!);
     if (!match) {
       throw Error("No match");
@@ -44,44 +90,33 @@ export async function directiveDispatcher(
     let [_fullMatch, type, arg] = match;
     try {
       arg = arg.trim();
-      const newBody = await directiveRenderers[type](type, pageName, arg);
+      const newBody = await directiveRenderers[type](type, pageMeta, arg);
       const result =
         `${directiveStartText}\n${newBody.trim()}\n${directiveEndText}`;
       return result;
     } catch (e: any) {
       return `${directiveStartText}\n**ERROR:** ${e.message}\n${directiveEndText}`;
     }
-  } else {
-    // #query
-    if (!(await sync.hasInitialSyncCompleted())) {
-      console.info(
-        "Initial sync hasn't completed yet, not updating query directives.",
-      );
-      // Render the query directive as-is
-      return renderToText(directiveTree);
-    }
-
-    const newBody = await directiveRenderers["query"](
-      "query",
-      pageName,
-      directiveStart.children![1], // The query ParseTree
-    );
-    const result =
-      `${directiveStartText}\n${newBody.trim()}\n${directiveEndText}`;
-    return result;
   }
 }
 
 export async function renderDirectives(
-  pageName: string,
+  pageMeta: PageMeta,
   directiveTree: ParseTree,
 ): Promise<string> {
-  const replacementText = await directiveDispatcher(pageName, directiveTree, {
-    use: templateDirectiveRenderer,
-    include: templateDirectiveRenderer,
-    query: queryDirectiveRenderer,
-    eval: evalDirectiveRenderer,
-  });
-
-  return cleanTemplateInstantiations(replacementText);
+  try {
+    const replacementText = await directiveDispatcher(pageMeta, directiveTree, {
+      use: templateDirectiveRenderer,
+      include: templateDirectiveRenderer,
+      query: queryDirectiveRenderer,
+      eval: evalDirectiveRenderer,
+    });
+    return cleanTemplateInstantiations(replacementText);
+  } catch (e) {
+    throw new RenderDirectiveError(
+      pageMeta,
+      renderToText(directiveTree.children![0].children![1]).trim(),
+      e,
+    );
+  }
 }

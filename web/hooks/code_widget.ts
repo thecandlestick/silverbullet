@@ -1,13 +1,10 @@
 import { Hook, Manifest } from "../../plugos/types.ts";
 import { System } from "../../plugos/system.ts";
+import { CodeWidgetCallback } from "$sb/types.ts";
 
 export type CodeWidgetT = {
   codeWidget?: string;
 };
-
-export type CodeWidgetCallback = (
-  bodyText: string,
-) => Promise<{ html: string; script: string }>;
 
 export class CodeWidgetHook implements Hook<CodeWidgetT> {
   codeWidgetCallbacks = new Map<string, CodeWidgetCallback>();
@@ -26,9 +23,12 @@ export class CodeWidgetHook implements Hook<CodeWidgetT> {
         if (!functionDef.codeWidget) {
           continue;
         }
-        this.codeWidgetCallbacks.set(functionDef.codeWidget, (bodyText) => {
-          return plug.invoke(name, [bodyText]);
-        });
+        this.codeWidgetCallbacks.set(
+          functionDef.codeWidget,
+          (bodyText, pageName) => {
+            return plug.invoke(name, [bodyText, pageName]);
+          },
+        );
       }
     }
   }

@@ -1,17 +1,10 @@
 name: search
 functions:
   indexPage:
-    path: search.ts:indexPage
-    events:
-    - page:index
+   path: search.ts:indexPage
+   events:
+   - page:index
 
-  clearIndex:
-    path: search.ts:clearIndex
-
-  searchUnindex:
-    path: "./search.ts:pageUnindex"
-    events:
-      - page:deleted
   searchQueryProvider:
     path: ./search.ts:queryProvider
     events:

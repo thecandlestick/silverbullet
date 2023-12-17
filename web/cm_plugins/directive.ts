@@ -23,7 +23,7 @@ export function directivePlugin() {
 
         if (type.name === "DirectiveStart") {
           if (cursorInRange) {
-            // Cursor outside this directive
+            // Cursor inside this directive
             widgets.push(
               Decoration.line({ class: "sb-directive-start" }).range(from),
             );

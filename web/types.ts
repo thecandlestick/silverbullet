@@ -1,19 +1,6 @@
+import { Manifest } from "../common/manifest.ts";
+import { PageMeta } from "$sb/types.ts";
 import { AppCommand } from "./hooks/command.ts";
-
-export type PageMeta = {
-  name: string;
-  lastModified: number;
-  lastOpened?: number;
-  perm: "ro" | "rw";
-} & Record<string, any>;
-
-export type AttachmentMeta = {
-  name: string;
-  contentType: string;
-  lastModified: number;
-  size: number;
-  perm: "ro" | "rw";
-};
 
 // Used by FilterBox
 export type FilterOption = {
@@ -33,6 +20,8 @@ export type PanelMode = number;
 
 export type BuiltinSettings = {
   indexPage: string;
+  customStyles?: string | string[];
+  plugOverrides?: Record<string, Partial<Manifest>>;
   // Format: compatible with docker ignore
   spaceIgnore?: string;
 };
@@ -51,7 +40,8 @@ export type AppViewState = {
   showCommandPalette: boolean;
   showCommandPaletteContext?: string;
   unsavedChanges: boolean;
-  synced: boolean;
+  syncFailures: number; // Reset everytime a sync succeeds
+  progressPerc?: number;
   panels: { [key: string]: PanelConfig };
   allPages: PageMeta[];
   commands: Map<string, AppCommand>;
@@ -89,7 +79,7 @@ export const initialViewState: AppViewState = {
   showPageNavigator: false,
   showCommandPalette: false,
   unsavedChanges: false,
-  synced: true,
+  syncFailures: 0,
   uiOptions: {
     vimMode: false,
     darkMode: false,
@@ -100,6 +90,8 @@ export const initialViewState: AppViewState = {
     rhs: {},
     bhs: {},
     modal: {},
+    top: {},
+    bottom: {},
   },
   allPages: [],
   commands: new Map(),
@@ -122,7 +114,7 @@ export type Action =
   | { type: "pages-listed"; pages: PageMeta[] }
   | { type: "page-changed" }
   | { type: "page-saved" }
-  | { type: "sync-change"; synced: boolean }
+  | { type: "sync-change"; syncSuccess: boolean }
   | { type: "start-navigate" }
   | { type: "stop-navigate" }
   | {
@@ -162,4 +154,5 @@ export type Action =
     callback: (value: boolean) => void;
   }
   | { type: "hide-confirm" }
-  | { type: "set-ui-option"; key: string; value: any };
+  | { type: "set-ui-option"; key: string; value: any }
+  | { type: "set-progress"; progressPerc?: number };

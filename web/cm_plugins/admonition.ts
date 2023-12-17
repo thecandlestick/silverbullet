@@ -6,7 +6,7 @@ import {
   syntaxTree,
   WidgetType,
 } from "../deps.ts";
-import { Editor } from "../editor.tsx";
+import { Client } from "../client.ts";
 import { decoratorStateField, isCursorInRange } from "./util.ts";
 
 type AdmonitionType = "note" | "warning";
@@ -27,7 +27,7 @@ class AdmonitionIconWidget extends WidgetType {
   toDOM(): HTMLElement {
     const outerDiv = document.createElement("div");
     outerDiv.classList.add("sb-admonition-icon");
-    outerDiv.addEventListener("click", (e) => {
+    outerDiv.addEventListener("click", () => {
       this.editorView.dispatch({
         selection: {
           anchor: this.pos,
@@ -97,7 +97,7 @@ function extractAdmonitionFields(rawText: string): AdmonitionFields | null {
   return null;
 }
 
-export function admonitionPlugin(editor: Editor) {
+export function admonitionPlugin(editor: Client) {
   return decoratorStateField((state: EditorState) => {
     const widgets: any[] = [];
 
@@ -170,7 +170,7 @@ export function admonitionPlugin(editor: Editor) {
                 widget: new AdmonitionIconWidget(
                   iconRange.from + 1,
                   admonitionType,
-                  editor.editorView!,
+                  editor.editorView,
                 ),
                 inclusive: true,
               }).range(iconRange.from, iconRange.to),

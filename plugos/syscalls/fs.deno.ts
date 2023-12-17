@@ -1,7 +1,7 @@
 import type { SysCallMapping } from "../system.ts";
 import { mime, path, walk } from "../deps.ts";
 import { base64DecodeDataUrl, base64Encode } from "../asset_bundle/base64.ts";
-import { FileMeta } from "../../common/types.ts";
+import { FileMeta } from "$sb/types.ts";
 
 export default function fileSystemSyscalls(root = "/"): SysCallMapping {
   function resolvedPath(p: string): string {
@@ -34,7 +34,8 @@ export default function fileSystemSyscalls(root = "/"): SysCallMapping {
       const s = await Deno.stat(p);
       return {
         name: filePath,
-        lastModified: s.mtime!.getTime(),
+        created: s.birthtime?.getTime() || s.mtime?.getTime() || 0,
+        lastModified: s.mtime?.getTime() || 0,
         contentType: mime.getType(filePath) || "application/octet-stream",
         size: s.size,
         perm: "rw",
@@ -56,7 +57,8 @@ export default function fileSystemSyscalls(root = "/"): SysCallMapping {
       const s = await Deno.stat(p);
       return {
         name: filePath,
-        lastModified: s.mtime!.getTime(),
+        created: s.birthtime?.getTime() || s.mtime?.getTime() || 0,
+        lastModified: s.mtime?.getTime() || 0,
         contentType: mime.getType(filePath) || "application/octet-stream",
         size: s.size,
         perm: "rw",
@@ -76,7 +78,11 @@ export default function fileSystemSyscalls(root = "/"): SysCallMapping {
         const file of walk(dirPath, {
           includeDirs: false,
           // Exclude hidden files
-          skip: [/^.*\/\..+$/],
+          skip: [
+            // Dynamically builds a regexp that matches hidden directories INSIDE the rootPath
+            // (but if the rootPath is hidden, it stil lists files inside of it, fixing #130 and #518)
+            new RegExp(`^${escapeRegExp(root)}.*\\/\\..+$`),
+          ],
           maxDepth: recursive ? Infinity : 1,
         })
       ) {
@@ -84,7 +90,8 @@ export default function fileSystemSyscalls(root = "/"): SysCallMapping {
         const s = await Deno.stat(fullPath);
         allFiles.push({
           name: fullPath.substring(dirPath.length + 1),
-          lastModified: s.mtime!.getTime(),
+          created: s.birthtime?.getTime() || s.mtime?.getTime() || 0,
+          lastModified: s.mtime?.getTime() || 0,
           contentType: mime.getType(fullPath) || "application/octet-stream",
           size: s.size,
           perm: "rw",
@@ -93,4 +100,8 @@ export default function fileSystemSyscalls(root = "/"): SysCallMapping {
       return allFiles;
     },
   };
+}
+
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }

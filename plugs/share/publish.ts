@@ -1,5 +1,4 @@
-import { events } from "$sb/plugos-syscall/mod.ts";
-import { editor, markdown } from "$sb/silverbullet-syscall/mod.ts";
+import { editor, events, markdown } from "$sb/syscalls.ts";
 import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
 import { PublishEvent } from "$sb/app_event.ts";
 
@@ -8,20 +7,15 @@ export async function publishCommand() {
   const text = await editor.getText();
   const pageName = await editor.getCurrentPage();
   const tree = await markdown.parseMarkdown(text);
-  const { $share } = await extractFrontmatter(tree);
+  let { $share } = await extractFrontmatter(tree);
   if (!$share) {
-    await editor.flashNotification("Saved.");
+    // Nothing to do here
     return;
   }
   if (!Array.isArray($share)) {
-    await editor.flashNotification(
-      "$share front matter must be an array.",
-      "error",
-    );
-    return;
+    $share = [$share];
   }
   await editor.flashNotification("Sharing...");
-  // Delegate actual publishing to the server
   try {
     await publish(pageName, $share);
     await editor.flashNotification("Done!");
@@ -31,6 +25,9 @@ export async function publishCommand() {
 }
 
 async function publish(pageName: string, uris: string[]) {
+  const broadcastResults = await events.dispatchEvent(`share:_`, {
+    name: pageName,
+  } as PublishEvent);
   for (const uri of uris) {
     const publisher = uri.split(":")[0];
     const results = await events.dispatchEvent(
@@ -40,7 +37,7 @@ async function publish(pageName: string, uris: string[]) {
         name: pageName,
       } as PublishEvent,
     );
-    if (results.length === 0) {
+    if (broadcastResults.length === 0 && results.length === 0) {
       throw new Error(`Unsupported publisher: ${publisher} for URI: ${uri}`);
     }
   }

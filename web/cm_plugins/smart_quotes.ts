@@ -2,10 +2,13 @@ import { KeyBinding, syntaxTree } from "../deps.ts";
 
 const straightQuoteContexts = [
   "CommentBlock",
+  "CodeBlock",
   "FencedCode",
   "InlineCode",
   "FrontMatterCode",
   "DirectiveStart",
+  "Attribute",
+  "CommandLink"
 ];
 
 // TODO: Add support for selection (put quotes around or create blockquote block?)

@@ -1,7 +1,7 @@
 import { commandLinkRegex } from "../../common/markdown_parser/parser.ts";
 import { ClickEvent } from "$sb/app_event.ts";
 import { Decoration, syntaxTree } from "../deps.ts";
-import { Editor } from "../editor.tsx";
+import { Client } from "../client.ts";
 import {
   ButtonWidget,
   decoratorStateField,
@@ -12,7 +12,7 @@ import {
 /**
  * Plugin to hide path prefix when the cursor is not inside.
  */
-export function cleanCommandLinkPlugin(editor: Editor) {
+export function cleanCommandLinkPlugin(editor: Client) {
   return decoratorStateField((state) => {
     const widgets: any[] = [];
     // let parentRange: [number, number];
@@ -49,7 +49,7 @@ export function cleanCommandLinkPlugin(editor: Editor) {
               (e) => {
                 if (e.altKey) {
                   // Move cursor into the link
-                  return editor.editorView!.dispatch({
+                  return editor.editorView.dispatch({
                     selection: { anchor: from + 2 },
                   });
                 }

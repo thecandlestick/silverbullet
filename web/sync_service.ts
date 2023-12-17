@@ -1,3 +1,4 @@
+import { sleep } from "$sb/lib/async.ts";
 import type { SpacePrimitives } from "../common/spaces/space_primitives.ts";
 import {
   SpaceSync,
@@ -5,35 +6,54 @@ import {
   SyncStatusItem,
 } from "../common/spaces/sync.ts";
 import { EventHook } from "../plugos/hooks/event.ts";
-import { KVStore } from "../plugos/lib/kv_store.ts";
+import { DataStore } from "../plugos/lib/datastore.ts";
+import { Space } from "./space.ts";
 
 // Keeps the current sync snapshot
-const syncSnapshotKey = "syncSnapshot";
+const syncSnapshotKey = ["sync", "snapshot"];
 
 // Keeps the start time of an ongoing sync, is reset once the sync is done
-const syncStartTimeKey = "syncStartTime";
+const syncStartTimeKey = ["sync", "startTime"];
+
+// Keeps the start time of the last full sync cycle
+const syncLastFullCycleKey = ["sync", "lastFullCycle"];
 
 // Keeps the last time an activity was registered, used to detect if a sync is still alive and whether a new one should be started already
-const syncLastActivityKey = "syncLastActivity";
+const syncLastActivityKey = ["sync", "lastActivity"];
+
+const syncInitialFullSyncCompletedKey = ["sync", "initialFullSyncCompleted"];
 
 // maximum time between two activities before we consider a sync crashed
-const syncMaxIdleTimeout = 1000 * 20; // 20s
+const syncMaxIdleTimeout = 1000 * 27;
 
 // How often to sync the whole space
-const syncInterval = 10 * 1000; // Every 10s
+const spaceSyncInterval = 17 * 1000; // Every 17s or so
+
+// Used from Client
+export const pageSyncInterval = 6000;
+
+export interface ISyncService {
+  start(): void;
+  isSyncing(): Promise<boolean>;
+  hasInitialSyncCompleted(): Promise<boolean>;
+  noOngoingSync(_timeout: number): Promise<void>;
+  syncFile(name: string): Promise<void>;
+  scheduleFileSync(_path: string): Promise<void>;
+  scheduleSpaceSync(): Promise<void>;
+}
 
 /**
  * The SyncService primarily wraps the SpaceSync engine but also coordinates sync between
  * different browser tabs. It is using the KVStore to keep track of sync state.
  */
-export class SyncService {
+export class SyncService implements ISyncService {
   spaceSync: SpaceSync;
   lastReportedSyncStatus = Date.now();
 
   constructor(
-    private localSpacePrimitives: SpacePrimitives,
-    private remoteSpace: SpacePrimitives,
-    private kvStore: KVStore,
+    readonly localSpacePrimitives: SpacePrimitives,
+    readonly remoteSpace: SpacePrimitives,
+    private ds: DataStore,
     private eventHook: EventHook,
     private isSyncCandidate: (path: string) => boolean,
   ) {
@@ -49,26 +69,39 @@ export class SyncService {
       },
     );
 
-    eventHook.addLocalListener("editor:pageLoaded", async (name) => {
-      await this.syncFile(`${name}.md`);
+    eventHook.addLocalListener(
+      "editor:pageLoaded",
+      (name, _prevPage, isSynced) => {
+        if (!isSynced) {
+          this.scheduleFileSync(`${name}.md`).catch(console.error);
+        }
+      },
+    );
+
+    eventHook.addLocalListener("editor:pageSaved", (name) => {
+      const path = `${name}.md`;
+      this.scheduleFileSync(path).catch(console.error);
     });
 
-    eventHook.addLocalListener("page:saved", async (name) => {
-      await this.syncFile(`${name}.md`);
+    this.spaceSync.on({
+      fileSynced: (meta, direction) => {
+        eventHook.dispatchEvent("file:synced", meta, direction);
+      },
     });
   }
 
   async isSyncing(): Promise<boolean> {
-    const startTime = await this.kvStore.get(syncStartTimeKey);
+    const startTime = await this.ds.get(syncStartTimeKey);
     if (!startTime) {
       return false;
     }
     // Sync is running, but is it still alive?
-    const lastActivity = await this.kvStore.get(syncLastActivityKey)!;
+    const lastActivity = await this.ds.get(syncLastActivityKey)!;
     if (Date.now() - lastActivity > syncMaxIdleTimeout) {
       // It's been too long since the last activity, let's consider this one crashed and
       // reset the sync start state
-      await this.kvStore.del(syncStartTimeKey);
+      await this.ds.delete(syncStartTimeKey);
+      console.info("Sync without activity for too long, resetting");
       return false;
     }
     return true;
@@ -76,101 +109,176 @@ export class SyncService {
 
   async hasInitialSyncCompleted(): Promise<boolean> {
     // Initial sync has happened when sync progress has been reported at least once, but the syncStartTime has been reset (which happens after sync finishes)
-    return !!(!(await this.kvStore.get(syncStartTimeKey)) &&
-      (await this.kvStore.get(syncLastActivityKey)));
+    return !!(await this.ds.get(syncInitialFullSyncCompletedKey));
   }
 
-  async registerSyncStart(): Promise<void> {
+  async registerSyncStart(fullSync: boolean): Promise<void> {
     // Assumption: this is called after an isSyncing() check
-    await this.kvStore.set(syncStartTimeKey, Date.now());
-    await this.kvStore.set(syncLastActivityKey, Date.now());
+    await this.ds.batchSet([
+      {
+        key: syncStartTimeKey,
+        value: Date.now(),
+      },
+      {
+        key: syncLastActivityKey,
+        value: Date.now(),
+      },
+      ...fullSync // If this is a full sync cycle
+        ? [{
+          key: syncLastFullCycleKey,
+          value: Date.now(),
+        }]
+        : [],
+    ]);
   }
 
   async registerSyncProgress(status?: SyncStatus): Promise<void> {
-    // Emit a sync event at most every 10s
-    if (status && this.lastReportedSyncStatus < Date.now() - 10000) {
-      this.eventHook.dispatchEvent("sync:progress", status);
+    // Emit a sync event at most every 2s
+    if (status && this.lastReportedSyncStatus < Date.now() - 2000) {
+      await this.eventHook.dispatchEvent("sync:progress", status);
       this.lastReportedSyncStatus = Date.now();
       await this.saveSnapshot(status.snapshot);
     }
-    await this.kvStore.set(syncLastActivityKey, Date.now());
+    await this.ds.set(syncLastActivityKey, Date.now());
   }
 
-  async registerSyncStop(): Promise<void> {
+  async registerSyncStop(isFullSync: boolean): Promise<void> {
     await this.registerSyncProgress();
-    await this.kvStore.del(syncStartTimeKey);
+    await this.ds.delete(syncStartTimeKey);
+    if (isFullSync) {
+      await this.ds.set(syncInitialFullSyncCompletedKey, true);
+    }
   }
 
   async getSnapshot(): Promise<Map<string, SyncStatusItem>> {
-    const snapshot = (await this.kvStore.get(syncSnapshotKey)) || {};
+    const snapshot = (await this.ds.get(syncSnapshotKey)) || {};
     return new Map<string, SyncStatusItem>(
       Object.entries(snapshot),
     );
   }
 
+  // Await a moment when the sync is no longer running
+  async noOngoingSync(timeout: number): Promise<void> {
+    // Not completely safe, could have race condition on setting the syncStartTimeKey
+    const startTime = Date.now();
+    while (await this.isSyncing()) {
+      console.log("Waiting for ongoing sync to finish...");
+      await sleep(321);
+      if (Date.now() - startTime > timeout) {
+        throw new Error("Timeout waiting for sync to finish");
+      }
+    }
+  }
+
+  filesScheduledForSync = new Set<string>();
+  async scheduleFileSync(path: string): Promise<void> {
+    if (this.filesScheduledForSync.has(path)) {
+      // Already scheduled, no need to duplicate
+      console.info(`File ${path} already scheduled for sync`);
+      return;
+    }
+    this.filesScheduledForSync.add(path);
+    await this.noOngoingSync(7000);
+    await this.syncFile(path);
+    this.filesScheduledForSync.delete(path);
+  }
+
+  async scheduleSpaceSync(): Promise<void> {
+    await this.noOngoingSync(5000);
+    await this.syncSpace();
+  }
+
   start() {
-    this.syncSpace().catch(
-      console.error,
-    );
+    this.syncSpace().catch(console.error);
 
     setInterval(async () => {
       try {
-        const lastActivity = (await this.kvStore.get(syncLastActivityKey)) || 0;
-        if (lastActivity && Date.now() - lastActivity > syncInterval) {
-          // It's been a while since the last activity, let's sync the whole space
-          // The reason to do this check is that there may be multiple tabs open each with their sync cycle
-          await this.syncSpace();
+        if (!await this.isSyncing()) {
+          const lastFullCycle = (await this.ds.get(syncLastFullCycleKey)) || 0;
+          if (lastFullCycle && Date.now() - lastFullCycle > spaceSyncInterval) {
+            // It's been a while since the last full cycle, let's sync the whole space
+            await this.syncSpace();
+          }
         }
       } catch (e: any) {
         console.error(e);
       }
-    }, syncInterval / 2); // check every half the sync cycle because actually running the sync takes some time therefore we don't want to wait for the full cycle
+    }, spaceSyncInterval / 2); // check every half the sync cycle because actually running the sync takes some time therefore we don't want to wait for the full cycle
   }
 
   async syncSpace(): Promise<number> {
     if (await this.isSyncing()) {
-      console.log("Already syncing");
+      console.log("Aborting space sync: already syncing");
       return 0;
     }
-    await this.registerSyncStart();
+    await this.registerSyncStart(true);
     let operations = 0;
     const snapshot = await this.getSnapshot();
+    // console.log("Excluded from sync", excludedFromSync);
     try {
-      operations = await this.spaceSync!.syncFiles(snapshot);
-      this.eventHook.dispatchEvent("sync:success", operations);
+      operations = await this.spaceSync!.syncFiles(
+        snapshot,
+        (path) => this.isSyncCandidate(path),
+      );
+      await this.saveSnapshot(snapshot);
+      await this.registerSyncStop(true);
+      await this.eventHook.dispatchEvent("sync:success", operations);
     } catch (e: any) {
-      this.eventHook.dispatchEvent("sync:error", e.message);
-      console.error("Sync error", e);
+      await this.saveSnapshot(snapshot);
+      await this.registerSyncStop(false);
+      await this.eventHook.dispatchEvent("sync:error", e.message);
+      console.error("Sync error", e.message);
     }
-    await this.saveSnapshot(snapshot);
-    await this.registerSyncStop();
     return operations;
   }
 
+  // Syncs a single file
   async syncFile(name: string) {
-    if (await this.isSyncing()) {
-      // console.log("Already syncing");
-      return;
-    }
+    // console.log("Checking if we can sync file", name);
     if (!this.isSyncCandidate(name)) {
+      console.info("Requested sync, but not a sync candidate", name);
       return;
     }
-    await this.registerSyncStart();
+    if (await this.isSyncing()) {
+      console.log("Already syncing, aborting individual file sync for", name);
+      return;
+    }
     console.log("Syncing file", name);
+    await this.registerSyncStart(false);
     const snapshot = await this.getSnapshot();
     try {
-      let localHash: number | undefined = undefined;
-      let remoteHash: number | undefined = undefined;
+      let localHash: number | undefined;
+      let remoteHash: number | undefined;
       try {
-        localHash =
-          (await this.localSpacePrimitives.getFileMeta(name)).lastModified;
+        const localMeta = await this.localSpacePrimitives.getFileMeta(name);
+        if (localMeta.noSync) {
+          console.info(
+            "File marked as no sync, skipping sync in this cycle",
+            name,
+          );
+          await this.registerSyncStop(false);
+          // Jumping out, not saving snapshot nor triggering a sync event, because we did nothing
+          return;
+        }
+        localHash = localMeta.lastModified;
       } catch {
         // Not present
       }
       try {
-        // This is wasteful, but Netlify (silverbullet.md) doesn't support OPTIONS call (404s) so we'll just fetch the whole file
-        const { meta } = await this.remoteSpace!.readFile(name);
-        remoteHash = meta.lastModified;
+        remoteHash = (await this.remoteSpace!.getFileMeta(name)).lastModified;
+        // HEAD
+        //
+        if (!remoteHash) {
+          console.info(
+            "Not syncing file, because remote didn't send X-Last-Modified header",
+          );
+          // This happens when the remote isn't a real SilverBullet server, specifically: it's not sending
+          // a X-Last-Modified header. In this case we'll just assume that the file is up to date.
+          await this.registerSyncStop(false);
+          // Jumping out, not saving snapshot nor triggering a sync event, because we did nothing
+          return;
+        }
+        //main
       } catch (e: any) {
         if (e.message === "Not found") {
           // File doesn't exist remotely, that's ok
@@ -179,18 +287,21 @@ export class SyncService {
         }
       }
 
-      await this.spaceSync!.syncFile(snapshot, name, localHash, remoteHash);
-      this.eventHook.dispatchEvent("sync:success");
+      await this.spaceSync.syncFile(snapshot, name, localHash, remoteHash);
+      this.eventHook.dispatchEvent("sync:success").catch(console.error);
+      // console.log("File successfully synced", name);
     } catch (e: any) {
-      this.eventHook.dispatchEvent("sync:error", e.message);
+      this.eventHook.dispatchEvent("sync:error", e.message).catch(
+        console.error,
+      );
       console.error("Sync error", e);
     }
     await this.saveSnapshot(snapshot);
-    await this.registerSyncStop();
+    await this.registerSyncStop(false);
   }
 
   async saveSnapshot(snapshot: Map<string, SyncStatusItem>) {
-    await this.kvStore.set(syncSnapshotKey, Object.fromEntries(snapshot));
+    await this.ds.set(syncSnapshotKey, Object.fromEntries(snapshot));
   }
 
   public async plugAwareConflictResolver(
@@ -220,10 +331,8 @@ export class SyncService {
       name,
       "will pick the version from secondary and be done with it.",
     );
-    const fileMeta = await primary.getFileMeta(name);
-
     // Read file from secondary
-    const { data } = await secondary.readFile(
+    const { data, meta } = await secondary.readFile(
       name,
     );
     // Write file to primary
@@ -231,13 +340,57 @@ export class SyncService {
       name,
       data,
       false,
-      fileMeta.lastModified,
+      meta,
     );
     // Update snapshot
     snapshot.set(name, [
       newMeta.lastModified,
-      fileMeta.lastModified,
+      meta.lastModified,
     ]);
+
     return 1;
+  }
+}
+
+/**
+ * A no-op sync service that doesn't do anything used when running in thin client mode
+ */
+export class NoSyncSyncService implements ISyncService {
+  constructor(private space: Space) {
+  }
+
+  isSyncing(): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  hasInitialSyncCompleted(): Promise<boolean> {
+    return Promise.resolve(true);
+  }
+
+  noOngoingSync(_timeout: number): Promise<void> {
+    return Promise.resolve();
+  }
+
+  scheduleFileSync(_path: string): Promise<void> {
+    return Promise.resolve();
+  }
+
+  scheduleSpaceSync(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  start() {
+    setInterval(() => {
+      // Trigger a page upload for change events
+      this.space.updatePageList().catch(console.error);
+    }, spaceSyncInterval);
+  }
+
+  syncSpace(): Promise<number> {
+    return Promise.resolve(0);
+  }
+
+  syncFile(_name: string): Promise<void> {
+    return Promise.resolve();
   }
 }

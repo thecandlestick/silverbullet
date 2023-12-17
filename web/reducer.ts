@@ -37,12 +37,14 @@ export default function reducer(
     case "sync-change":
       return {
         ...state,
-        synced: action.synced,
+        syncFailures: action.syncSuccess ? 0 : state.syncFailures + 1,
       };
     case "start-navigate":
       return {
         ...state,
         showPageNavigator: true,
+        showCommandPalette: false,
+        showFilterBox: false,
       };
     case "stop-navigate":
       return {
@@ -69,6 +71,8 @@ export default function reducer(
       return {
         ...state,
         showCommandPalette: true,
+        showPageNavigator: false,
+        showFilterBox: false,
         showCommandPaletteContext: action.context,
       };
     }
@@ -171,6 +175,11 @@ export default function reducer(
           ...state.uiOptions,
           [action.key]: action.value,
         },
+      };
+    case "set-progress":
+      return {
+        ...state,
+        progressPerc: action.progressPerc,
       };
   }
   return state;

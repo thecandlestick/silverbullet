@@ -1,25 +1,29 @@
 import type { Plug } from "../../plugos/plug.ts";
 import { SysCallMapping, System } from "../../plugos/system.ts";
-import type { Editor } from "../editor.tsx";
+import type { Client } from "../client.ts";
 import { CommandDef } from "../hooks/command.ts";
+import { proxySyscall } from "./util.ts";
 
 export function systemSyscalls(
-  editor: Editor,
   system: System<any>,
+  client?: Client,
 ): SysCallMapping {
-  return {
+  const api: SysCallMapping = {
     "system.invokeFunction": (
       ctx,
-      env: string,
       name: string,
       ...args: any[]
     ) => {
-      if (!ctx.plug) {
-        throw Error("No plug associated with context");
+      if (name === "server" || name === "client") {
+        // Backwards compatibility mode (previously there was an 'env' argument)
+        name = args[0];
+        args = args.slice(1);
       }
 
       let plug: Plug<any> | undefined = ctx.plug;
-      if (name.indexOf(".") !== -1) {
+      const fullName = name;
+      // console.log("Invoking function", fullName, "on plug", plug);
+      if (name.includes(".")) {
         // plug name in the name
         const [plugName, functionName] = name.split(".");
         plug = system.loadedPlugs.get(plugName);
@@ -28,23 +32,49 @@ export function systemSyscalls(
         }
         name = functionName;
       }
+      const functionDef = plug?.manifest!.functions[name];
+      if (!functionDef) {
+        throw Error(`Function ${name} not found`);
+      }
+      if (
+        client && functionDef.env && system.env &&
+        functionDef.env !== system.env
+      ) {
+        // Proxy to another environment
+        return proxySyscall(
+          ctx,
+          client.httpSpacePrimitives,
+          "system.invokeFunction",
+          [fullName, ...args],
+        );
+      }
       return plug.invoke(name, args);
     },
-    "system.invokeCommand": (_ctx, name: string) => {
-      return editor.runCommandByName(name);
+    "system.invokeCommand": (_ctx, name: string, args?: string[]) => {
+      if (!client) {
+        throw new Error("Not supported");
+      }
+      return client.runCommandByName(name, args);
     },
     "system.listCommands": (): { [key: string]: CommandDef } => {
+      if (!client) {
+        throw new Error("Not supported");
+      }
       const allCommands: { [key: string]: CommandDef } = {};
-      for (let [cmd, def] of editor.commandHook.editorCommands) {
+      for (const [cmd, def] of client.system.commandHook.editorCommands) {
         allCommands[cmd] = def.command;
       }
       return allCommands;
     },
     "system.reloadPlugs": () => {
-      return editor.reloadPlugs();
+      if (!client) {
+        throw new Error("Not supported");
+      }
+      return client.loadPlugs();
     },
     "system.getEnv": () => {
       return system.env;
     },
   };
+  return api;
 }

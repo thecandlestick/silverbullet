@@ -1,6 +1,5 @@
-import { EditorView, ViewPlugin, ViewUpdate } from "../deps.ts";
-import { maximumAttachmentSize } from "../../common/types.ts";
-import { Editor } from "../editor.tsx";
+import { EditorView, syntaxTree, ViewPlugin, ViewUpdate } from "../deps.ts";
+import { Client } from "../client.ts";
 
 // We use turndown to convert HTML to Markdown
 import TurndownService from "https://cdn.skypack.dev/turndown@7.1.1";
@@ -11,6 +10,15 @@ import {
   taskListItems,
 } from "https://cdn.skypack.dev/@joplin/turndown-plugin-gfm@1.0.45";
 import { safeRun } from "../../common/util.ts";
+import { lezerToParseTree } from "../../common/markdown_parser/parse_tree.ts";
+import {
+  addParentPointers,
+  findParentMatching,
+  nodeAtPos,
+} from "../../plug-api/lib/tree.ts";
+import { folderName, resolve } from "../../common/path.ts";
+import { maximumAttachmentSize } from "../constants.ts";
+
 const turndownService = new TurndownService({
   hr: "---",
   codeBlockStyle: "fenced",
@@ -72,7 +80,7 @@ export const pasteLinkExtension = ViewPlugin.fromClass(
   },
 );
 
-export function attachmentExtension(editor: Editor) {
+export function attachmentExtension(editor: Client) {
   let shiftDown = false;
   return EditorView.domEventHandlers({
     dragover: (event) => {
@@ -106,11 +114,34 @@ export function attachmentExtension(editor: Editor) {
     paste: (event: ClipboardEvent) => {
       const payload = [...event.clipboardData!.items];
       const richText = event.clipboardData?.getData("text/html");
+
       // Only do rich text paste if shift is NOT down
       if (richText && !shiftDown) {
+        // Are we in a fencede code block?
+        const editorText = editor.editorView.state.sliceDoc();
+        const tree = lezerToParseTree(
+          editorText,
+          syntaxTree(editor.editorView.state).topNode,
+        );
+        addParentPointers(tree);
+        const currentNode = nodeAtPos(
+          tree,
+          editor.editorView.state.selection.main.from,
+        );
+        if (currentNode) {
+          const fencedParentNode = findParentMatching(
+            currentNode,
+            (t) => t.type === "FencedCode",
+          );
+          if (fencedParentNode || currentNode.type === "FencedCode") {
+            console.log("Inside of fenced code block, not pasting rich text");
+            return false;
+          }
+        }
+
         const markdown = striptHtmlComments(turndownService.turndown(richText))
           .trim();
-        const view = editor.editorView!;
+        const view = editor.editorView;
         const selection = view.state.selection.main;
         view.dispatch({
           changes: [
@@ -173,6 +204,8 @@ export function attachmentExtension(editor: Editor) {
       return;
     }
 
+    suggestedName = resolve(folderName(editor.currentPage!), suggestedName);
+
     const finalFileName = await editor.prompt(
       "File name for pasted attachment",
       suggestedName,
@@ -180,18 +213,19 @@ export function attachmentExtension(editor: Editor) {
     if (!finalFileName) {
       return;
     }
-    await editor.space.writeAttachment(finalFileName, new Uint8Array(data));
-    let attachmentMarkdown = `[${finalFileName}](${
-      encodeURIComponent(finalFileName)
-    })`;
+    await editor.space.writeAttachment(
+      finalFileName,
+      new Uint8Array(data),
+    );
+    let attachmentMarkdown = `[${finalFileName}](${encodeURI(finalFileName)})`;
     if (mimeType.startsWith("image/")) {
-      attachmentMarkdown = `![](${encodeURIComponent(finalFileName)})`;
+      attachmentMarkdown = `![](${encodeURI(finalFileName)})`;
     }
-    editor.editorView!.dispatch({
+    editor.editorView.dispatch({
       changes: [
         {
           insert: attachmentMarkdown,
-          from: editor.editorView!.state.selection.main.from,
+          from: editor.editorView.state.selection.main.from,
         },
       ],
     });

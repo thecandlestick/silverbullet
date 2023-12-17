@@ -2,36 +2,53 @@ import { YAML } from "$sb/plugos-syscall/mod.ts";
 
 import {
   addParentPointers,
-  findNodeOfType,
+  collectNodesOfType,
   ParseTree,
   renderToText,
   replaceNodesMatchingAsync,
   traverseTreeAsync,
 } from "$sb/lib/tree.ts";
 
-// Extracts front matter (or legacy "meta" code blocks) from a markdown document
+export type FrontMatter = { tags: string[] } & Record<string, any>;
+
+export type FrontmatterExtractOptions = {
+  removeKeys?: string[];
+  removeTags?: string[] | true;
+  removeFrontmatterSection?: boolean;
+};
+
+// Extracts front matter from a markdown document
 // optionally removes certain keys from the front matter
 export async function extractFrontmatter(
   tree: ParseTree,
-  removeKeys: string[] = [],
-): Promise<any> {
-  let data: any = {};
+  options: FrontmatterExtractOptions = {},
+): Promise<FrontMatter> {
+  let data: FrontMatter = {
+    tags: [],
+  };
   addParentPointers(tree);
+  let paragraphCounter = 0;
 
   await replaceNodesMatchingAsync(tree, async (t) => {
-    // Find top-level hash tags
-    if (t.type === "Hashtag") {
-      // Check if if nested directly into a Paragraph
-      if (t.parent && t.parent.type === "Paragraph") {
-        const tagname = t.children![0].text!.substring(1);
-        if (!data.tags) {
-          data.tags = [];
-        }
-        if (Array.isArray(data.tags) && !data.tags.includes(tagname)) {
+    // Find tags in the first paragraph to attach to the page
+    if (t.type === "Paragraph") {
+      paragraphCounter++;
+      // Only attach hashtags in the first paragraph to the page
+      if (paragraphCounter !== 1) {
+        return;
+      }
+      collectNodesOfType(t, "Hashtag").forEach((h) => {
+        const tagname = h.children![0].text!.substring(1);
+        if (!data.tags.includes(tagname)) {
           data.tags.push(tagname);
         }
-      }
-      return;
+        if (
+          options.removeTags === true || options.removeTags?.includes(tagname)
+        ) {
+          // Ugly hack to remove the hashtag
+          h.children![0].text = "";
+        }
+      });
     }
     // Find FrontMatter and parse it
     if (t.type === "FrontMatter") {
@@ -41,10 +58,18 @@ export async function extractFrontmatter(
         const parsedData: any = await YAML.parse(yamlText);
         const newData = { ...parsedData };
         data = { ...data, ...parsedData };
-        if (removeKeys.length > 0) {
+        // Make sure we have a tags array
+        if (!data.tags) {
+          data.tags = [];
+        }
+        // Normalize tags to an array and support a "tag1, tag2" notation
+        if (typeof data.tags === "string") {
+          data.tags = (data.tags as string).split(/,\s*/);
+        }
+        if (options.removeKeys && options.removeKeys.length > 0) {
           let removedOne = false;
 
-          for (const key of removeKeys) {
+          for (const key of options.removeKeys) {
             if (key in newData) {
               delete newData[key];
               removedOne = true;
@@ -55,49 +80,14 @@ export async function extractFrontmatter(
           }
         }
         // If nothing is left, let's just delete this whole block
-        if (Object.keys(newData).length === 0) {
+        if (
+          Object.keys(newData).length === 0 || options.removeFrontmatterSection
+        ) {
           return null;
         }
       } catch (e: any) {
-        console.error("Could not parse frontmatter", e);
+        console.warn("Could not parse frontmatter", e.message);
       }
-    }
-
-    // Find a fenced code block with `meta` as the language type
-    if (t.type !== "FencedCode") {
-      return;
-    }
-    const codeInfoNode = findNodeOfType(t, "CodeInfo");
-    if (!codeInfoNode) {
-      return;
-    }
-    if (codeInfoNode.children![0].text !== "meta") {
-      return;
-    }
-    const codeTextNode = findNodeOfType(t, "CodeText");
-    if (!codeTextNode) {
-      // Honestly, this shouldn't happen
-      return;
-    }
-    const codeText = codeTextNode.children![0].text!;
-    const parsedData: any = YAML.parse(codeText);
-    const newData = { ...parsedData };
-    data = { ...data, ...parsedData };
-    if (removeKeys.length > 0) {
-      let removedOne = false;
-      for (const key of removeKeys) {
-        if (key in newData) {
-          delete newData[key];
-          removedOne = true;
-        }
-      }
-      if (removedOne) {
-        codeTextNode.children![0].text = (await YAML.stringify(newData)).trim();
-      }
-    }
-    // If nothing is left, let's just delete this whole block
-    if (Object.keys(newData).length === 0) {
-      return null;
     }
 
     return undefined;
@@ -114,7 +104,7 @@ export async function extractFrontmatter(
 // Updates the front matter of a markdown document and returns the text as a rendered string
 export async function prepareFrontmatterDispatch(
   tree: ParseTree,
-  data: Record<string, any>,
+  data: string | Record<string, any>,
 ): Promise<any> {
   let dispatchData: any = null;
   await traverseTreeAsync(tree, async (t) => {
@@ -124,14 +114,20 @@ export async function prepareFrontmatterDispatch(
       const yamlText = renderToText(bodyNode);
 
       try {
-        const parsedYaml = await YAML.parse(yamlText) as any;
-        const newData = { ...parsedYaml, ...data };
+        let frontmatterText = "";
+        if (typeof data === "string") {
+          frontmatterText = yamlText + data + "\n";
+        } else {
+          const parsedYaml = await YAML.parse(yamlText) as any;
+          const newData = { ...parsedYaml, ...data };
+          frontmatterText = await YAML.stringify(newData);
+        }
         // Patch inline
         dispatchData = {
           changes: {
             from: bodyNode.from,
             to: bodyNode.to,
-            insert: await YAML.stringify(newData),
+            insert: frontmatterText,
           },
         };
       } catch (e: any) {
@@ -143,12 +139,19 @@ export async function prepareFrontmatterDispatch(
   });
   if (!dispatchData) {
     // If we didn't find frontmatter, let's add it
+    let frontmatterText = "";
+    if (typeof data === "string") {
+      frontmatterText = data + "\n";
+    } else {
+      frontmatterText = await YAML.stringify(data);
+    }
+    const fullFrontmatterText = "---\n" + frontmatterText +
+      "---\n";
     dispatchData = {
       changes: {
         from: 0,
         to: 0,
-        insert: "---\n" + await YAML.stringify(data) +
-          "---\n",
+        insert: fullFrontmatterText,
       },
     };
   }

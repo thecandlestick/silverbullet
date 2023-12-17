@@ -2,8 +2,9 @@ import { Hook, Manifest } from "../../plugos/types.ts";
 import { System } from "../../plugos/system.ts";
 import { Completion, CompletionContext, CompletionResult } from "../deps.ts";
 import { safeRun } from "../../common/util.ts";
-import { Editor } from "../editor.tsx";
+import { Client } from "../client.ts";
 import { syntaxTree } from "../deps.ts";
+import { SlashCompletion } from "$sb/app_event.ts";
 
 export type SlashCommandDef = {
   name: string;
@@ -24,9 +25,9 @@ const slashCommandRegexp = /([^\w:]|^)\/[\w\-]*/;
 
 export class SlashCommandHook implements Hook<SlashCommandHookT> {
   slashCommands = new Map<string, AppSlashCommand>();
-  private editor: Editor;
+  private editor: Client;
 
-  constructor(editor: Editor) {
+  constructor(editor: Client) {
     this.editor = editor;
   }
 
@@ -53,9 +54,9 @@ export class SlashCommandHook implements Hook<SlashCommandHookT> {
   }
 
   // Completer for CodeMirror
-  public slashCommandCompleter(
+  public async slashCommandCompleter(
     ctx: CompletionContext,
-  ): CompletionResult | null {
+  ): Promise<CompletionResult | null> {
     const prefix = ctx.matchBefore(slashCommandRegexp);
     if (!prefix) {
       return null;
@@ -68,6 +69,7 @@ export class SlashCommandHook implements Hook<SlashCommandHookT> {
     if (currentNode.type.name === "CommentBlock") {
       return null;
     }
+
     for (const def of this.slashCommands.values()) {
       options.push({
         label: def.slashCommand.name,
@@ -75,7 +77,7 @@ export class SlashCommandHook implements Hook<SlashCommandHookT> {
         boost: def.slashCommand.boost,
         apply: () => {
           // Delete slash command part
-          this.editor.editorView?.dispatch({
+          this.editor.editorView.dispatch({
             changes: {
               from: prefix!.from + prefixText.indexOf("/"),
               to: ctx.pos,
@@ -90,6 +92,48 @@ export class SlashCommandHook implements Hook<SlashCommandHookT> {
         },
       });
     }
+
+    const slashCompletions: SlashCompletion[] | null = await this.editor
+      .completeWithEvent(
+        ctx,
+        "slash:complete",
+      ) as any;
+
+    if (slashCompletions) {
+      for (const slashCompletion of slashCompletions) {
+        options.push({
+          label: slashCompletion.label,
+          detail: slashCompletion.detail,
+          apply: () => {
+            // Delete slash command part
+            this.editor.editorView.dispatch({
+              changes: {
+                from: prefix!.from + prefixText.indexOf("/"),
+                to: ctx.pos,
+                insert: "",
+              },
+            });
+            // Replace with whatever the completion is
+            safeRun(async () => {
+              const [plugName, functionName] = slashCompletion.invoke.split(
+                ".",
+              );
+              const plug = this.editor.system.system.loadedPlugs.get(plugName);
+              if (!plug) {
+                this.editor.flashNotification(
+                  `Plug ${plugName} not found`,
+                  "error",
+                );
+                return;
+              }
+              await plug.invoke(functionName, [slashCompletion]);
+              this.editor.focus();
+            });
+          },
+        });
+      }
+    }
+
     return {
       // + 1 because of the '/'
       from: prefix.from + prefixText.indexOf("/") + 1,

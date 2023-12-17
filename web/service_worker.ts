@@ -1,14 +1,13 @@
-import Dexie from "https://esm.sh/v120/dexie@3.2.2/dist/dexie.js";
-import { mime } from "https://deno.land/x/mimetypes@v1.0.0/mod.ts";
-
-import type { FileContent } from "../common/spaces/indexeddb_space_primitives.ts";
+import type { FileContent } from "../common/spaces/datastore_space_primitives.ts";
 import { simpleHash } from "../common/crypto.ts";
+import { DataStore } from "../plugos/lib/datastore.ts";
+import { IndexedDBKvPrimitives } from "../plugos/lib/indexeddb_kv_primitives.ts";
 
-const CACHE_NAME = "{{CACHE_NAME}}";
+const CACHE_NAME = "{{CACHE_NAME}}_{{CONFIG_HASH}}";
 
 const precacheFiles = Object.fromEntries([
   "/",
-  "/.client/reset.html",
+  "/.client/logout.html",
   "/.client/client.js",
   "/.client/favicon.png",
   "/.client/iAWriterMonoS-Bold.woff2",
@@ -24,47 +23,45 @@ const precacheFiles = Object.fromEntries([
 self.addEventListener("install", (event: any) => {
   console.log("[Service worker]", "Installing service worker...");
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log(
-          "[Service worker]",
-          "Now pre-caching client files",
-        );
-        return cache.addAll(Object.values(precacheFiles)).then(() => {
-          console.log(
-            "[Service worker]",
-            Object.keys(precacheFiles).length,
-            "client files cached",
-          );
-          // @ts-ignore: No need to wait
-          self.skipWaiting();
-        });
-      }),
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      console.log(
+        "[Service worker]",
+        "Now pre-caching client files",
+      );
+      await cache.addAll(Object.values(precacheFiles));
+      console.log(
+        "[Service worker]",
+        Object.keys(precacheFiles).length,
+        "client files cached",
+      );
+      // @ts-ignore: No need to wait
+      self.skipWaiting();
+    })(),
   );
 });
 
 self.addEventListener("activate", (event: any) => {
-  console.log("[Service worker]", "Activating new service worker!!!");
+  console.log("[Service worker]", "Activating new service worker!");
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
+    (async () => {
+      const cacheNames = await caches.keys();
+      await Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
             console.log("[Service worker]", "Removing old cache", cacheName);
             return caches.delete(cacheName);
           }
         }),
-      ).then(() => {
-        // Let's activate ourselves for all existing clients
-        // @ts-ignore: No need to wait, clients is a serviceworker thing
-        return clients.claim();
-      });
-    }),
+      );
+      // @ts-ignore: No need to wait
+      return clients.claim();
+    })(),
   );
 });
 
-let db: Dexie | undefined;
-let fileContentTable: Dexie.Table<FileContent, string> | undefined;
+let ds: DataStore | undefined;
+const filesContentPrefix = ["file", "content"];
 
 self.addEventListener("fetch", (event: any) => {
   const url = new URL(event.request.url);
@@ -73,71 +70,108 @@ self.addEventListener("fetch", (event: any) => {
   const cacheKey = precacheFiles[url.pathname] || event.request.url;
 
   event.respondWith(
-    // Try the static (client) file cache first
-    caches.match(cacheKey)
-      .then((response) => {
-        // Return the cached response if found
-        if (response) {
-          return response;
-        }
+    (async () => {
+      const request = event.request;
 
-        const requestUrl = new URL(event.request.url);
-        const pathname = requestUrl.pathname;
-        // If this is a /.fs request, this can either be a plug worker load or an attachment load
-        if (pathname.startsWith("/.fs")) {
-          if (fileContentTable && !event.request.headers.has("x-sync-mode")) {
-            console.log(
-              "Attempting to serve file from locally synced space:",
-              pathname,
-            );
-            // Don't fetch from DB when in sync mode (because then updates won't sync)
-            const path = decodeURIComponent(
-              requestUrl.pathname.slice("/.fs/".length),
-            );
-            return fileContentTable.get(path).then(
-              (data) => {
-                if (data) {
-                  console.log("Serving from space", path);
-                  return new Response(data.data, {
-                    headers: {
-                      "Content-type": mime.getType(path) ||
-                        "application/octet-stream",
-                    },
-                  });
-                } else {
-                  console.error(
-                    "Did not find file in locally synced space",
-                    path,
-                  );
-                  return new Response("Not found", {
-                    status: 404,
-                  });
-                }
-              },
-            );
-          } else {
-            // Just fetch the file directly
-            return fetch(event.request);
-          }
-        } else if (pathname !== "/.auth") {
-          // Must be a page URL, let's serve index.html which will handle it
-          return caches.match(precacheFiles["/"]).then((response) => {
-            // This shouldnt't happen, index.html not in the cache for some reason
-            return response || fetch(event.request);
-          });
-        } else {
-          return fetch(event.request);
-        }
-      }),
+      // console.log("Getting request", request, [...request.headers.entries()]);
+
+      // Any request with the X-Sync-Mode header originates from the sync engine: pass it on to the server
+      if (request.headers.has("x-sync-mode")) {
+        return fetch(request);
+      }
+
+      // Try the static (client) file cache first
+      const cachedResponse = await caches.match(cacheKey);
+      // Return the cached response if found
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      if (!ds) {
+        // Not initialzed yet, or in thin client mode, let's just proxy
+        return fetch(request);
+      }
+
+      const requestUrl = new URL(request.url);
+      const pathname = requestUrl.pathname;
+
+      // Are we fetching a URL from the same origin as the app? If not, we don't handle it and pass it on
+      if (location.host !== requestUrl.host) {
+        return fetch(request);
+      }
+
+      if (pathname === "/.auth" || pathname === "/index.json") {
+        return fetch(request);
+      } else if (/\/.+\.[a-zA-Z]+$/.test(pathname)) {
+        // If this is a /*.* request, this can either be a plug worker load or an attachment load
+        return handleLocalFileRequest(request, pathname);
+      } else {
+        // Must be a page URL, let's serve index.html which will handle it
+        return (await caches.match(precacheFiles["/"])) || fetch(request);
+      }
+    })().catch((e) => {
+      console.warn("[Service worker]", "Fetch failed:", e);
+      return new Response("Offline", {
+        status: 503, // Service Unavailable
+      });
+    }),
   );
 });
+
+async function handleLocalFileRequest(
+  request: Request,
+  pathname: string,
+): Promise<Response> {
+  const path = decodeURIComponent(pathname.slice(1));
+  const data = await ds?.get<FileContent>([...filesContentPrefix, path]);
+  if (data) {
+    // console.log("Serving from space", path);
+    return new Response(
+      data.data,
+      {
+        headers: {
+          "Content-type": data.meta.contentType,
+          "Content-Length": "" + data.meta.size,
+          "X-Permission": data.meta.perm,
+          "X-Created": "" + data.meta.created,
+          "X-Last-Modified": "" + data.meta.lastModified,
+        },
+      },
+    );
+  } else if (path.startsWith("!")) {
+    // Federated URL handling
+    let url = path.slice(1);
+    if (url.startsWith("localhost")) {
+      url = `http://${url}`;
+    } else {
+      url = `https://${url}`;
+    }
+    console.info("Proxying federated URL", path, "to", url);
+    return fetch(url, {
+      method: request.method,
+      headers: request.headers,
+      body: request.body,
+    });
+  } else {
+    console.error(
+      "Did not find file in locally synced space",
+      path,
+    );
+    return new Response("Not found", {
+      status: 404,
+      headers: {
+        "Cache-Control": "no-cache",
+      },
+    });
+  }
+}
 
 self.addEventListener("message", (event: any) => {
   if (event.data.type === "flushCache") {
     caches.delete(CACHE_NAME)
       .then(() => {
         console.log("[Service worker]", "Cache deleted");
-        db?.close();
+        // ds?.close();
         event.source.postMessage({ type: "cacheFlushed" });
       });
   }
@@ -146,14 +180,10 @@ self.addEventListener("message", (event: any) => {
     const dbPrefix = "" + simpleHash(spaceFolderPath);
 
     // Setup space
-    db = new Dexie(`${dbPrefix}_space`, {
-      indexedDB: globalThis.indexedDB,
+    const kv = new IndexedDBKvPrimitives(`${dbPrefix}_synced_space`);
+    kv.init().then(() => {
+      ds = new DataStore(kv);
+      console.log("Datastore in service worker initialized...");
     });
-    db.version(1).stores({
-      fileMeta: "name",
-      fileContent: "name",
-    });
-
-    fileContentTable = db.table<FileContent, string>("fileContent");
   }
 });

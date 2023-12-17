@@ -1,6 +1,7 @@
 import { SETTINGS_TEMPLATE } from "./settings_template.ts";
 import { YAML } from "./deps.ts";
 import { SpacePrimitives } from "./spaces/space_primitives.ts";
+import { expandPropertyNames } from "$sb/lib/json.ts";
 
 export function safeRun(fn: () => Promise<void>) {
   fn().catch((e) => {
@@ -24,7 +25,7 @@ export function parseYamlSettings(settingsMarkdown: string): {
   }
   const yaml = match[1];
   try {
-    return YAML.parse(yaml) as {
+    return YAML.load(yaml) as {
       [key: string]: any;
     };
   } catch (e: any) {
@@ -41,29 +42,42 @@ export async function ensureSettingsAndIndex(
     settingsText = new TextDecoder().decode(
       (await space.readFile("SETTINGS.md")).data,
     );
-  } catch {
-    await space.writeFile(
-      "SETTINGS.md",
-      new TextEncoder().encode(SETTINGS_TEMPLATE),
-      true,
-    );
+  } catch (e: any) {
+    if (e.message === "Not found") {
+      console.log("No settings found, creating default settings");
+      await space.writeFile(
+        "SETTINGS.md",
+        new TextEncoder().encode(SETTINGS_TEMPLATE),
+        true,
+      );
+    } else {
+      console.error("Error reading settings", e.message);
+      console.error("Falling back to default settings");
+    }
     settingsText = SETTINGS_TEMPLATE;
-    // Ok, then let's also write the index page
+    // Ok, then let's also check the index page
     try {
       await space.getFileMeta("index.md");
-    } catch {
+    } catch (e: any) {
+      console.log(
+        "No index page found, creating default index page",
+        e.message,
+      );
       await space.writeFile(
         "index.md",
         new TextEncoder().encode(
           `Hello! And welcome to your brand new SilverBullet space!
 
-<!-- #use [[💭 silverbullet.md/Getting Started]] -->
-Loading some onboarding content for you (but doing so does require a working internet connection)...
-<!-- /use -->`,
+\`\`\`template
+page: "[[!silverbullet.md/Getting Started]]"
+\`\`\`
+`,
         ),
       );
     }
   }
 
-  return parseYamlSettings(settingsText);
+  const settings = parseYamlSettings(settingsText);
+  expandPropertyNames(settings);
+  return settings;
 }

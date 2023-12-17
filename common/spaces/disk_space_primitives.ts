@@ -1,10 +1,9 @@
-// import { mkdir, readdir, readFile, stat, unlink, writeFile } from "fs/promises";
-import { path } from "../deps.ts";
-import { readAll } from "../deps.ts";
-import { FileMeta } from "../types.ts";
+import * as path from "https://deno.land/std@0.189.0/path/mod.ts";
+import { readAll } from "https://deno.land/std@0.165.0/streams/conversion.ts";
 import { SpacePrimitives } from "./space_primitives.ts";
 import { mime } from "https://deno.land/x/mimetypes@v1.0.0/mod.ts";
-import { walk } from "https://deno.land/std@0.165.0/fs/walk.ts";
+import { walk } from "https://deno.land/std@0.198.0/fs/walk.ts";
+import { FileMeta } from "$sb/types.ts";
 
 function lookupContentType(path: string): string {
   return mime.getType(path) || "application/octet-stream";
@@ -55,7 +54,8 @@ export class DiskSpacePrimitives implements SpacePrimitives {
         data,
         meta: {
           name: name,
-          lastModified: s.mtime!.getTime(),
+          created: s.birthtime?.getTime() || s.mtime?.getTime() || 0,
+          lastModified: s.mtime?.getTime() || 0,
           perm: "rw",
           size: s.size,
           contentType: contentType,
@@ -63,7 +63,7 @@ export class DiskSpacePrimitives implements SpacePrimitives {
       };
     } catch {
       // console.error("Error while reading file", name, e);
-      throw Error(`Could not read file ${name}`);
+      throw Error("Not found");
     }
   }
 
@@ -71,7 +71,7 @@ export class DiskSpacePrimitives implements SpacePrimitives {
     name: string,
     data: Uint8Array,
     _selfUpdate?: boolean,
-    lastModified?: number,
+    meta?: FileMeta,
   ): Promise<FileMeta> {
     const localPath = this.filenameToPath(name);
     try {
@@ -87,21 +87,14 @@ export class DiskSpacePrimitives implements SpacePrimitives {
       // Actually write the file
       await Deno.write(file.rid, data);
 
-      if (lastModified) {
-        console.log("Seting mtime to", new Date(lastModified));
-        await Deno.futime(file.rid, new Date(), new Date(lastModified));
+      if (meta?.lastModified) {
+        // console.log("Seting mtime to", new Date(meta.lastModified));
+        await Deno.futime(file.rid, new Date(), new Date(meta.lastModified));
       }
       file.close();
 
       // Fetch new metadata
-      const s = await Deno.stat(localPath);
-      return {
-        name: name,
-        size: s.size,
-        contentType: lookupContentType(name),
-        lastModified: s.mtime!.getTime(),
-        perm: "rw",
-      };
+      return this.getFileMeta(name);
     } catch (e) {
       console.error("Error while writing file", name, e);
       throw Error(`Could not write ${name}`);
@@ -116,7 +109,8 @@ export class DiskSpacePrimitives implements SpacePrimitives {
         name: name,
         size: s.size,
         contentType: lookupContentType(name),
-        lastModified: s.mtime!.getTime(),
+        created: s.birthtime?.getTime() || s.mtime?.getTime() || 0,
+        lastModified: s.mtime?.getTime() || 0,
         perm: "rw",
       };
     } catch {
@@ -146,13 +140,15 @@ export class DiskSpacePrimitives implements SpacePrimitives {
       const fullPath = file.path;
       try {
         const s = await Deno.stat(fullPath);
+        // console.log(fullPath, s.isSymlink);
         const name = fullPath.substring(this.rootPath.length + 1);
         if (excludedFiles.includes(name)) {
           continue;
         }
         allFiles.push({
           name: normalizeForwardSlashPath(name),
-          lastModified: s.mtime!.getTime(),
+          created: s.birthtime?.getTime() || s.mtime?.getTime() || 0,
+          lastModified: s.mtime?.getTime() || 0,
           contentType: mime.getType(fullPath) || "application/octet-stream",
           size: s.size,
           perm: "rw",

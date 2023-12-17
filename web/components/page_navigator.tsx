@@ -1,6 +1,8 @@
 import { FilterList } from "./filter.tsx";
-import { FilterOption, PageMeta } from "../types.ts";
+import { FilterOption } from "../types.ts";
 import { CompletionContext, CompletionResult } from "../deps.ts";
+import { PageMeta } from "$sb/types.ts";
+import { isFederationPath } from "$sb/lib/resolve.ts";
 
 export function PageNavigator({
   allPages,
@@ -20,7 +22,7 @@ export function PageNavigator({
   const options: FilterOption[] = [];
   for (const pageMeta of allPages) {
     // Order by last modified date in descending order
-    let orderId = -pageMeta.lastModified;
+    let orderId = -new Date(pageMeta.lastModified).getTime();
     // Unless it was opened in this session
     if (pageMeta.lastOpened) {
       orderId = -pageMeta.lastOpened;
@@ -30,12 +32,16 @@ export function PageNavigator({
       // ... then we put it all the way to the end
       orderId = Infinity;
     }
+    // And deprioritize federated pages too
+    if (isFederationPath(pageMeta.name)) {
+      orderId = Math.round(orderId / 10); // Just 10x lower the timestamp to push them down, should work
+    }
     options.push({
       ...pageMeta,
       orderId: orderId,
     });
   }
-  let completePrefix: string | undefined = undefined;
+  let completePrefix = currentPage + "/";
   if (currentPage && currentPage.includes("/")) {
     const pieces = currentPage.split("/");
     completePrefix = pieces.slice(0, pieces.length - 1).join("/") + "/";
@@ -51,7 +57,7 @@ export function PageNavigator({
       darkMode={darkMode}
       completer={completer}
       allowNew={true}
-      helpText="Start typing the page name to filter results, press <code>Return</code> to open."
+      helpText="Press <code>Enter</code> to open the selected page, or <code>Shift-Enter</code> to create a new page with this exact name."
       newHint="Create page"
       completePrefix={completePrefix}
       onSelect={(opt) => {

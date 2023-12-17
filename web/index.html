@@ -7,6 +7,9 @@
     content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <base href="/" />
   <link rel="apple-touch-icon" href="/.client/logo.png">
+  <meta name="theme-color" content="#e1e1e1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#262626" media="(prefers-color-scheme: dark)">
+
   <title>SilverBullet</title>
   <script>
     // Some global variables we need to make this work
@@ -35,19 +38,20 @@
     window.silverBulletConfig = {
       // These {{VARIABLES}} are replaced by http_server.ts
       spaceFolderPath: "{{SPACE_PATH}}",
-      syncEndpoint: "{{SYNC_ENDPOINT}}",
+      syncOnly: "{{SYNC_ONLY}}" === "true",
+      clientEncryption: "{{CLIENT_ENCRYPTION}}" === "true",
     };
-    // But in case these variables aren't replaced by the server, fall back fully static mode (no sync)
+    // But in case these variables aren't replaced by the server, fall back sync only mode
     if (window.silverBulletConfig.spaceFolderPath.includes("{{")) {
       window.silverBulletConfig = {
         spaceFolderPath: "",
-        syncEndpoint: "/.fs"
+        syncOnly: true,
+        clientEncryption: false,
       };
     }
   </script>
-  <style id="custom-styles">
-  </style>
   <link rel="stylesheet" href="/.client/main.css" />
+  <style id="custom-styles"></style>
   <script type="module" src="/.client/client.js"></script>
   <link rel="manifest" href="/.client/manifest.json" />
   <link rel="icon" type="image/x-icon" href="/.client/favicon.png" />

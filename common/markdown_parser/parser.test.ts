@@ -73,19 +73,88 @@ Before
 End
 `;
 
-Deno.test("Test directive parser", () => {
+const inlineAttributeSample = `
+Hello there [a link](http://zef.plus)
+[age: 100]
+[age:: 200]
+
+Here's a more [ambiguous: case](http://zef.plus)
+
+And one with nested brackets: [array: [1, 2, 3]]
+`;
+
+Deno.test("Test inline attribute syntax", () => {
   const lang = buildMarkdown([]);
-  let tree = parse(lang, directiveSample);
-  // console.log("tree", JSON.stringify(tree, null, 2));
-  assertEquals(renderToText(tree), directiveSample);
+  const tree = parse(lang, inlineAttributeSample);
+  // console.log("Attribute parsed", JSON.stringify(tree, null, 2));
+  const attributes = collectNodesOfType(tree, "Attribute");
+  let nameNode = findNodeOfType(attributes[0], "AttributeName");
+  assertEquals(nameNode?.children![0].text, "age");
+  let valueNode = findNodeOfType(attributes[0], "AttributeValue");
+  assertEquals(valueNode?.children![0].text, "100");
 
-  tree = parse(lang, nestedDirectiveExample);
-  // console.log("tree", JSON.stringify(tree, null, 2));
-  assertEquals(renderToText(tree), nestedDirectiveExample);
+  nameNode = findNodeOfType(attributes[1], "AttributeName");
+  assertEquals(nameNode?.children![0].text, "age");
+  valueNode = findNodeOfType(attributes[1], "AttributeValue");
+  assertEquals(valueNode?.children![0].text, "200");
 
-  const orderByExample = `<!-- #query page order by lastModified -->
-  
-  <!-- /query -->`;
-  tree = parse(lang, orderByExample);
-  console.log("Tree", JSON.stringify(tree, null, 2));
+  nameNode = findNodeOfType(attributes[2], "AttributeName");
+  assertEquals(nameNode?.children![0].text, "array");
+  valueNode = findNodeOfType(attributes[2], "AttributeValue");
+  assertEquals(valueNode?.children![0].text, "[1, 2, 3]");
+});
+
+const multiStatusTaskExample = `
+* [ ] Task 1
+- [x] Task 2
+* [TODO] Task 3
+`;
+
+Deno.test("Test multi-status tasks", () => {
+  const lang = buildMarkdown([]);
+  const tree = parse(lang, multiStatusTaskExample);
+  // console.log("Tasks parsed", JSON.stringify(tree, null, 2));
+  const tasks = collectNodesOfType(tree, "Task");
+  assertEquals(tasks.length, 3);
+  // Check " " checkbox state parsing
+  assertEquals(tasks[0].children![0].children![1].text, " ");
+  assertEquals(tasks[1].children![0].children![1].text, "x");
+  assertEquals(tasks[2].children![0].children![1].text, "TODO");
+});
+
+const commandLinkSample = `
+{[Some: Command]}
+{[Other: Command|Alias]}
+{[Command: Space | Spaces ]}
+`;
+
+Deno.test("Test command links", () => {
+  const lang = buildMarkdown([]);
+  const tree = parse(lang, commandLinkSample);
+  const commands = collectNodesOfType(tree, "CommandLink");
+  console.log("Command links parsed", JSON.stringify(commands, null, 2));
+  assertEquals(commands.length, 3);
+  assertEquals(commands[0].children![1].children![0].text, "Some: Command");
+  assertEquals(commands[1].children![1].children![0].text, "Other: Command");
+  assertEquals(commands[1].children![3].children![0].text, "Alias");
+  assertEquals(commands[2].children![1].children![0].text, "Command: Space ");
+  assertEquals(commands[2].children![3].children![0].text, " Spaces ");
+});
+
+const commandLinkArgsSample = `
+{[Args: Command]("with", "args")}
+{[Othargs: Command|Args alias]("other", "args", 123)}
+`;
+
+Deno.test("Test command link arguments", () => {
+  const lang = buildMarkdown([]);
+  const tree = parse(lang, commandLinkArgsSample);
+  const commands = collectNodesOfType(tree, "CommandLink");
+  assertEquals(commands.length, 2);
+
+  const args1 = findNodeOfType(commands[0], "CommandLinkArgs")
+  assertEquals(args1!.children![0].text, '"with", "args"');
+
+  const args2 = findNodeOfType(commands[1], "CommandLinkArgs")
+  assertEquals(args2!.children![0].text, '"other", "args", 123');
 });

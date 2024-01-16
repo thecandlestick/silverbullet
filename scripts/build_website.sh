@@ -27,9 +27,9 @@ cp -r dist_client_bundle/.client/* website_build/_client/
 echo "And all plugs"
 cp -r dist_plug_bundle/_plug/* website_build/_plug/
 #echo "And additional ones"
-curl https://raw.githubusercontent.com/silverbulletmd/silverbullet-mermaid/main/mermaid.plug.js > website_build/_fs/_plug/mermaid.plug.js
+curl https://raw.githubusercontent.com/silverbulletmd/silverbullet-mermaid/main/mermaid.plug.js > website_build/_plug/mermaid.plug.js
 #curl https://raw.githubusercontent.com/silverbulletmd/silverbullet-graphview/main/graphview.plug.js > website_build/_fs/_plug/graphview.plug.js
-curl https://raw.githubusercontent.com/silverbulletmd/silverbullet-katex/main/katex.plug.js > website_build/_fs/_plug/katex.plug.js
+curl https://raw.githubusercontent.com/silverbulletmd/silverbullet-katex/main/katex.plug.js > website_build/_plug/katex.plug.js
 
 echo "But remove some plugs"
 rm -rf website_build/_plug/{plugmd}.plug.js

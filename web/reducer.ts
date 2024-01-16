@@ -11,6 +11,12 @@ export default function reducer(
         ...state,
         isLoading: true,
         currentPage: action.name,
+        panels: state.currentPage === action.name ? state.panels : {
+          ...state.panels,
+          // Hide these by default to avoid flickering
+          top: {},
+          bottom: {},
+        },
       };
     case "page-loaded":
       return {
@@ -39,34 +45,37 @@ export default function reducer(
         ...state,
         syncFailures: action.syncSuccess ? 0 : state.syncFailures + 1,
       };
-    case "start-navigate":
+    case "update-page-list": {
+      // Let's move over any "lastOpened" times to the "allPages" list
+      const oldPageMeta = new Map(
+        [...state.allPages].map((pm) => [pm.name, pm]),
+      );
+      for (const pageMeta of action.allPages) {
+        const oldPageMetaItem = oldPageMeta.get(pageMeta.name);
+        if (oldPageMetaItem && oldPageMetaItem.lastOpened) {
+          pageMeta.lastOpened = oldPageMetaItem.lastOpened;
+        }
+      }
+
+      return {
+        ...state,
+        allPages: action.allPages,
+      };
+    }
+    case "start-navigate": {
       return {
         ...state,
         showPageNavigator: true,
         showCommandPalette: false,
         showFilterBox: false,
       };
+    }
     case "stop-navigate":
       return {
         ...state,
         showPageNavigator: false,
       };
-    case "pages-listed": {
-      // Let's move over any "lastOpened" times to the "allPages" list
-      const oldPageMeta = new Map(
-        [...state.allPages].map((pm) => [pm.name, pm]),
-      );
-      for (const pageMeta of action.pages) {
-        const oldPageMetaItem = oldPageMeta.get(pageMeta.name);
-        if (oldPageMetaItem && oldPageMetaItem.lastOpened) {
-          pageMeta.lastOpened = oldPageMetaItem.lastOpened;
-        }
-      }
-      return {
-        ...state,
-        allPages: action.pages,
-      };
-    }
+
     case "show-palette": {
       return {
         ...state,

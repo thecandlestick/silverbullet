@@ -49,7 +49,7 @@ int main()
   int *p = new int;
   cin >> x;
   int *q = new int[x];
-  Fish *f = new Fish;
+  Fish *f = new Fish; // user-defined class, Fish
 
   delete p;     // p = nullptr;
   delete [] q;  // q = nullptr;
@@ -100,10 +100,11 @@ int main()
   int *p;
 
   for( int r=0; r < 10; r++ )
-    p = new int[10];  // AAAA! Memory Leak!
+    p = new int[10];
 
   return 0;
 }
+````
 <!-- /include -->
 
 These problems create very nasty bugs, because they often do not crash your program. They allow it to go on until something else breaks as a result!

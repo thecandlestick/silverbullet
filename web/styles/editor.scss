@@ -234,7 +234,8 @@
     width: 3ch;
   }
 
-  .sb-hashtag {
+  .sb-hashtag,
+  .hashtag {
     border-radius: 6px;
     padding: 0 3px;
     margin: 0 1px 0 0;
@@ -316,47 +317,6 @@
     font-size: 91%;
   }
 
-  .sb-directive-start {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-style: solid;
-    border-width: 1px 1px 0 1px;
-    padding: 3px;
-  }
-
-  .sb-directive-end {
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    border-style: solid;
-    border-width: 0 1px 1px 1px;
-    padding: 3px;
-  }
-
-  .sb-directive-start .sb-comment,
-  .sb-directive-end .sb-comment {
-    position: relative;
-    left: -12px;
-  }
-
-  .sb-directive-start-outside,
-  .sb-directive-end-outside {
-    color: transparent;
-    pointer-events: none;
-    height: 1.3em;
-
-    .sb-directive-placeholder {
-      padding-right: 7px;
-      float: right;
-      font-size: 80%;
-    }
-
-    &>span,
-    &.sb-directive-start,
-    &.sb-directive-end {
-      color: transparent;
-    }
-  }
-
   .sb-line-frontmatter-outside,
   .sb-line-code-outside {
     .sb-meta {
@@ -403,6 +363,11 @@
     font-weight: bold;
   }
 
+  thead tr td {
+    // Primarily to make the column headers look reasonable with the button bar that may be put on top
+    padding: 11px 8px;
+  }
+
   th,
   td {
     padding: 8px;
@@ -443,6 +408,133 @@
     line-height: 0;
   }
 
+  .sb-markdown-widget {
+    margin: 0 0 -4ch 0;
+  }
+
+  .sb-markdown-top-widget h1,
+  .sb-markdown-bottom-widget h1 {
+    margin: 0 0 5px 0;
+    padding: 10px !important;
+    background-color: var(--editor-widget-background-color);
+    font-size: 1.2em;
+  }
+
+  .sb-markdown-top-widget:has(*) {
+    margin-bottom: 10px;
+  }
+
+  .sb-markdown-bottom-widget {
+    margin-top: 10px;
+  }
+
+  .sb-markdown-top-widget:has(*) .content {
+    max-height: 500px;
+  }
+
+  @media screen and (max-height: 1000px) {
+    .sb-markdown-top-widget:has(*) .content {
+      max-height: 300px;
+    }
+  }
+
+  .sb-markdown-widget,
+  .sb-markdown-top-widget:has(*),
+  .sb-markdown-bottom-widget:has(*) {
+    border: 1px solid var(--editor-widget-background-color);
+    border-radius: 5px;
+    white-space: normal;
+    position: relative;
+    min-height: 48px;
+
+    .content {
+      overflow-y: auto;
+    }
+
+    ul,
+    ol {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    ul {
+      list-style: none;
+      // padding-left: 1ch;
+    }
+
+    ul li::before {
+      content: "\2022";
+      /* Add content: \2022 is the CSS Code/unicode for a bullet */
+      color: var(--editor-list-bullet-color);
+      display: inline-block;
+      /* Needed to add space between the bullet and the text */
+      width: 1em;
+      /* Also needed for space (tweak if needed) */
+      margin-left: -1em;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      margin: 0;
+    }
+
+    a.wiki-link {
+      border-radius: 5px;
+      padding: 0 5px;
+      color: var(--editor-wiki-link-page-color);
+      background-color: var(--editor-wiki-link-page-background-color);
+      text-decoration: none;
+    }
+
+    span.task-deadline {
+      background-color: rgba(22, 22, 22, 0.07);
+    }
+
+    tt {
+      background-color: var(--editor-code-background-color);
+    }
+
+    // Only show the button bar on hover on non-touch devices
+    &:hover .button-bar {
+      display: block;
+    }
+
+    // Always show button bar on touch devices
+    @media (hover: none) and (pointer: coarse) {
+      .button-bar {
+        display: block !important;
+      }
+    }
+
+    .button-bar {
+      position: absolute;
+      right: 0;
+      top: 0;
+      display: none;
+      background: var(--editor-widget-background-color);
+      padding-inline: 3px;
+      padding: 4px 0;
+      border-radius: 0 0 0 5px;
+
+      button {
+        border: none;
+        background: none;
+        cursor: pointer;
+        color: var(--root-color);
+        margin-right: -8px;
+        padding: 11px 8px;
+      }
+
+      button:last-of-type {
+        margin-right: 2px;
+      }
+
+    }
+  }
+
   .sb-fenced-code-iframe {
     background-color: transparent;
 
@@ -451,8 +543,8 @@
       width: 100%;
       max-width: 100%;
       padding: 0;
-      margin: 0;
-      border: 1px solid var(--editor-directive-background-color);
+      margin: 0 0 -2ch 0;
+      border: 1px solid var(--editor-widget-background-color);
       border-radius: 5px;
     }
   }
@@ -488,14 +580,3 @@
 div:not(.cm-focused).cm-fat-cursor {
   outline: none !important;
 }
-
-
-// @media only screen and (max-width: 600px) {
-//   #sb-editor {
-
-//     .sb-directive-start-outside,
-//     .sb-directive-end-outside {
-//       height: 22px;
-//     }
-//   }
-// }

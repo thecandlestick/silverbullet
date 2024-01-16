@@ -25,7 +25,10 @@ import {
   xmlLanguage,
   yamlLanguage,
 } from "./deps.ts";
-import { highlightingDirectiveParser } from "./markdown_parser/parser.ts";
+import {
+  expressionParser,
+  highlightingQueryParser,
+} from "./markdown_parser/parser.ts";
 
 export const builtinLanguages: Record<string, Language> = {
   "meta": StreamLanguage.define(yamlLanguage),
@@ -33,6 +36,7 @@ export const builtinLanguages: Record<string, Language> = {
   "template": StreamLanguage.define(yamlLanguage),
   "embed": StreamLanguage.define(yamlLanguage),
   "data": StreamLanguage.define(yamlLanguage),
+  "toc": StreamLanguage.define(yamlLanguage),
   "javascript": javascriptLanguage,
   "js": javascriptLanguage,
   "typescript": typescriptLanguage,
@@ -79,7 +83,11 @@ export const builtinLanguages: Record<string, Language> = {
   "dart": StreamLanguage.define(dartLanguage),
   "query": LRLanguage.define({
     name: "query",
-    parser: highlightingDirectiveParser,
+    parser: highlightingQueryParser,
+  }),
+  "expression": LRLanguage.define({
+    name: "expression",
+    parser: expressionParser,
   }),
 };
 

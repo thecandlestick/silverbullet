@@ -8,7 +8,7 @@ import {
 import { decoratorStateField } from "./util.ts";
 
 import type { Client } from "../client.ts";
-import { resolvePath } from "$sb/lib/resolve.ts";
+import { resolveAttachmentPath, resolvePath } from "$sb/lib/resolve.ts";
 
 class InlineImageWidget extends WidgetType {
   constructor(
@@ -25,7 +25,7 @@ class InlineImageWidget extends WidgetType {
   }
 
   get estimatedHeight(): number {
-    const cachedHeight = this.client.space.getCachedImageHeight(this.url);
+    const cachedHeight = this.client.getCachedWidgetHeight(`image:${this.url}`);
     // console.log("Estimated height requested", this.url, cachedHeight);
     return cachedHeight;
   }
@@ -34,13 +34,14 @@ class InlineImageWidget extends WidgetType {
     const img = document.createElement("img");
     let url = this.url;
     url = resolvePath(this.client.currentPage!, url, true);
-    console.log("Resolving image to", url);
     // console.log("Creating DOM", this.url);
-    const cachedImageHeight = this.client.space.getCachedImageHeight(url);
+    const cachedImageHeight = this.client.getCachedWidgetHeight(
+      `image:${this.url}`,
+    );
     img.onload = () => {
       // console.log("Loaded", this.url, "with height", img.height);
       if (img.height !== cachedImageHeight) {
-        this.client.space.setCachedImageHeight(url, img.height);
+        this.client.setCachedWidgetHeight(`image:${this.url}`, img.height);
       }
     };
     img.src = url;
@@ -76,8 +77,9 @@ export function inlineImagesPlugin(client: Client) {
 
         let url = imageRexexResult.groups.url;
         const title = imageRexexResult.groups.title;
-        if (url.indexOf("://") === -1) {
-          url = decodeURI(url);
+
+        if (url.indexOf("://") === -1 && !url.startsWith("/")) {
+          url = resolveAttachmentPath(client.currentPage!, decodeURI(url));
         }
         widgets.push(
           Decoration.widget({

@@ -1,6 +1,5 @@
 import { collectNodesOfType } from "$sb/lib/tree.ts";
 import type { CompleteEvent, IndexTreeEvent } from "$sb/app_event.ts";
-import { removeQueries } from "$sb/lib/query.ts";
 import { ObjectValue, QueryExpression } from "$sb/types.ts";
 import { indexObjects, queryObjects } from "./api.ts";
 
@@ -11,14 +10,13 @@ type AnchorObject = ObjectValue<{
 }>;
 
 export async function indexAnchors({ name: pageName, tree }: IndexTreeEvent) {
-  removeQueries(tree);
   const anchors: ObjectValue<AnchorObject>[] = [];
 
   collectNodesOfType(tree, "NamedAnchor").forEach((n) => {
     const aName = n.children![0].text!.substring(1);
     anchors.push({
       ref: `${pageName}$${aName}`,
-      tags: ["anchor"],
+      tag: "anchor",
       name: aName,
       page: pageName,
       pos: n.from!,
@@ -45,7 +43,7 @@ export async function anchorComplete(completeEvent: CompleteEvent) {
     // "bare" anchor, match any page for completion purposes
     filter = undefined;
   }
-  const allAnchors = await queryObjects<AnchorObject>("anchor", { filter });
+  const allAnchors = await queryObjects<AnchorObject>("anchor", { filter }, 5);
   return {
     from: completeEvent.pos - match[1].length,
     options: allAnchors.map((a) => ({

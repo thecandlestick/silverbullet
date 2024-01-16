@@ -1,11 +1,12 @@
 import type { IndexTreeEvent } from "$sb/app_event.ts";
 
 import { collectNodesOfType, ParseTree, renderToText } from "$sb/lib/tree.ts";
-import { removeQueries } from "$sb/lib/query.ts";
 import { extractAttributes } from "$sb/lib/attribute.ts";
 import { rewritePageRefs } from "$sb/lib/resolve.ts";
 import { ObjectValue } from "$sb/types.ts";
 import { indexObjects } from "./api.ts";
+import { updateITags } from "$sb/lib/tags.ts";
+import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
 
 export type ItemObject = ObjectValue<
   {
@@ -17,9 +18,8 @@ export type ItemObject = ObjectValue<
 
 export async function indexItems({ name, tree }: IndexTreeEvent) {
   const items: ObjectValue<ItemObject>[] = [];
-  removeQueries(tree);
 
-  // console.log("Indexing items", name);
+  const frontmatter = await extractFrontmatter(tree);
 
   const coll = collectNodesOfType(tree, "ListItem");
 
@@ -32,11 +32,10 @@ export async function indexItems({ name, tree }: IndexTreeEvent) {
       continue;
     }
 
-    const tags = new Set<string>(["item"]);
-
+    const tags = new Set<string>();
     const item: ItemObject = {
       ref: `${name}@${n.from}`,
-      tags: [],
+      tag: "item",
       name: "", // to be replaced
       page: name,
       pos: n.from!,
@@ -64,7 +63,11 @@ export async function indexItems({ name, tree }: IndexTreeEvent) {
     }
 
     item.name = textNodes.map(renderToText).join("").trim();
-    item.tags = [...tags.values()];
+    if (tags.size > 0) {
+      item.tags = [...tags];
+    }
+
+    updateITags(item, frontmatter);
 
     items.push(item);
   }

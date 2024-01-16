@@ -1,5 +1,4 @@
 import type { CompleteEvent, IndexTreeEvent } from "$sb/app_event.ts";
-import { removeQueries } from "$sb/lib/query.ts";
 import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
 import { indexObjects, queryObjects } from "./api.ts";
 import {
@@ -16,10 +15,9 @@ export type TagObject = ObjectValue<{
 }>;
 
 export async function indexTags({ name, tree }: IndexTreeEvent) {
-  removeQueries(tree);
   const tags = new Set<string>(); // name:parent
   addParentPointers(tree);
-  const pageTags: string[] = (await extractFrontmatter(tree)).tags;
+  const pageTags: string[] = (await extractFrontmatter(tree)).tags || [];
   for (const pageTag of pageTags) {
     tags.add(`${pageTag}:page`);
   }
@@ -43,7 +41,7 @@ export async function indexTags({ name, tree }: IndexTreeEvent) {
       const [tagName, parent] = tag.split(":");
       return {
         ref: tag,
-        tags: ["tag"],
+        tag: "tag",
         name: tagName,
         page: name,
         parent,
@@ -62,16 +60,27 @@ export async function tagComplete(completeEvent: CompleteEvent) {
   }
   const tagPrefix = match[0].substring(1);
   let parent = "page";
-  if (taskPrefixRegex.test(completeEvent.linePrefix)) {
-    parent = "task";
-  } else if (itemPrefixRegex.test(completeEvent.linePrefix)) {
-    parent = "item";
+  if (!completeEvent.parentNodes.find((n) => n.startsWith("FrontMatter:"))) {
+    if (taskPrefixRegex.test(completeEvent.linePrefix)) {
+      parent = "task";
+    } else if (itemPrefixRegex.test(completeEvent.linePrefix)) {
+      parent = "item";
+    }
   }
 
-  // Query all tags
-  const allTags = await queryObjects<TagObject>("tag", {
+  // Query all tags with a matching parent
+  const allTags: any[] = await queryObjects<TagObject>("tag", {
     filter: ["=", ["attr", "parent"], ["string", parent]],
-  });
+    select: [{ name: "name" }],
+    distinct: true,
+  }, 5);
+
+  if (parent === "page") {
+    // Also add template, even though that would otherwise not appear because has "builtin" as a parent
+    allTags.push({
+      name: "template",
+    });
+  }
 
   return {
     from: completeEvent.pos - tagPrefix.length,

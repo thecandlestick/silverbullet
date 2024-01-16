@@ -5,6 +5,7 @@ import { AppCommand } from "./hooks/command.ts";
 // Used by FilterBox
 export type FilterOption = {
   name: string;
+  description?: string;
   orderId?: number;
   hint?: string;
 } & Record<string, any>;
@@ -18,10 +19,18 @@ export type Notification = {
 
 export type PanelMode = number;
 
+export type Shortcut = {
+  key?: string;
+  mac?: string;
+  priority?: number;
+  command: string;
+};
+
 export type BuiltinSettings = {
   indexPage: string;
   customStyles?: string | string[];
   plugOverrides?: Record<string, Partial<Manifest>>;
+  shortcuts?: Shortcut[];
   // Format: compatible with docker ignore
   spaceIgnore?: string;
 };
@@ -90,8 +99,6 @@ export const initialViewState: AppViewState = {
     rhs: {},
     bhs: {},
     modal: {},
-    top: {},
-    bottom: {},
   },
   allPages: [],
   commands: new Map(),
@@ -111,10 +118,10 @@ export const initialViewState: AppViewState = {
 export type Action =
   | { type: "page-loaded"; meta: PageMeta }
   | { type: "page-loading"; name: string }
-  | { type: "pages-listed"; pages: PageMeta[] }
   | { type: "page-changed" }
   | { type: "page-saved" }
   | { type: "sync-change"; syncSuccess: boolean }
+  | { type: "update-page-list"; allPages: PageMeta[] }
   | { type: "start-navigate" }
   | { type: "stop-navigate" }
   | {

@@ -3,8 +3,6 @@ assets:
   - "assets/*"
 functions:
   # API
-  markdownContentWidget:
-    path: markdown_content_widget.ts:markdownContentWidget
   expandCodeWidgets:
     path: api.ts:expandCodeWidgets
   markdownToHtml:
@@ -31,7 +29,3 @@ functions:
     path: "./preview.ts:previewClickHandler"
     events:
       - preview:click
-
-  markdownWidget:
-    path: ./widget.ts:markdownWidget
-    codeWidget: markdown

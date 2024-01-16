@@ -97,6 +97,7 @@ export type QueryExpression =
   | ["string", string]
   | ["boolean", boolean]
   | ["null"]
+  | ["not", QueryExpression]
   | ["array", QueryExpression[]]
   | ["object", Record<string, any>]
   | ["regexp", string, string] // regex, modifier
@@ -117,7 +118,9 @@ export type FunctionMap = Record<string, (...args: any[]) => any>;
  */
 export type ObjectValue<T> = {
   ref: string;
-  tags: string[];
+  tag: string; // main tag
+  tags?: string[];
+  itags?: string[]; // implicit or inherited tags (inherited from the page for instance)
 } & T;
 
 export type ObjectQuery = Omit<Query, "prefix">;
@@ -126,12 +129,20 @@ export type ObjectQuery = Omit<Query, "prefix">;
 export type CodeWidgetCallback = (
   bodyText: string,
   pageName: string,
-) => Promise<CodeWidgetContent>;
+) => Promise<CodeWidgetContent | null>;
 
 export type CodeWidgetContent = {
   html?: string;
   markdown?: string;
   script?: string;
+  buttons?: CodeWidgetButton[];
+};
+
+export type CodeWidgetButton = {
+  widgetTarget?: boolean;
+  description: string;
+  svg: string;
+  invokeFunction: string;
 };
 
 export type LintDiagnostic = {
@@ -145,4 +156,4 @@ export type UploadFile = {
   name: string;
   contentType: string;
   content: Uint8Array;
-}
+};

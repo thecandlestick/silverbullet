@@ -1,4 +1,6 @@
-import buildMarkdown from "../common/markdown_parser/parser.ts";
+import buildMarkdown, {
+  commandLinkRegex,
+} from "../common/markdown_parser/parser.ts";
 import { readonlyMode } from "./cm_plugins/readonly.ts";
 import customMarkdownStyle from "./style.ts";
 import {
@@ -51,8 +53,51 @@ export function createEditorState(
   readOnly: boolean,
 ): EditorState {
   const commandKeyBindings: KeyBinding[] = [];
+
+  // Track which keyboard shortcuts for which commands we've overridden, so we can skip them later
+  const overriddenCommands = new Set<string>();
+  // Keyboard shortcuts from SETTINGS take precedense
+  if (client.settings?.shortcuts) {
+    for (const shortcut of client.settings.shortcuts) {
+      // Figure out if we're using the command link syntax here, if so: parse it out
+      const commandMatch = commandLinkRegex.exec(shortcut.command);
+      let cleanCommandName = shortcut.command;
+      let args: any[] = [];
+      if (commandMatch) {
+        cleanCommandName = commandMatch[1];
+        args = commandMatch[5] ? JSON.parse(`[${commandMatch[5]}]`) : [];
+      }
+      if (args.length === 0) {
+        // If there was no "specialization" of this command (that is, we effectively created a keybinding for an existing command but with arguments), let's add it to the overridden command set:
+        overriddenCommands.add(cleanCommandName);
+      }
+      commandKeyBindings.push({
+        key: shortcut.key,
+        mac: shortcut.mac,
+        run: (): boolean => {
+          client.runCommandByName(cleanCommandName, args).catch((e: any) => {
+            console.error(e);
+            client.flashNotification(
+              `Error running command: ${e.message}`,
+              "error",
+            );
+          }).then(() => {
+            // Always be focusing the editor after running a command
+            client.focus();
+          });
+          return true;
+        },
+      });
+    }
+  }
+
+  // Then add bindings for plug commands
   for (const def of client.system.commandHook.editorCommands.values()) {
     if (def.command.key) {
+      // If we've already overridden this command, skip it
+      if (overriddenCommands.has(def.command.key)) {
+        continue;
+      }
       commandKeyBindings.push({
         key: def.command.key,
         mac: def.command.mac,
@@ -81,6 +126,7 @@ export function createEditorState(
       });
     }
   }
+
   let touchCount = 0;
 
   const markdownLanguage = buildMarkdown(client.system.mdExtensions);
@@ -178,9 +224,7 @@ export function createEditorState(
           key: "Ctrl-k",
           mac: "Cmd-k",
           run: (): boolean => {
-            client.ui.viewDispatch({ type: "start-navigate" });
-            client.space.updatePageList();
-
+            client.startPageNavigate();
             return true;
           },
         },
@@ -254,11 +298,14 @@ export function createEditorState(
         },
 
         mousedown: (event: MouseEvent, view: EditorView) => {
+          const pos = view.posAtCoords(event);
+          if (event.button !== 0) {
+            return;
+          }
+          if (!pos) {
+            return;
+          }
           safeRun(async () => {
-            const pos = view.posAtCoords(event);
-            if (!pos) {
-              return;
-            }
             const potentialClickEvent: ClickEvent = {
               page: pageName,
               ctrlKey: event.ctrlKey,

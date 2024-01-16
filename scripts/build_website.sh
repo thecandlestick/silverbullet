@@ -32,7 +32,7 @@ curl https://raw.githubusercontent.com/silverbulletmd/silverbullet-mermaid/main/
 curl https://raw.githubusercontent.com/silverbulletmd/silverbullet-katex/main/katex.plug.js > website_build/_fs/_plug/katex.plug.js
 
 echo "But remove some plugs"
-rm -rf website_build/_plug/{plugmd,directive}.plug.js
+rm -rf website_build/_plug/{plugmd}.plug.js
 
 
 # Generate random modified date, and replace in _headers too

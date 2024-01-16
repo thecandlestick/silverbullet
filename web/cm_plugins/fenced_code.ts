@@ -1,79 +1,14 @@
-import { WidgetContent } from "../../plug-api/app_event.ts";
-import { Decoration, EditorState, syntaxTree, WidgetType } from "../deps.ts";
+import { Decoration, EditorState, syntaxTree } from "../deps.ts";
 import type { Client } from "../client.ts";
 import {
   decoratorStateField,
   invisibleDecoration,
   isCursorInRange,
+  shouldRenderAsCode,
 } from "./util.ts";
-import { createWidgetSandboxIFrame } from "../components/widget_sandbox_iframe.ts";
-import type { CodeWidgetCallback } from "$sb/types.ts";
-
-class IFrameWidget extends WidgetType {
-  iframe?: HTMLIFrameElement;
-
-  constructor(
-    readonly from: number,
-    readonly to: number,
-    readonly client: Client,
-    readonly bodyText: string,
-    readonly codeWidgetCallback: CodeWidgetCallback,
-  ) {
-    super();
-  }
-
-  toDOM(): HTMLElement {
-    const from = this.from;
-    const iframe = createWidgetSandboxIFrame(
-      this.client,
-      this.bodyText,
-      this.codeWidgetCallback(this.bodyText, this.client.currentPage!),
-      (message) => {
-        switch (message.type) {
-          case "blur":
-            this.client.editorView.dispatch({
-              selection: { anchor: from },
-            });
-            this.client.focus();
-
-            break;
-          case "reload":
-            this.codeWidgetCallback(this.bodyText, this.client.currentPage!)
-              .then(
-                (widgetContent: WidgetContent) => {
-                  iframe.contentWindow!.postMessage({
-                    type: "html",
-                    html: widgetContent.html,
-                    script: widgetContent.script,
-                    theme:
-                      document.getElementsByTagName("html")[0].dataset.theme,
-                  });
-                },
-              );
-            break;
-        }
-      },
-    );
-
-    const estimatedHeight = this.estimatedHeight;
-    iframe.height = `${estimatedHeight}px`;
-
-    return iframe;
-  }
-
-  get estimatedHeight(): number {
-    const cachedHeight = this.client.space.getCachedWidgetHeight(this.bodyText);
-    // console.log("Calling estimated height", cachedHeight);
-    return cachedHeight > 0 ? cachedHeight : 150;
-  }
-
-  eq(other: WidgetType): boolean {
-    return (
-      other instanceof IFrameWidget &&
-      other.bodyText === this.bodyText
-    );
-  }
-}
+import { MarkdownWidget } from "./markdown_widget.ts";
+import { IFrameWidget } from "./iframe_widget.ts";
+import { isTemplate } from "$sb/lib/cheap_yaml.ts";
 
 export function fencedCodePlugin(editor: Client) {
   return decoratorStateField((state: EditorState) => {
@@ -81,13 +16,20 @@ export function fencedCodePlugin(editor: Client) {
     syntaxTree(state).iterate({
       enter({ from, to, name, node }) {
         if (name === "FencedCode") {
-          if (isCursorInRange(state, [from, to])) return;
+          if (shouldRenderAsCode(state, [from, to])) {
+            // Don't render the widget if the cursor is inside the fenced code
+            return;
+          }
           const text = state.sliceDoc(from, to);
           const [_, lang] = text.match(/^```(\w+)?/)!;
           const codeWidgetCallback = editor.system.codeWidgetHook
             .codeWidgetCallbacks
             .get(lang);
-          if (codeWidgetCallback) {
+          const renderMode = editor.system.codeWidgetHook.codeWidgetModes.get(
+            lang,
+          );
+          // Only custom render when we have a custom renderer, and the current page is not a template
+          if (codeWidgetCallback && !isTemplate(state.sliceDoc(0, from))) {
             // We got a custom renderer!
             const lineStrings = text.split("\n");
 
@@ -131,15 +73,28 @@ export function fencedCodePlugin(editor: Client) {
               );
             });
 
+            const bodyText = lineStrings.slice(1, lineStrings.length - 1).join(
+              "\n",
+            );
+            const widget = renderMode === "markdown"
+              ? new MarkdownWidget(
+                from + lineStrings[0].length + 1,
+                editor,
+                `widget:${editor.currentPage}:${bodyText}`,
+                bodyText,
+                codeWidgetCallback,
+                "sb-markdown-widget",
+              )
+              : new IFrameWidget(
+                from + lineStrings[0].length + 1,
+                to - lineStrings[lineStrings.length - 1].length - 1,
+                editor,
+                lineStrings.slice(1, lineStrings.length - 1).join("\n"),
+                codeWidgetCallback,
+              );
             widgets.push(
               Decoration.widget({
-                widget: new IFrameWidget(
-                  from + lineStrings[0].length + 1,
-                  to - lineStrings[lineStrings.length - 1].length - 1,
-                  editor,
-                  lineStrings.slice(1, lineStrings.length - 1).join("\n"),
-                  codeWidgetCallback,
-                ),
+                widget: widget,
               }).range(from),
             );
             return false;

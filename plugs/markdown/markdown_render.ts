@@ -16,7 +16,7 @@ export type MarkdownRenderOptions = {
   attachmentUrlPrefix?: string;
   preserveAttributes?: true;
   // When defined, use to inline images as data: urls
-  translateUrls?: (url: string) => string;
+  translateUrls?: (url: string, type: "link" | "image") => string;
 };
 
 function cleanTags(values: (Tag | null)[], cleanWhitespace = false): Tag[] {
@@ -245,10 +245,11 @@ function render(
       if (aliasNode) {
         linkText = aliasNode.children![0].text!;
       }
+      const [pageName] = ref.split(/[@$]/);
       return {
         name: "a",
         attrs: {
-          href: `/${ref.replace("@", "#")}`,
+          href: `/${pageName}`,
           class: "wiki-link",
           "data-ref": ref,
         },
@@ -267,7 +268,10 @@ function render(
     }
     case "Hashtag":
       return {
-        name: "strong",
+        name: "span",
+        attrs: {
+          class: "hashtag",
+        },
         body: t.children![0].text!,
       };
 
@@ -323,12 +327,17 @@ function render(
       };
     case "CommandLink": {
       // Child 0 is CommandLinkMark, child 1 is CommandLinkPage
-      const commandText = t.children![1].children![0].text!;
+      const command = t.children![1].children![0].text!;
+      let commandText = command;
+      const aliasNode = findNodeOfType(t, "CommandLinkAlias");
+      if (aliasNode) {
+        commandText = aliasNode.children![0].text!;
+      }
 
       return {
         name: "button",
         attrs: {
-          "data-onclick": JSON.stringify(["command", commandText]),
+          "data-onclick": JSON.stringify(["command", command]),
         },
         body: commandText,
       };
@@ -391,10 +400,6 @@ function render(
         body: cleanTags(mapRender(newChildren)),
       };
     }
-    case "Directive": {
-      const body = findNodeOfType(t, "DirectiveBody")!;
-      return posPreservingRender(body.children![0], options);
-    }
     case "Attribute":
       if (options.preserveAttributes) {
         return {
@@ -417,6 +422,16 @@ function render(
     }
     case "Entity":
       return t.children![0].text!;
+
+    case "TemplateDirective": {
+      return {
+        name: "span",
+        attrs: {
+          class: "template-directive",
+        },
+        body: renderToText(t),
+      };
+    }
 
     // Text
     case undefined:
@@ -466,11 +481,11 @@ export function renderMarkdownToHtml(
         return;
       }
       if (t.name === "img") {
-        t.attrs!.src = options.translateUrls!(t.attrs!.src!);
+        t.attrs!.src = options.translateUrls!(t.attrs!.src!, "image");
       }
 
       if (t.name === "a" && t.attrs!.href) {
-        t.attrs!.href = options.translateUrls!(t.attrs!.href);
+        t.attrs!.href = options.translateUrls!(t.attrs!.href, "link");
       }
     });
   }

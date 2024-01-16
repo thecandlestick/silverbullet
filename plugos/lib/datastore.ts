@@ -2,7 +2,6 @@ import { applyQueryNoFilterKV, evalQueryExpression } from "$sb/lib/query.ts";
 import { FunctionMap, KV, KvKey, KvQuery } from "$sb/types.ts";
 import { builtinFunctions } from "$sb/lib/builtin_query_functions.ts";
 import { KvPrimitives } from "./kv_primitives.ts";
-
 /**
  * This is the data store class you'll actually want to use, wrapping the primitives
  * in a more user-friendly way
@@ -19,6 +18,9 @@ export class DataStore {
   }
 
   batchGet<T = any>(keys: KvKey[]): Promise<(T | null)[]> {
+    if (keys.length === 0) {
+      return Promise.resolve([]);
+    }
     return this.kv.batchGet(keys);
   }
 
@@ -27,6 +29,9 @@ export class DataStore {
   }
 
   batchSet<T = any>(entries: KV<T>[]): Promise<void> {
+    if (entries.length === 0) {
+      return Promise.resolve();
+    }
     const allKeyStrings = new Set<string>();
     const uniqueEntries: KV[] = [];
     for (const { key, value } of entries) {
@@ -46,6 +51,9 @@ export class DataStore {
   }
 
   batchDelete(keys: KvKey[]): Promise<void> {
+    if (keys.length === 0) {
+      return Promise.resolve();
+    }
     return this.kv.batchDelete(keys);
   }
 

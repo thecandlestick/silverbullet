@@ -10,29 +10,41 @@ import {
   renderToText,
   traverseTreeAsync,
 } from "$sb/lib/tree.ts";
+import { updateITags } from "$sb/lib/tags.ts";
 
 export async function indexPage({ name, tree }: IndexTreeEvent) {
   if (name.startsWith("_")) {
     // Don't index pages starting with _
     return;
   }
-  let pageMeta = await space.getPageMeta(name);
-
+  const pageMeta = await space.getPageMeta(name);
   const frontmatter = await extractFrontmatter(tree);
   const toplevelAttributes = await extractAttributes(tree, false);
 
   // Push them all into the page object
-  pageMeta = { ...pageMeta, ...frontmatter, ...toplevelAttributes };
+  // Note the order here, making sure that the actual page meta data overrules
+  // any attempt to manually set built-in attributes like 'name' or 'lastModified'
+  // pageMeta appears at the beginning and the end due to the ordering behavior of ojects in JS (making builtin attributes appear first)
+  const combinedPageMeta: PageMeta = {
+    ...pageMeta,
+    ...frontmatter,
+    ...toplevelAttributes,
+    ...pageMeta,
+  };
 
-  pageMeta.tags = [...new Set(["page", ...pageMeta.tags || []])];
+  combinedPageMeta.tags = [
+    ...new Set([
+      ...frontmatter.tags || [],
+      ...toplevelAttributes.tags || [],
+    ]),
+  ];
 
-  if (pageMeta.tags.includes("template")) {
-    // If this is a template, we don't want to index it as a page or anything else, just a template
-    pageMeta.tags = ["template"];
-  }
+  combinedPageMeta.tag = "page";
 
-  // console.log("Page object", pageObj);
-  await indexObjects<PageMeta>(name, [pageMeta]);
+  updateITags(combinedPageMeta, frontmatter);
+
+  // console.log("Page object", combinedPageMeta);
+  await indexObjects<PageMeta>(name, [combinedPageMeta]);
 }
 
 export async function lintFrontmatter(): Promise<LintDiagnostic[]> {
@@ -96,13 +108,6 @@ async function lintYaml(
     const errorMatch = errorRegex.exec(e.message);
     if (errorMatch) {
       console.log("YAML error", e.message);
-      // const line = parseInt(errorMatch[1], 10) - 1;
-      // const yamlLines = yamlText.split("\n");
-      // let pos = posOffset;
-      // for (let i = 0; i < line; i++) {
-      //   pos += yamlLines[i].length + 1;
-      // }
-      // const endPos = pos + yamlLines[line].length;
 
       return {
         from,

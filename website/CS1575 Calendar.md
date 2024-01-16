@@ -1,7 +1,7 @@
 
 |  |  |  |  |
 |----------|----------|----------|----------|
-| [[CS1575|Home]] | [[Course Calendar|Calendar]] | [[Syllabus]] | [[Lecture Notes]] |
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
 
 ---
 

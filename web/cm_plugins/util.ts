@@ -6,7 +6,6 @@ import {
   DecorationSet,
   EditorState,
   EditorView,
-  foldedRanges,
   StateField,
   Transaction,
   WidgetType,
@@ -29,10 +28,29 @@ export class LinkWidget extends WidgetType {
     const anchor = document.createElement("a");
     anchor.className = this.options.cssClass;
     anchor.textContent = this.options.text;
-    anchor.addEventListener("click", (e) => {
+
+    // Mouse handling
+    anchor.addEventListener("mousedown", (e) => {
+      if (e.button !== 0) {
+        return;
+      }
       e.preventDefault();
       e.stopPropagation();
       this.options.callback(e);
+    });
+
+    // Touch handling
+    let touchCount = 0;
+    anchor.addEventListener("touchmove", () => {
+      touchCount++;
+    });
+    anchor.addEventListener("touchend", (e) => {
+      if (touchCount === 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.options.callback(new MouseEvent("click", e));
+      }
+      touchCount = 0;
     });
     anchor.setAttribute("title", this.options.title);
     anchor.href = this.options.href || "#";
@@ -142,38 +160,22 @@ export function isCursorInRange(state: EditorState, range: [number, number]) {
   );
 }
 
+export function shouldRenderAsCode(
+  state: EditorState,
+  range: [number, number],
+) {
+  const mainSelection = state.selection.main;
+  // When the selection is empty, we need to check if the cursor is inside the fenced code
+  if (mainSelection.empty) {
+    return checkRangeOverlap(range, [mainSelection.from, mainSelection.to]);
+  } else {
+    // If the selection is encompassing the fenced code we render as code, or vice versa
+    return checkRangeSubset([mainSelection.from, mainSelection.to], range) ||
+      checkRangeSubset(range, [mainSelection.from, mainSelection.to]);
+  }
+}
+
 /**
  * Decoration to simply hide anything.
  */
 export const invisibleDecoration = Decoration.replace({});
-
-/**
- * Returns the lines of the editor that are in the given range and not folded.
- * This function is of use when you need to get the lines of a particular
- * block node and add line decorations to each line of it.
- *
- * @param view - Editor view
- * @param from - Start of the range
- * @param to - End of the range
- * @returns A list of line blocks that are in the range
- */
-export function editorLines(view: EditorView, from: number, to: number) {
-  let lines = view.viewportLineBlocks.filter((block) =>
-    // Keep lines that are in the range
-    checkRangeOverlap([block.from, block.to], [from, to])
-  );
-
-  const folded = foldedRanges(view.state).iter();
-  while (folded.value) {
-    lines = lines.filter(
-      (line) =>
-        !checkRangeOverlap(
-          [folded.from, folded.to],
-          [line.from, line.to],
-        ),
-    );
-    folded.next();
-  }
-
-  return lines;
-}

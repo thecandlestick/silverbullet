@@ -1,8 +1,14 @@
-import { createSandbox } from "./environments/deno_sandbox.ts";
+import { createSandbox } from "./sandboxes/deno_worker_sandbox.ts";
 import { System } from "./system.ts";
-import { assertEquals } from "../test_deps.ts";
+import { assert, assertEquals } from "../test_deps.ts";
 import { compileManifest } from "./compile.ts";
 import { esbuild } from "./deps.ts";
+import {
+  createSandbox as createNoSandbox,
+  runWithSystemLock,
+} from "./sandboxes/no_sandbox.ts";
+import { sleep } from "$sb/lib/async.ts";
+import { SysCallMapping } from "./system.ts";
 
 Deno.test("Run a deno sandbox", async () => {
   const system = new System("server");
@@ -13,7 +19,7 @@ Deno.test("Run a deno sandbox", async () => {
     failingSyscall: () => {
       throw new Error("#fail");
     },
-  });
+  } as SysCallMapping);
   system.registerSyscalls(["restricted"], {
     restrictedSyscall: () => {
       return "restricted";
@@ -33,15 +39,47 @@ Deno.test("Run a deno sandbox", async () => {
   );
 
   const plug = await system.load(
-    new URL(`file://${workerPath}`),
     "test",
-    0,
-    createSandbox,
+    createSandbox(new URL(`file://${workerPath}`)),
   );
 
-  console.log("Plug", plug.manifest);
+  assertEquals({
+    addedNumbers: 3,
+    yamlMessage: "hello: world\n",
+  }, await plug.invoke("boot", []));
 
-  assertEquals("hello", await plug.invoke("boot", []));
+  await system.unloadAll();
+
+  // Now load directly from module
+  const { plug: plugExport } = await import(
+    `file://${workerPath}`
+  );
+
+  const plug2 = await system.load("test", createNoSandbox(plugExport));
+
+  let running = false;
+  await Promise.all([
+    runWithSystemLock(system, async () => {
+      console.log("Starting first run");
+      running = true;
+      await sleep(5);
+      assertEquals({
+        addedNumbers: 3,
+        yamlMessage: "hello: world\n",
+      }, await plug2.invoke("boot", []));
+      console.log("Done first run");
+      running = false;
+    }),
+    runWithSystemLock(system, async () => {
+      assert(!running);
+      console.log("Starting second run");
+      assertEquals({
+        addedNumbers: 3,
+        yamlMessage: "hello: world\n",
+      }, await plug2.invoke("boot", []));
+      console.log("Done second run");
+    }),
+  ]);
 
   await system.unloadAll();
 

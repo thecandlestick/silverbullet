@@ -4,7 +4,7 @@ import { loadMarkdownExtensions } from "../common/markdown_parser/markdown_ext.t
 import buildMarkdown from "../common/markdown_parser/parser.ts";
 import { EventedSpacePrimitives } from "../common/spaces/evented_space_primitives.ts";
 import { PlugSpacePrimitives } from "../common/spaces/plug_space_primitives.ts";
-import { createSandbox } from "../plugos/environments/webworker_sandbox.ts";
+import { createSandbox } from "../plugos/sandboxes/web_worker_sandbox.ts";
 import { CronHook } from "../plugos/hooks/cron.ts";
 import { EventHook } from "../plugos/hooks/event.ts";
 import { MQHook } from "../plugos/hooks/mq.ts";
@@ -33,10 +33,25 @@ import { CodeWidgetHook } from "../web/hooks/code_widget.ts";
 import { KVPrimitivesManifestCache } from "../plugos/manifest_cache.ts";
 import { KvPrimitives } from "../plugos/lib/kv_primitives.ts";
 import { ShellBackend } from "./shell_backend.ts";
+import { ensureSpaceIndex } from "../common/space_index.ts";
+
+// // Important: load this before the actual plugs
+// import {
+//   createSandbox as noSandboxFactory,
+//   runWithSystemLock,
+// } from "../plugos/sandboxes/no_sandbox.ts";
+
+// // Load list of builtin plugs
+// import { plug as plugIndex } from "../dist_plug_bundle/_plug/index.plug.js";
+// import { plug as plugFederation } from "../dist_plug_bundle/_plug/federation.plug.js";
+// import { plug as plugQuery } from "../dist_plug_bundle/_plug/query.plug.js";
+// import { plug as plugSearch } from "../dist_plug_bundle/_plug/search.plug.js";
+// import { plug as plugTasks } from "../dist_plug_bundle/_plug/tasks.plug.js";
+// import { plug as plugTemplate } from "../dist_plug_bundle/_plug/template.plug.js";
 
 const fileListInterval = 30 * 1000; // 30s
 
-const plugNameExtractRegex = /\/(.+)\.plug\.js$/;
+const plugNameExtractRegex = /([^/]+)\.plug\.js$/;
 
 export class ServerSystem {
   system!: System<SilverBulletHooks>;
@@ -98,7 +113,7 @@ export class ServerSystem {
       ),
       eventHook,
     );
-    const space = new Space(this.spacePrimitives, this.ds, eventHook);
+    const space = new Space(this.spacePrimitives, eventHook);
 
     // Add syscalls
     this.system.registerSyscalls(
@@ -137,51 +152,52 @@ export class ServerSystem {
     );
 
     this.listInterval = setInterval(() => {
+      // runWithSystemLock(this.system, async () => {
+      //   await space.updatePageList();
+      // });
       space.updatePageList().catch(console.error);
     }, fileListInterval);
 
-    eventHook.addLocalListener("file:changed", (path, localChange) => {
-      (async () => {
-        if (!localChange && path.endsWith(".md")) {
-          const pageName = path.slice(0, -3);
-          const data = await this.spacePrimitives.readFile(path);
-          console.log("Outside page change: reindexing", pageName);
-          // Change made outside of editor, trigger reindex
-          await eventHook.dispatchEvent("page:index_text", {
-            name: pageName,
-            text: new TextDecoder().decode(data.data),
-          });
-        }
+    eventHook.addLocalListener("file:changed", async (path, localChange) => {
+      if (!localChange && path.endsWith(".md")) {
+        const pageName = path.slice(0, -3);
+        const data = await this.spacePrimitives.readFile(path);
+        console.log("Outside page change: reindexing", pageName);
+        // Change made outside of editor, trigger reindex
+        await eventHook.dispatchEvent("page:index_text", {
+          name: pageName,
+          text: new TextDecoder().decode(data.data),
+        });
+      }
 
-        if (path.startsWith("_plug/") && path.endsWith(".plug.js")) {
-          console.log("Plug updated, reloading:", path);
-          this.system.unload(path);
-          await this.loadPlugFromSpace(path);
-        }
-      })().catch(console.error);
+      if (path.startsWith("_plug/") && path.endsWith(".plug.js")) {
+        console.log("Plug updated, reloading:", path);
+        this.system.unload(path);
+        await this.loadPlugFromSpace(path);
+      }
     });
 
-    // Check if this space was ever indexed before
-    if (!await this.ds.get(["$initialIndexDone"])) {
-      console.log("Indexing space for the first time (in the background)");
-      const indexPromise = this.system.loadedPlugs.get("index")!.invoke(
-        "reindexSpace",
-        [],
-      ).then(() => {
-        console.log("Initial index completed!");
-        this.ds.set(["$initialIndexDone"], true);
-      }).catch(console.error);
-      if (awaitIndex) {
-        await indexPromise;
-      }
+    // Ensure a valid index
+    const indexPromise = ensureSpaceIndex(this.ds, this.system);
+    if (awaitIndex) {
+      await indexPromise;
     }
 
+    // await runWithSystemLock(this.system, async () => {
     await eventHook.dispatchEvent("system:ready");
+    // });
   }
 
   async loadPlugs() {
+    // await this.system.load("index", noSandboxFactory(plugIndex));
+    // await this.system.load("federation", noSandboxFactory(plugFederation));
+    // await this.system.load("query", noSandboxFactory(plugQuery));
+    // await this.system.load("search", noSandboxFactory(plugSearch));
+    // await this.system.load("tasks", noSandboxFactory(plugTasks));
+    // await this.system.load("template", noSandboxFactory(plugTemplate));
+
     for (const { name } of await this.spacePrimitives.fetchFileList()) {
-      if (name.endsWith(".plug.js")) {
+      if (plugNameExtractRegex.test(name)) {
         await this.loadPlugFromSpace(name);
       }
     }
@@ -191,11 +207,12 @@ export class ServerSystem {
     const { meta, data } = await this.spacePrimitives.readFile(path);
     const plugName = path.match(plugNameExtractRegex)![1];
     return this.system.load(
-      // Base64 encoding this to support `deno compile` mode
-      new URL(base64EncodedDataUrl("application/javascript", data)),
       plugName,
+      createSandbox(
+        // Base64 encoding this to support `deno compile` mode
+        new URL(base64EncodedDataUrl("application/javascript", data)),
+      ),
       meta.lastModified,
-      createSandbox,
     );
   }
 

@@ -1,6 +1,7 @@
 import {
   cleanPageRef,
   federatedPathToUrl,
+  resolveAttachmentPath,
   resolvePath,
   rewritePageRefs,
 } from "$sb/lib/resolve.ts";
@@ -48,16 +49,13 @@ Deno.test("Test rewritePageRefs", () => {
   let tree = parseMarkdown(`
 This is a [[local link]] and [[local link|with alias]].
 
-<!-- #query page render [[template/page]] -->
-<!-- /query -->
+\`\`\`query
+page render [[template/page]]
+\`\`\`
 
-<!-- #use [[template/use-template]] {} -->
-
-<!-- /use -->
-
-<!-- #include [[template/include-template]] {} -->
-
-<!-- /include -->
+\`\`\`template
+page: "[[template/use-template]]"
+\`\`\`
 `);
   rewritePageRefs(tree, "!silverbullet.md");
   let rewrittenText = renderToText(tree);
@@ -67,16 +65,13 @@ This is a [[local link]] and [[local link|with alias]].
     `
 This is a [[!silverbullet.md/local link]] and [[!silverbullet.md/local link|with alias]].
 
-<!-- #query page render [[!silverbullet.md/template/page]] -->
-<!-- /query -->
+\`\`\`query
+page render [[!silverbullet.md/template/page]]
+\`\`\`
 
-<!-- #use [[!silverbullet.md/template/use-template]] {} -->
-
-<!-- /use -->
-
-<!-- #include [[!silverbullet.md/template/include-template]] {} -->
-
-<!-- /include -->
+\`\`\`template
+page: "[[!silverbullet.md/template/use-template]]"
+\`\`\`
 `,
   );
 
@@ -89,5 +84,23 @@ This is a [[!silverbullet.md/local link]] and [[!silverbullet.md/local link|with
   assertEquals(
     rewrittenText,
     `This is a [[local link]] and [[local link|with alias]].`,
+  );
+
+  assertEquals("test.jpg", resolveAttachmentPath("test", "test.jpg"));
+  assertEquals(
+    "folder/test.jpg",
+    resolveAttachmentPath("folder/test", "test.jpg"),
+  );
+  assertEquals(
+    "test.jpg",
+    resolveAttachmentPath("folder/test", "/test.jpg"),
+  );
+  assertEquals(
+    "https://silverbullet.md/something/test.jpg",
+    resolveAttachmentPath("!silverbullet.md/something/bla", "test.jpg"),
+  );
+  assertEquals(
+    "https://silverbullet.md/test.jpg",
+    resolveAttachmentPath("!silverbullet.md/something/bla", "/test.jpg"),
   );
 });

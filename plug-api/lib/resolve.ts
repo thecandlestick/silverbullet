@@ -16,7 +16,24 @@ export function resolvePath(
   }
 }
 
+export function resolveAttachmentPath(
+  currentPage: string,
+  pathToResolve: string,
+): string {
+  const folder = folderName(currentPage);
+  if (folder && !pathToResolve.startsWith("/")) {
+    pathToResolve = folder + "/" + pathToResolve;
+  }
+  if (pathToResolve.startsWith("/")) {
+    pathToResolve = pathToResolve.slice(1);
+  }
+  return federatedPathToUrl(resolvePath(currentPage, pathToResolve));
+}
+
 export function federatedPathToUrl(path: string): string {
+  if (!path.startsWith("!")) {
+    return path;
+  }
   path = path.substring(1);
   if (path.startsWith("localhost")) {
     path = "http://" + path;
@@ -32,29 +49,6 @@ export function isFederationPath(path: string) {
 
 export function rewritePageRefs(tree: ParseTree, containerPageName: string) {
   traverseTree(tree, (n): boolean => {
-    if (n.type === "DirectiveStart") {
-      const pageRef = findNodeOfType(n, "PageRef")!;
-      if (pageRef) {
-        const pageRefName = pageRef.children![0].text!.slice(2, -2);
-        pageRef.children![0].text = `[[${
-          resolvePath(containerPageName, pageRefName)
-        }]]`;
-      }
-      const directiveText = n.children![0].text;
-      // #use or #import
-      if (directiveText) {
-        const match = /\[\[(.+)\]\]/.exec(directiveText);
-        if (match) {
-          const pageRefName = match[1];
-          n.children![0].text = directiveText.replace(
-            match[0],
-            `[[${resolvePath(containerPageName, pageRefName)}]]`,
-          );
-        }
-      }
-
-      return true;
-    }
     if (n.type === "FencedCode") {
       const codeInfo = findNodeOfType(n, "CodeInfo");
       if (!codeInfo) {
@@ -100,4 +94,8 @@ export function cleanPageRef(pageRef: string) {
   } else {
     return pageRef;
   }
+}
+
+export function folderName(path: string) {
+  return path.split("/").slice(0, -1).join("/");
 }

@@ -1,6 +1,6 @@
 import { asset, clientStore, editor, markdown, system } from "$sb/syscalls.ts";
 import { renderMarkdownToHtml } from "./markdown_render.ts";
-import { resolvePath } from "$sb/lib/resolve.ts";
+import { resolveAttachmentPath } from "$sb/lib/resolve.ts";
 import { expandCodeWidgets } from "./api.ts";
 
 export async function updateMarkdownPreview() {
@@ -11,8 +11,8 @@ export async function updateMarkdownPreview() {
   const text = await editor.getText();
   const mdTree = await markdown.parseMarkdown(text);
   // const cleanMd = await cleanMarkdown(text);
-  const css = await asset.readAsset("assets/preview.css");
-  const js = await asset.readAsset("assets/preview.js");
+  const css = await asset.readAsset("markdown", "assets/preview.css");
+  const js = await asset.readAsset("markdown", "assets/preview.js");
 
   await expandCodeWidgets(mdTree, currentPage);
   const html = renderMarkdownToHtml(mdTree, {
@@ -20,7 +20,7 @@ export async function updateMarkdownPreview() {
     annotationPositions: true,
     translateUrls: (url) => {
       if (!url.includes("://")) {
-        url = resolvePath(currentPage, decodeURI(url), true);
+        url = resolveAttachmentPath(currentPage, decodeURI(url));
       }
       return url;
     },

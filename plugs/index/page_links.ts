@@ -3,12 +3,12 @@ import { IndexTreeEvent } from "$sb/app_event.ts";
 import { resolvePath } from "$sb/lib/resolve.ts";
 import { indexObjects, queryObjects } from "./api.ts";
 import { ObjectValue } from "$sb/types.ts";
+import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
+import { updateITags } from "$sb/lib/tags.ts";
 
 const pageRefRegex = /\[\[([^\]]+)\]\]/g;
 
-export type LinkObject = {
-  ref: string;
-  tags: string[];
+export type LinkObject = ObjectValue<{
   // The page the link points to
   toPage: string;
   // The page the link occurs in
@@ -16,9 +16,8 @@ export type LinkObject = {
   pos: number;
   snippet: string;
   alias?: string;
-  inDirective: boolean;
   asTemplate: boolean;
-};
+}>;
 
 export function extractSnippet(text: string, pos: number): string {
   let prefix = "";
@@ -48,58 +47,10 @@ export async function indexLinks({ name, tree }: IndexTreeEvent) {
   const links: ObjectValue<LinkObject>[] = [];
   // [[Style Links]]
   // console.log("Now indexing links for", name);
-
+  const frontmatter = await extractFrontmatter(tree);
   const pageText = renderToText(tree);
 
-  let directiveDepth = 0;
   traverseTree(tree, (n): boolean => {
-    if (n.type === "DirectiveStart") {
-      directiveDepth++;
-      const pageRef = findNodeOfType(n, "PageRef")!;
-      if (pageRef) {
-        const pageRefName = resolvePath(
-          name,
-          pageRef.children![0].text!.slice(2, -2),
-        );
-        const pos = pageRef.from! + 2;
-        links.push({
-          ref: `${name}@${pos}`,
-          tags: ["link"],
-          toPage: pageRefName,
-          pos: pos,
-          snippet: extractSnippet(pageText, pos),
-          page: name,
-          asTemplate: true,
-          inDirective: false,
-        });
-      }
-      const directiveText = n.children![0].text;
-      // #use or #import
-      if (directiveText) {
-        const match = /\[\[(.+)\]\]/.exec(directiveText);
-        if (match) {
-          const pageRefName = resolvePath(name, match[1]);
-          const pos = n.from! + match.index! + 2;
-          links.push({
-            ref: `${name}@${pos}`,
-            tags: ["link"],
-            toPage: pageRefName,
-            page: name,
-            snippet: extractSnippet(pageText, pos),
-            pos: pos,
-            asTemplate: true,
-            inDirective: false,
-          });
-        }
-      }
-
-      return true;
-    }
-    if (n.type === "DirectiveEnd") {
-      directiveDepth--;
-      return true;
-    }
-
     if (n.type === "WikiLink") {
       const wikiLinkPage = findNodeOfType(n, "WikiLinkPage")!;
       const wikiLinkAlias = findNodeOfType(n, "WikiLinkAlias");
@@ -108,20 +59,17 @@ export async function indexLinks({ name, tree }: IndexTreeEvent) {
       toPage = toPage.split(/[@$]/)[0];
       const link: LinkObject = {
         ref: `${name}@${pos}`,
-        tags: ["link"],
+        tag: "link",
         toPage: toPage,
         snippet: extractSnippet(pageText, pos),
         pos,
         page: name,
-        inDirective: false,
         asTemplate: false,
       };
-      if (directiveDepth > 0) {
-        link.inDirective = true;
-      }
       if (wikiLinkAlias) {
         link.alias = wikiLinkAlias.children![0].text!;
       }
+      updateITags(link, frontmatter);
       links.push(link);
       return true;
     }
@@ -143,16 +91,17 @@ export async function indexLinks({ name, tree }: IndexTreeEvent) {
         for (const match of matches) {
           const pageRefName = resolvePath(name, match[1]);
           const pos = codeText.from! + match.index! + 2;
-          links.push({
+          const link = {
             ref: `${name}@${pos}`,
-            tags: ["link"],
+            tag: "link",
             toPage: pageRefName,
             page: name,
             snippet: extractSnippet(pageText, pos),
             pos: pos,
             asTemplate: true,
-            inDirective: false,
-          });
+          };
+          updateITags(link, frontmatter);
+          links.push(link);
         }
       }
     }

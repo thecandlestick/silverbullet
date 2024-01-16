@@ -116,6 +116,7 @@ int main()
   
 return 0;
 }
+```
 <!-- /include -->
 
 
@@ -190,7 +191,6 @@ int main()
   (*p).x = 3;   // Valid, access member x of *p
   p -> s = 1.61;  // Valid, access member s of *p
   p -> swim();
-  (*p).swim();
 
   return 0;
 }

@@ -3,6 +3,7 @@ functions:
   queryWidget:
     path: query.ts:widget
     codeWidget: query
+    renderMode: markdown
 
   lintQuery:
     path: query.ts:lintQuery
@@ -12,6 +13,7 @@ functions:
   templateWidget:
     path: template.ts:widget
     codeWidget: template
+    renderMode: markdown
 
   queryComplete:
     path: complete.ts:queryComplete
@@ -24,10 +26,14 @@ functions:
     - editor:complete
 
   refreshAllWidgets:
-    path: widget.ts:refreshAll
+    path: widget.ts:refreshAllWidgets
     command:
       name: "Live Queries and Templates: Refresh All"
       key: "Alt-q"
+
+  # Query widget buttons
+  editButton:
+    path: widget.ts:editButton
 
   # Slash commands
   insertQuery:
@@ -39,15 +45,6 @@ functions:
         ```query
         |^|
         ```
-  insertInclude:
-    redirect: template.insertTemplateText
-    slashCommand:
-      name: include
-      description: Include another page
-      value: |
-        <!-- #include [[|^|]] -->
-
-        <!-- /include -->
   insertUseTemplate:
     redirect: template.insertTemplateText
     slashCommand:

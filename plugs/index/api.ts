@@ -3,6 +3,7 @@ import { KV, KvKey, KvQuery, ObjectQuery, ObjectValue } from "$sb/types.ts";
 import { QueryProviderEvent } from "$sb/app_event.ts";
 import { builtins } from "./builtins.ts";
 import { AttributeObject, determineType } from "./attributes.ts";
+import { ttlCache } from "$sb/lib/memory_cache.ts";
 
 const indexKey = "idx";
 const pageKey = "ridx";
@@ -64,14 +65,21 @@ export async function clearIndex(): Promise<void> {
 /**
  * Indexes entities in the data store
  */
-export async function indexObjects<T>(
+export function indexObjects<T>(
   page: string,
   objects: ObjectValue<T>[],
 ): Promise<void> {
   const kvs: KV<T>[] = [];
   const allAttributes = new Map<string, string>(); // tag:name -> attributeType
   for (const obj of objects) {
-    for (const tag of obj.tags) {
+    if (!obj.tag) {
+      console.error("Object has no tag", obj, "this shouldn't happen");
+      continue;
+    }
+    // Index as all the tag + any additional tags specified
+    const allTags = [obj.tag, ...obj.tags || []];
+    for (const tag of allTags) {
+      // The object itself
       kvs.push({
         key: [tag, cleanKey(obj.ref, page)],
         value: obj,
@@ -79,14 +87,26 @@ export async function indexObjects<T>(
       // Index attributes
       const builtinAttributes = builtins[tag];
       if (!builtinAttributes) {
-        // For non-builtin tags, index all attributes
-        for (
+        // This is not a builtin tag, so we index all attributes (almost, see below)
+        attributeLabel: for (
           const [attrName, attrValue] of Object.entries(
             obj as Record<string, any>,
           )
         ) {
           if (attrName.startsWith("$")) {
             continue;
+          }
+          // Check for all tags attached to this object if they're builtins
+          // If so: if `attrName` is defined in the builtin, use the attributeType from there (mostly to preserve readOnly aspects)
+          for (const otherTag of allTags) {
+            const builtinAttributes = builtins[otherTag];
+            if (builtinAttributes && builtinAttributes[attrName]) {
+              allAttributes.set(
+                `${tag}:${attrName}`,
+                builtinAttributes[attrName],
+              );
+              continue attributeLabel;
+            }
           }
           allAttributes.set(`${tag}:${attrName}`, determineType(attrValue));
         }
@@ -108,22 +128,28 @@ export async function indexObjects<T>(
     }
   }
   if (allAttributes.size > 0) {
-    await indexObjects<AttributeObject>(
-      page,
-      [...allAttributes].map(([key, value]) => {
-        const [tag, name] = key.split(":");
-        return {
+    [...allAttributes].forEach(([key, value]) => {
+      const [tagName, name] = key.split(":");
+      const attributeType = value.startsWith("!") ? value.substring(1) : value;
+      kvs.push({
+        key: ["attribute", cleanKey(key, page)],
+        value: {
           ref: key,
-          tags: ["attribute"],
-          tag,
+          tag: "attribute",
+          tagName,
           name,
-          attributeType: value,
+          attributeType,
+          readOnly: value.startsWith("!"),
           page,
-        };
-      }),
-    );
+        } as T,
+      });
+    });
   }
-  return batchSet(page, kvs);
+  if (kvs.length > 0) {
+    return batchSet(page, kvs);
+  } else {
+    return Promise.resolve();
+  }
 }
 
 function cleanKey(ref: string, page: string) {
@@ -134,15 +160,18 @@ function cleanKey(ref: string, page: string) {
   }
 }
 
-export async function queryObjects<T>(
+export function queryObjects<T>(
   tag: string,
   query: ObjectQuery,
+  ttlSecs?: number,
 ): Promise<ObjectValue<T>[]> {
-  return (await datastore.query({
-    ...query,
-    prefix: [indexKey, tag],
-    distinct: true,
-  })).map(({ value }) => value);
+  return ttlCache(query, async () => {
+    return (await datastore.query({
+      ...query,
+      prefix: [indexKey, tag],
+      distinct: true,
+    })).map(({ value }) => value);
+  }, ttlSecs);
 }
 
 export async function query(
@@ -175,7 +204,11 @@ export async function objectSourceProvider({
 }
 
 export async function discoverSources() {
-  return (await datastore.query({ prefix: [indexKey, "tag"] })).map((
+  return (await datastore.query({
+    prefix: [indexKey, "tag"],
+    select: [{ name: "name" }],
+    distinct: true,
+  })).map((
     { value },
   ) => value.name);
 }

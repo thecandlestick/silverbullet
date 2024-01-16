@@ -13,8 +13,14 @@ export const fuzzySearchAndSort = (
   if (!searchPhrase) {
     return arr.sort((a, b) => (a.orderId || 0) - (b.orderId || 0));
   }
+
   const enrichedArr: FuseOption[] = arr.map((item) => {
-    return { ...item, baseName: item.name.split("/").pop()! };
+    return {
+      ...item,
+      baseName: item.name.split("/").pop()!,
+      tags: item.tags?.join(" "),
+      aliases: item.aliases?.join(" "),
+    };
   });
   const fuse = new Fuse(enrichedArr, {
     keys: [{
@@ -22,14 +28,20 @@ export const fuzzySearchAndSort = (
       weight: 0.3,
     }, {
       name: "baseName",
+      weight: 1,
+    }, {
+      name: "displayName",
       weight: 0.7,
+    }, {
+      name: "aliases",
+      weight: 0.5,
     }],
     includeScore: true,
     shouldSort: true,
     isCaseSensitive: false,
+    ignoreLocation: true,
     threshold: 0.6,
     sortFn: (a, b): number => {
-      //   console.log(a, b);
       if (a.score === b.score) {
         const aOrder = enrichedArr[a.idx].orderId || 0;
         const bOrder = enrichedArr[b.idx].orderId || 0;

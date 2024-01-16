@@ -7,6 +7,9 @@ export type CommandDef = {
 
   contexts?: string[];
 
+  // Default 0, higher is higher priority = higher in the list
+  priority?: number;
+
   // Bind to keyboard shortcut
   key?: string;
   mac?: string;
@@ -14,7 +17,7 @@ export type CommandDef = {
 
 export type AppCommand = {
   command: CommandDef;
-  run: (args?: string[]) => Promise<void>;
+  run: (args?: any[]) => Promise<void>;
 };
 
 export type CommandHookT = {
@@ -44,7 +47,7 @@ export class CommandHook extends EventEmitter<CommandHookEvents>
         this.editorCommands.set(cmd.name, {
           command: cmd,
           run: (args?: string[]) => {
-            return plug.invoke(name, [cmd, ...args??[]]);
+            return plug.invoke(name, [cmd, ...args ?? []]);
           },
         });
       }

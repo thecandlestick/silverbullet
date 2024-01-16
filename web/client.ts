@@ -7,7 +7,7 @@ import {
   SyntaxNode,
   syntaxTree,
 } from "../common/deps.ts";
-import { fileMetaToPageMeta, Space } from "./space.ts";
+import { Space } from "./space.ts";
 import { FilterOption } from "./types.ts";
 import { ensureSettingsAndIndex } from "../common/util.ts";
 import { EventHook } from "../plugos/hooks/event.ts";
@@ -38,15 +38,20 @@ import { OpenPages } from "./open_pages.ts";
 import { MainUI } from "./editor_ui.tsx";
 import { cleanPageRef } from "$sb/lib/resolve.ts";
 import { SpacePrimitives } from "../common/spaces/space_primitives.ts";
-import { FileMeta, PageMeta } from "$sb/types.ts";
+import { CodeWidgetButton, FileMeta, PageMeta } from "$sb/types.ts";
 import { DataStore } from "../plugos/lib/datastore.ts";
 import { IndexedDBKvPrimitives } from "../plugos/lib/indexeddb_kv_primitives.ts";
 import { DataStoreMQ } from "../plugos/lib/mq.datastore.ts";
 import { DataStoreSpacePrimitives } from "../common/spaces/datastore_space_primitives.ts";
 import {
-  encryptedFileExt,
   EncryptedSpacePrimitives,
 } from "../common/spaces/encrypted_space_primitives.ts";
+
+import {
+  ensureSpaceIndex,
+  markFullSpaceIndexComplete,
+} from "../common/space_index.ts";
+import { LimitedMap } from "$sb/lib/limited_map.ts";
 const frontMatterRegex = /^---\n(([^\n]|\n)*?)---\n/;
 
 const autoSaveInterval = 1000;
@@ -63,7 +68,6 @@ declare global {
   }
 }
 
-// TODO: Oh my god, need to refactor this
 export class Client {
   system!: ClientSystem;
   editorView!: EditorView;
@@ -108,6 +112,9 @@ export class Client {
   stateDataStore!: DataStore;
   spaceDataStore!: DataStore;
   mq!: DataStoreMQ;
+
+  // Used by the "wiki link" highlighter to check if a page exists
+  public allKnownPages = new Set<string>();
 
   constructor(
     private parent: Element,
@@ -186,6 +193,7 @@ export class Client {
     // Load settings
     this.settings = await ensureSettingsAndIndex(localSpacePrimitives);
 
+    await this.loadCaches();
     // Pinging a remote space to ensure we're authenticated properly, if not will result in a redirect to auth page
     try {
       await this.httpSpacePrimitives.ping();
@@ -213,7 +221,7 @@ export class Client {
 
     await this.loadPlugs();
     this.initNavigator();
-    this.initSync();
+    await this.initSync();
 
     this.loadCustomStyles().catch(console.error);
 
@@ -228,10 +236,15 @@ export class Client {
         console.error("Interval sync error", e);
       }
     }, pageSyncInterval);
+
+    this.updatePageListCache().catch(console.error);
   }
 
-  private initSync() {
+  private async initSync() {
     this.syncService.start();
+
+    // We're still booting, if a initial sync has already been completed we know this is the initial sync
+    const initialSync = !await this.syncService.hasInitialSyncCompleted();
 
     this.eventHook.addLocalListener("sync:success", async (operations) => {
       // console.log("Operations", operations);
@@ -242,13 +255,24 @@ export class Client {
       if (operations !== undefined) {
         // "sync:success" is called with a number of operations only from syncSpace(), not from syncing individual pages
         this.fullSyncCompleted = true;
+
+        console.log("Full sync completed");
+
+        // A full sync just completed
+        if (!initialSync) {
+          // If this was NOT the initial sync let's check if we need to perform a space reindex
+          ensureSpaceIndex(this.stateDataStore, this.system.system).catch(
+            console.error,
+          );
+        } else {
+          // This was the initial sync, let's mark a full index as completed
+          await markFullSpaceIndexComplete(this.stateDataStore);
+        }
       }
-      // if (this.system.plugsUpdated) {
       if (operations) {
         // Likely initial sync so let's show visually that we're synced now
         this.showProgress(100);
       }
-      // }
 
       this.ui.viewDispatch({ type: "sync-change", syncSuccess: true });
     });
@@ -282,57 +306,66 @@ export class Client {
       cleanPageRef(this.settings.indexPage),
     );
 
-    this.pageNavigator.subscribe(async (pageName, pos: number | string) => {
-      console.log("Now navigating to", pageName);
+    this.pageNavigator.subscribe(
+      async (pageName, pos: number | string | undefined) => {
+        console.log("Now navigating to", pageName);
 
-      const stateRestored = await this.loadPage(pageName);
-      if (pos) {
-        if (typeof pos === "string") {
-          console.log("Navigating to anchor", pos);
+        const stateRestored = await this.loadPage(pageName, pos === undefined);
+        if (pos) {
+          if (typeof pos === "string") {
+            console.log("Navigating to anchor", pos);
 
-          // We're going to look up the anchor through a API invocation
-          const matchingAnchor = await this.system.system.localSyscall(
-            "index",
-            "system.invokeFunction",
-            ["getObjectByRef", pageName, "anchor", `${pageName}$${pos}`],
-          );
-
-          if (!matchingAnchor) {
-            return this.flashNotification(
-              `Could not find anchor $${pos}`,
-              "error",
+            // We're going to look up the anchor through a API invocation
+            const matchingAnchor = await this.system.system.localSyscall(
+              "system.invokeFunction",
+              [
+                "index.getObjectByRef",
+                pageName,
+                "anchor",
+                `${pageName}$${pos}`,
+              ],
             );
-          } else {
-            pos = matchingAnchor.pos as number;
-          }
-        }
-        setTimeout(() => {
-          this.editorView.dispatch({
-            selection: { anchor: pos as number },
-            effects: EditorView.scrollIntoView(pos as number, { y: "start" }),
-          });
-        });
-      } else if (!stateRestored) {
-        // Somewhat ad-hoc way to determine if the document contains frontmatter and if so, putting the cursor _after it_.
-        const pageText = this.editorView.state.sliceDoc();
 
-        // Default the cursor to be at position 0
-        let initialCursorPos = 0;
-        const match = frontMatterRegex.exec(pageText);
-        if (match) {
-          // Frontmatter found, put cursor after it
-          initialCursorPos = match[0].length;
+            if (!matchingAnchor) {
+              return this.flashNotification(
+                `Could not find anchor $${pos}`,
+                "error",
+              );
+            } else {
+              pos = matchingAnchor.pos as number;
+            }
+          }
+          setTimeout(() => {
+            this.editorView.dispatch({
+              selection: { anchor: pos as number },
+              effects: EditorView.scrollIntoView(pos as number, {
+                y: "start",
+                yMargin: 5,
+              }),
+            });
+          });
+        } else if (!stateRestored) {
+          // Somewhat ad-hoc way to determine if the document contains frontmatter and if so, putting the cursor _after it_.
+          const pageText = this.editorView.state.sliceDoc();
+
+          // Default the cursor to be at position 0
+          let initialCursorPos = 0;
+          const match = frontMatterRegex.exec(pageText);
+          if (match) {
+            // Frontmatter found, put cursor after it
+            initialCursorPos = match[0].length;
+          }
+          // By default scroll to the top
+          this.editorView.scrollDOM.scrollTop = 0;
+          this.editorView.dispatch({
+            selection: { anchor: initialCursorPos },
+            // And then scroll down if required
+            scrollIntoView: true,
+          });
         }
-        // By default scroll to the top
-        this.editorView.scrollDOM.scrollTop = 0;
-        this.editorView.dispatch({
-          selection: { anchor: initialCursorPos },
-          // And then scroll down if required
-          scrollIntoView: true,
-        });
-      }
-      await this.stateDataStore.set(["client", "lastOpenedPage"], pageName);
-    });
+        await this.stateDataStore.set(["client", "lastOpenedPage"], pageName);
+      },
+    );
 
     if (location.hash === "#boot") {
       (async () => {
@@ -473,7 +506,6 @@ export class Client {
 
     this.space = new Space(
       localSpacePrimitives,
-      this.stateDataStore,
       this.eventHook,
     );
 
@@ -501,14 +533,27 @@ export class Client {
       },
     );
 
-    this.eventHook.addLocalListener("file:listed", (fileList: FileMeta[]) => {
-      this.ui.viewDispatch({
-        type: "pages-listed",
-        pages: fileList.filter(this.space.isListedPage).map(
-          fileMetaToPageMeta,
-        ),
-      });
+    // Caching a list of known pages for the wiki_link highlighter (that checks if a page exists)
+    this.eventHook.addLocalListener("page:saved", (pageName: string) => {
+      // Make sure this page is in the list of known pages
+      this.allKnownPages.add(pageName);
     });
+
+    this.eventHook.addLocalListener("page:deleted", (pageName: string) => {
+      this.allKnownPages.delete(pageName);
+    });
+
+    this.eventHook.addLocalListener(
+      "file:listed",
+      (allFiles: FileMeta[]) => {
+        // Update list of known pages
+        this.allKnownPages = new Set(
+          allFiles.filter((f) => f.name.endsWith(".md")).map((f) =>
+            f.name.slice(0, -3)
+          ),
+        );
+      },
+    );
 
     this.space.watch();
 
@@ -591,6 +636,21 @@ export class Client {
       },
       type === "info" ? 4000 : 5000,
     );
+  }
+
+  startPageNavigate() {
+    // Then show the page navigator
+    this.ui.viewDispatch({ type: "start-navigate" });
+    this.updatePageListCache().catch(console.error);
+  }
+
+  async updatePageListCache() {
+    console.log("Updating page list cache");
+    const allPages = await this.system.queryObjects<PageMeta>("page", {});
+    this.ui.viewDispatch({
+      type: "update-page-list",
+      allPages,
+    });
   }
 
   private progressTimeout?: number;
@@ -719,9 +779,9 @@ export class Client {
     if (currentNode) {
       let node: SyntaxNode | null = currentNode;
       do {
-        if (node.name === "FencedCode") {
+        if (node.name === "FencedCode" || node.name === "FrontMatter") {
           const body = editorState.sliceDoc(node.from + 3, node.to - 3);
-          parentNodes.push(`FencedCode:${body}`);
+          parentNodes.push(`${node.name}:${body}`);
         } else {
           parentNodes.push(node.name);
         }
@@ -748,6 +808,7 @@ export class Client {
         actualResult = result;
       }
     }
+    // console.log("Compeltion result", actualResult);
     return actualResult;
   }
 
@@ -813,10 +874,12 @@ export class Client {
     await this.pageNavigator!.navigate(name, pos, replaceState);
   }
 
-  async loadPage(pageName: string): Promise<boolean> {
+  async loadPage(pageName: string, restoreState = true): Promise<boolean> {
     const loadingDifferentPage = pageName !== this.currentPage;
     const editorView = this.editorView;
     const previousPage = this.currentPage;
+
+    // console.log("Navigating to", pageName, restoreState);
 
     // Persist current page state and nicely close page
     if (previousPage) {
@@ -882,7 +945,7 @@ export class Client {
     if (editorView.contentDOM) {
       this.tweakEditorDOM(editorView.contentDOM);
     }
-    const stateRestored = this.openPages.restoreState(pageName);
+    const stateRestored = restoreState && this.openPages.restoreState(pageName);
     this.space.watchPage(pageName);
 
     // Note: these events are dispatched asynchronously deliberately (not waiting for results)
@@ -934,7 +997,7 @@ export class Client {
     }
   }
 
-  async runCommandByName(name: string, args?: string[]) {
+  async runCommandByName(name: string, args?: any[]) {
     const cmd = this.ui.viewState.commands.get(name);
     if (cmd) {
       if (args) {
@@ -972,4 +1035,61 @@ export class Client {
     }
     return;
   }
+
+  // Widget and image height caching
+  private widgetCache = new LimitedMap<WidgetCacheItem>(100); // bodyText -> WidgetCacheItem
+  private widgetHeightCache = new LimitedMap<number>(100); // bodytext -> height
+
+  async loadCaches() {
+    const [widgetHeightCache, widgetCache] = await this
+      .stateDataStore.batchGet([[
+        "cache",
+        "widgetHeight",
+      ], ["cache", "widgets"]]);
+    this.widgetHeightCache = new LimitedMap(100, widgetHeightCache || {});
+    this.widgetCache = new LimitedMap(100, widgetCache || {});
+  }
+
+  debouncedWidgetHeightCacheFlush = throttle(() => {
+    this.stateDataStore.set(
+      ["cache", "widgetHeight"],
+      this.widgetHeightCache.toJSON(),
+    )
+      .catch(
+        console.error,
+      );
+    // console.log("Flushed widget height cache to store");
+  }, 2000);
+
+  setCachedWidgetHeight(bodyText: string, height: number) {
+    this.widgetHeightCache.set(bodyText, height);
+    this.debouncedWidgetHeightCacheFlush();
+  }
+  getCachedWidgetHeight(bodyText: string): number {
+    return this.widgetHeightCache.get(bodyText) ?? -1;
+  }
+
+  debouncedWidgetCacheFlush = throttle(() => {
+    this.stateDataStore.set(["cache", "widgets"], this.widgetCache.toJSON())
+      .catch(
+        console.error,
+      );
+    console.log("Flushed widget cache to store");
+  }, 2000);
+
+  setWidgetCache(key: string, cacheItem: WidgetCacheItem) {
+    this.widgetCache.set(key, cacheItem);
+    this.debouncedWidgetCacheFlush();
+  }
+
+  getWidgetCache(key: string): WidgetCacheItem | undefined {
+    return this.widgetCache.get(key);
+  }
 }
+
+type WidgetCacheItem = {
+  height: number;
+  html: string;
+  buttons?: CodeWidgetButton[];
+  banner?: string;
+};

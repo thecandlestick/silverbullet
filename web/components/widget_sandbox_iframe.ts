@@ -104,7 +104,7 @@ export function mountIFrame(
   preloadedIFrame: PreloadedIFrame,
   client: Client,
   widgetHeightCacheKey: string | null,
-  content: WidgetContent | Promise<WidgetContent>,
+  content: WidgetContent | null | Promise<WidgetContent | null>,
   onMessage?: (message: any) => void,
 ) {
   const iframe = preloadedIFrame.iframe;
@@ -149,7 +149,7 @@ export function mountIFrame(
           case "setHeight":
             iframe.height = data.height + "px";
             if (widgetHeightCacheKey) {
-              client.space.setCachedWidgetHeight(
+              client.setCachedWidgetHeight(
                 widgetHeightCacheKey,
                 data.height,
               );
@@ -174,20 +174,28 @@ export function mountIFrame(
       console.warn("Iframe went away or content was not loaded");
       return;
     }
-    if (resolvedContent.html) {
-      iframe.contentWindow!.postMessage({
-        type: "html",
-        html: resolvedContent.html,
-        script: resolvedContent.script,
-        theme: document.getElementsByTagName("html")[0].dataset.theme,
-      });
-    } else if (resolvedContent.url) {
-      iframe.contentWindow!.location.href = resolvedContent.url;
-      if (resolvedContent.height) {
-        iframe.height = resolvedContent.height + "px";
-      }
-      if (resolvedContent.width) {
-        iframe.width = resolvedContent.width + "px";
+    if (resolvedContent) {
+      if (resolvedContent.html) {
+        iframe.contentWindow!.postMessage({
+          type: "html",
+          html: resolvedContent.html,
+          script: resolvedContent.script,
+          theme: document.getElementsByTagName("html")[0].dataset.theme,
+        });
+      } else if (resolvedContent.url) {
+        iframe.contentWindow!.location.href = resolvedContent.url;
+        if (resolvedContent.height) {
+          iframe.height = resolvedContent.height + "px";
+          if (widgetHeightCacheKey) {
+            client.setCachedWidgetHeight(
+              widgetHeightCacheKey!,
+              resolvedContent.height,
+            );
+          }
+        }
+        if (resolvedContent.width) {
+          iframe.width = resolvedContent.width + "px";
+        }
       }
     }
   }).catch(console.error);
@@ -196,7 +204,7 @@ export function mountIFrame(
 export function createWidgetSandboxIFrame(
   client: Client,
   widgetHeightCacheKey: string | null,
-  content: WidgetContent | Promise<WidgetContent>,
+  content: WidgetContent | null | Promise<WidgetContent | null>,
   onMessage?: (message: any) => void,
 ) {
   // console.log("Claiming iframe");

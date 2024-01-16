@@ -3,7 +3,7 @@ import { Manifest, SilverBulletHooks } from "../common/manifest.ts";
 import buildMarkdown from "../common/markdown_parser/parser.ts";
 import { CronHook } from "../plugos/hooks/cron.ts";
 import { EventHook } from "../plugos/hooks/event.ts";
-import { createSandbox } from "../plugos/environments/webworker_sandbox.ts";
+import { createSandbox } from "../plugos/sandboxes/web_worker_sandbox.ts";
 
 import assetSyscalls from "../plugos/syscalls/asset.ts";
 import { eventSyscalls } from "../plugos/syscalls/event.ts";
@@ -40,6 +40,8 @@ import { codeWidgetSyscalls } from "./syscalls/code_widget.ts";
 import { clientCodeWidgetSyscalls } from "./syscalls/client_code_widget.ts";
 import { KVPrimitivesManifestCache } from "../plugos/manifest_cache.ts";
 import { deepObjectMerge } from "$sb/lib/json.ts";
+import { Query } from "$sb/types.ts";
+import { PanelWidgetHook } from "./hooks/panel_widget.ts";
 
 const plugNameExtractRegex = /\/(.+)\.plug\.js$/;
 
@@ -50,6 +52,7 @@ export class ClientSystem {
   codeWidgetHook: CodeWidgetHook;
   mdExtensions: MDExt[] = [];
   system: System<SilverBulletHooks>;
+  panelWidgetHook: PanelWidgetHook;
 
   constructor(
     private client: Client,
@@ -81,6 +84,10 @@ export class ClientSystem {
     // Code widget hook
     this.codeWidgetHook = new CodeWidgetHook();
     this.system.addHook(this.codeWidgetHook);
+
+    // Panel widget hook
+    this.panelWidgetHook = new PanelWidgetHook();
+    this.system.addHook(this.panelWidgetHook);
 
     // MQ hook
     if (client.syncMode) {
@@ -126,10 +133,9 @@ export class ClientSystem {
           console.log("Plug updated, reloading", plugName, "from", path);
           this.system.unload(path);
           const plug = await this.system.load(
-            new URL(`/${path}`, location.href),
             plugName,
+            createSandbox(new URL(`/${path}`, location.href)),
             newHash,
-            createSandbox,
           );
           if ((plug.manifest! as Manifest).syntax) {
             // If there are syntax extensions, rebuild the markdown parser immediately
@@ -139,23 +145,6 @@ export class ClientSystem {
         }
       },
     );
-
-    // Debugging
-    // this.eventHook.addLocalListener("file:listed", (files) => {
-    //   console.log("New file list", files);
-    // });
-
-    // this.eventHook.addLocalListener("file:changed", (file) => {
-    //   console.log("File changed", file);
-    // });
-
-    // this.eventHook.addLocalListener("file:created", (file) => {
-    //   console.log("File created", file);
-    // });
-
-    // this.eventHook.addLocalListener("file:deleted", (file) => {
-    //   console.log("File deleted", file);
-    // });
   }
 
   async init() {
@@ -204,17 +193,16 @@ export class ClientSystem {
 
   async reloadPlugsFromSpace(space: Space) {
     console.log("Loading plugs");
-    await space.updatePageList();
+    // await space.updatePageList();
     await this.system.unloadAll();
     console.log("(Re)loading plugs");
     await Promise.all((await space.listPlugs()).map(async (plugMeta) => {
       try {
         const plugName = plugNameExtractRegex.exec(plugMeta.name)![1];
         await this.system.load(
-          new URL(plugMeta.name, location.origin),
           plugName,
+          createSandbox(new URL(plugMeta.name, location.origin)),
           plugMeta.lastModified,
-          createSandbox,
         );
       } catch (e: any) {
         console.error(
@@ -238,6 +226,13 @@ export class ClientSystem {
   }
 
   localSyscall(name: string, args: any[]) {
-    return this.system.localSyscall("[local]", name, args);
+    return this.system.localSyscall(name, args);
+  }
+
+  queryObjects<T>(tag: string, query: Query): Promise<T[]> {
+    return this.localSyscall(
+      "system.invokeFunction",
+      ["index.queryObjects", tag, query],
+    );
   }
 }

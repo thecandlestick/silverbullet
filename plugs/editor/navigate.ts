@@ -7,7 +7,7 @@ import {
   nodeAtPos,
   ParseTree,
 } from "$sb/lib/tree.ts";
-import { resolvePath } from "$sb/lib/resolve.ts";
+import { resolveAttachmentPath, resolvePath } from "$sb/lib/resolve.ts";
 
 async function actionClickOrActionEnter(
   mdTree: ParseTree | null,
@@ -40,7 +40,7 @@ async function actionClickOrActionEnter(
   switch (mdTree.type) {
     case "WikiLink": {
       let pageLink = mdTree.children![1]!.children![0].text!;
-      let pos;
+      let pos: string | number = 0;
       if (pageLink.includes("@") || pageLink.includes("$")) {
         [pageLink, pos] = pageLink.split(/[@$]/);
         if (pos.match(/^\d+$/)) {
@@ -79,7 +79,9 @@ async function actionClickOrActionEnter(
         return editor.flashNotification("Empty link, ignoring", "error");
       }
       if (url.indexOf("://") === -1 && !url.startsWith("mailto:")) {
-        return editor.openUrl(resolvePath(currentPage, decodeURI(url)));
+        return editor.openUrl(
+          resolveAttachmentPath(currentPage, decodeURI(url)),
+        );
       } else {
         await editor.openUrl(url);
       }
@@ -93,8 +95,11 @@ async function actionClickOrActionEnter(
       try {
         const args = argsText ? JSON.parse(`[${argsText}]`) : [];
         await system.invokeCommand(commandName, args);
-      } catch(e: any) {
-        await editor.flashNotification(`Error parsing command link arguments: ${e.message}`, "error");
+      } catch (e: any) {
+        await editor.flashNotification(
+          `Error parsing command link arguments: ${e.message}`,
+          "error",
+        );
       }
       break;
     }

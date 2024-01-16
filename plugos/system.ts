@@ -1,6 +1,6 @@
 import { Hook } from "./types.ts";
 import { EventEmitter } from "./event.ts";
-import type { SandboxFactory } from "./sandbox.ts";
+import type { SandboxFactory } from "./sandboxes/sandbox.ts";
 import { Plug } from "./plug.ts";
 import { InMemoryManifestCache, ManifestCache } from "./manifest_cache.ts";
 
@@ -15,11 +15,12 @@ export type SystemEvents<HookT> = {
 
 // Passed to every syscall, allows to pass in additional context that the syscall may use
 export type SyscallContext = {
-  plug: Plug<any>;
+  // This is the plug that is invoking the syscall,
+  // which may be undefined where this cannot be determined (e.g. when running in a NoSandbox)
+  plug?: string;
 };
 
 type SyscallSignature = (
-  ctx: SyscallContext,
   ...args: any[]
 ) => Promise<any> | any;
 
@@ -74,7 +75,11 @@ export class System<HookT> extends EventEmitter<SystemEvents<HookT>> {
     }
   }
 
-  syscallWithContext(
+  localSyscall(name: string, args: any): Promise<any> {
+    return this.syscall({}, name, args);
+  }
+
+  syscall(
     ctx: SyscallContext,
     name: string,
     args: any[],
@@ -83,36 +88,29 @@ export class System<HookT> extends EventEmitter<SystemEvents<HookT>> {
     if (!syscall) {
       throw Error(`Unregistered syscall ${name}`);
     }
-    for (const permission of syscall.requiredPermissions) {
-      if (!ctx.plug) {
-        throw Error(`Syscall ${name} requires permission and no plug is set`);
+    if (ctx.plug) {
+      // Only when running in a plug context do we check permissions
+      const plug = this.loadedPlugs.get(ctx.plug!);
+      if (!plug) {
+        throw new Error(
+          `Plug ${ctx.plug} not found while attempting to invoke ${name}}`,
+        );
       }
-      if (!ctx.plug.grantedPermissions.includes(permission)) {
-        throw Error(`Missing permission '${permission}' for syscall ${name}`);
+      for (const permission of syscall.requiredPermissions) {
+        if (!plug.grantedPermissions.includes(permission)) {
+          throw Error(`Missing permission '${permission}' for syscall ${name}`);
+        }
       }
     }
     return Promise.resolve(syscall.callback(ctx, ...args));
   }
 
-  localSyscall(
-    contextPlugName: string,
-    syscallName: string,
-    args: any[],
-  ): Promise<any> {
-    return this.syscallWithContext(
-      { plug: this.plugs.get(contextPlugName)! },
-      syscallName,
-      args,
-    );
-  }
-
   async load(
-    workerUrl: URL,
     name: string,
-    hash: number,
     sandboxFactory: SandboxFactory<HookT>,
+    hash = -1,
   ): Promise<Plug<HookT>> {
-    const plug = new Plug(this, workerUrl, name, hash, sandboxFactory);
+    const plug = new Plug(this, name, hash, sandboxFactory);
 
     // Wait for worker to boot, and pass back its manifest
     await plug.ready;

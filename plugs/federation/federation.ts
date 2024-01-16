@@ -82,7 +82,7 @@ export async function cacheFileListing(uri: string): Promise<FileMeta[]> {
     const r = await nativeFetch(indexUrl, {
       method: "GET",
       headers: {
-        Accept: "application/json",
+        "X-Sync-Mode": "true",
         "Cache-Control": "no-cache",
       },
       signal: fetchController.signal,
@@ -119,12 +119,17 @@ export async function readFile(
   name: string,
 ): Promise<{ data: Uint8Array; meta: FileMeta } | undefined> {
   const url = federatedPathToUrl(name);
-  const r = await nativeFetch(url);
+  console.log("Fetching federated file", url);
+  const r = await nativeFetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/octet-stream",
+    },
+  });
   if (r.status === 503) {
     throw new Error("Offline");
   }
   const fileMeta = await responseToFileMeta(r, name);
-  console.log("Fetching", url);
   if (r.status === 404) {
     throw Error("Not found");
   }
@@ -195,6 +200,7 @@ export async function getFileMeta(name: string): Promise<FileMeta> {
   const r = await nativeFetch(url, {
     method: "GET",
     headers: {
+      "X-Sync-Mode": "true",
       "X-Get-Meta": "true",
     },
   });

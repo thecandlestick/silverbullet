@@ -1,4 +1,3 @@
-import { Application } from "../server/deps.ts";
 import { HttpServer } from "../server/http_server.ts";
 import clientAssetBundle from "../dist/client_asset_bundle.json" assert {
   type: "json",
@@ -46,8 +45,6 @@ export async function serveCommand(
     console.log("Running in sync-only mode (no backend processing)");
   }
 
-  const app = new Application();
-
   if (!folder) {
     // Didn't get a folder as an argument, check if we got it as an environment variable
     folder = Deno.env.get("SB_FOLDER");
@@ -67,8 +64,7 @@ export async function serveCommand(
   );
   if (hostname === "127.0.0.1") {
     console.info(
-      `SilverBullet will only be available locally (via http://localhost:${port}).
-To allow outside connections, pass -L 0.0.0.0 as a flag, and put a TLS terminator on top.`,
+      `SilverBullet will only be available locally, to allow outside connections, pass -L0.0.0.0 as a flag, and put a TLS terminator on top.`,
     );
   }
 
@@ -91,7 +87,6 @@ To allow outside connections, pass -L 0.0.0.0 as a flag, and put a TLS terminato
   });
 
   const httpServer = new HttpServer({
-    app,
     hostname,
     port,
     clientAssetBundle: new AssetBundle(clientAssetBundle as AssetJson),

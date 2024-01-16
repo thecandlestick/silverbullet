@@ -1,7 +1,7 @@
 
 |  |  |  |  |
 |----------|----------|----------|----------|
-| [[CS1575|Home]] | [[Course Calendar|Calendar]] | [[Syllabus]] | [[Lecture Notes]] |
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
 
 ---
 
@@ -9,15 +9,21 @@
 email: jackmanhardt@mst.edu
 
 ## Meeting Times
-1pm - 1:50pm M/W/F (CS 120)
+
+* Section 102
+9:30am - 10:45am T/Th (CS 222)
+
+* Section 103
+12:30pm - 1:45pm T/Th (CS 222)
 
 ## Office Hours
-2pm - 3pm M/W/F (CS 213)
-3pm - 4pm Tues. (CS 213)
+TBA
 
 Individual meetings by email appointment
 
 ---
+
+# Grading
 
 ## Assignments
 Homework will be primarily C++ coding-based, with the amount of assignments dependent on the speed of content covered. Your lowest homework score will be dropped.
@@ -25,6 +31,12 @@ Homework will be primarily C++ coding-based, with the amount of assignments depe
 Instead of large quizzes or exams, in-class assignments will be spread out to short, daily knowledge-checks. You will need to bring some form of internet-capable device to the lectures for this purpose.
 
 There is _no_ midterm exam and _no_ final exam
+
+## Scale
+
+The breakdown of your grade will be as follows:
+* 85% Programming assignments
+* 15% In-class assignments (Knowledge-checks)
 
 ## Autograder ([grade.sh](https://gitlab.com/classroomcode/grade-sh/grade-sh))
 Your assignments in this course will be graded by an open-source autograding tool developed right here at S&T. Some exciting features include the ability to receive ==immediate feedback== on your current progress and built-in tools to help you incrementally develop your code.
@@ -42,7 +54,7 @@ Your assignments in this course will be graded by an open-source autograding too
 
 ## Helpful Stuff
 
-**LEAD Session:** Tuesday 5-7pm (CS 204)
+**LEAD Session:** TBA
 
 [[Assignment Tutorial]]
 
@@ -56,7 +68,7 @@ Your assignments in this course will be graded by an open-source autograding too
 You are expected to be present for all lectures. Make-ups for in-class assignments will only be considered if you notify me about your absence ahead of time.
 
 ## Late Work
-No late work will be accepted once the assignment repositories close. It is **highly recommended** that you start your assignments as early as possible. They are designed to be worked on one small unit at a time, with partial credit awarded accordingly.
+Due to the transparency of grading in this class, and the availability of partial credit on all assignments, no late work will be accepted once the assignment repositories close. It is **highly recommended** that you start your assignments as early as possible. They are designed to be worked on one small unit at a time, with partial credit awarded accordingly.
 
 ## Academic Honesty
 All code submitted must be 100% your own work!

@@ -13,12 +13,13 @@ import {
   replaceNodesMatching,
   traverseTreeAsync,
 } from "$sb/lib/tree.ts";
-import { removeQueries } from "$sb/lib/query.ts";
 import { niceDate } from "$sb/lib/dates.ts";
 import { extractAttributes } from "$sb/lib/attribute.ts";
 import { rewritePageRefs } from "$sb/lib/resolve.ts";
 import { ObjectValue } from "$sb/types.ts";
 import { indexObjects, queryObjects } from "../index/plug_api.ts";
+import { updateITags } from "$sb/lib/tags.ts";
+import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
 
 export type TaskObject = ObjectValue<
   {
@@ -47,10 +48,8 @@ const incompleteStates = [" "];
 export async function indexTasks({ name, tree }: IndexTreeEvent) {
   const tasks: ObjectValue<TaskObject>[] = [];
   const taskStates = new Map<string, { count: number; firstPos: number }>();
-  removeQueries(tree);
-  addParentPointers(tree);
-  // const allAttributes: AttributeObject[] = [];
-  // const allTags = new Set<string>();
+  const frontmatter = await extractFrontmatter(tree);
+
   await traverseTreeAsync(tree, async (n) => {
     if (n.type !== "Task") {
       return false;
@@ -67,7 +66,7 @@ export async function indexTasks({ name, tree }: IndexTreeEvent) {
     const complete = completeStates.includes(state);
     const task: TaskObject = {
       ref: `${name}@${n.from}`,
-      tags: [],
+      tag: "task",
       name: "",
       done: complete,
       page: name,
@@ -86,10 +85,12 @@ export async function indexTasks({ name, tree }: IndexTreeEvent) {
       if (tree.type === "Hashtag") {
         // Push the tag to the list, removing the initial #
         const tagName = tree.children![0].text!.substring(1);
+        if (!task.tags) {
+          task.tags = [];
+        }
         task.tags.push(tagName);
       }
     });
-    task.tags = ["task", ...task.tags];
 
     // Extract attributes and remove from tree
     const extractedAttributes = await extractAttributes(n, true);
@@ -98,6 +99,8 @@ export async function indexTasks({ name, tree }: IndexTreeEvent) {
     }
 
     task.name = n.children!.slice(1).map(renderToText).join("").trim();
+
+    updateITags(task, frontmatter);
 
     tasks.push(task);
     return true;
@@ -109,7 +112,7 @@ export async function indexTasks({ name, tree }: IndexTreeEvent) {
       name,
       Array.from(taskStates.entries()).map(([state, { firstPos, count }]) => ({
         ref: `${name}@${firstPos}`,
-        tags: ["taskstate"],
+        tag: "taskstate",
         state,
         count,
         page: name,

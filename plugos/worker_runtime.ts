@@ -9,6 +9,20 @@ declare global {
   function syscall(name: string, ...args: any[]): Promise<any>;
 }
 
+// Are we running in a (web) worker?
+
+// Determines if we're running in a web worker environment (Deno or browser)
+// - in a browser's main threads, typeof window is "object"
+// - in a browser's worker threads, typeof window === "undefined"
+// - in Deno's main thread typeof window === "object"
+// - in Deno's workers typeof window === "undefined
+// - in Cloudflare workers typeof window === "undefined", but typeof globalThis.WebSocketPair is defined
+const runningAsWebWorker = typeof window === "undefined" &&
+  // @ts-ignore: globalThis
+  typeof globalThis.WebSocketPair === "undefined";
+
+// console.log("Running as web worker:", runningAsWebWorker);
+
 if (typeof Deno === "undefined") {
   // @ts-ignore: Deno hack
   self.Deno = {
@@ -39,24 +53,31 @@ function workerPostMessage(msg: ControllerMessage) {
   self.postMessage(msg);
 }
 
-self.syscall = async (name: string, ...args: any[]) => {
-  return await new Promise((resolve, reject) => {
-    syscallReqId++;
-    pendingRequests.set(syscallReqId, { resolve, reject });
-    workerPostMessage({
-      type: "sys",
-      id: syscallReqId,
-      name,
-      args,
+if (runningAsWebWorker) {
+  globalThis.syscall = async (name: string, ...args: any[]) => {
+    return await new Promise((resolve, reject) => {
+      syscallReqId++;
+      pendingRequests.set(syscallReqId, { resolve, reject });
+      workerPostMessage({
+        type: "sys",
+        id: syscallReqId,
+        name,
+        args,
+      });
     });
-  });
-};
+  };
+}
 
 export function setupMessageListener(
   // deno-lint-ignore ban-types
   functionMapping: Record<string, Function>,
   manifest: any,
 ) {
+  if (!runningAsWebWorker) {
+    // Don't do any of this stuff if this is not a web worker
+    // This caters to the NoSandbox run mode
+    return;
+  }
   self.addEventListener("message", (event: { data: WorkerMessage }) => {
     (async () => {
       const data = event.data;
@@ -154,10 +175,10 @@ export async function sandboxFetch(
   return syscall("sandboxFetch.fetch", reqInfo, options);
 }
 
+// @ts-ignore: monkey patching fetch
+globalThis.nativeFetch = globalThis.fetch;
 // Monkey patch fetch()
-
 export function monkeyPatchFetch() {
-  globalThis.nativeFetch = globalThis.fetch;
   // @ts-ignore: monkey patching fetch
   globalThis.fetch = async function (
     reqInfo: RequestInfo,
@@ -183,4 +204,6 @@ export function monkeyPatchFetch() {
   };
 }
 
-monkeyPatchFetch();
+if (runningAsWebWorker) {
+  monkeyPatchFetch();
+}

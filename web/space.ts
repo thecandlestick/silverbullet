@@ -4,48 +4,10 @@ import { safeRun } from "../common/util.ts";
 
 import { AttachmentMeta, FileMeta, PageMeta } from "$sb/types.ts";
 import { EventHook } from "../plugos/hooks/event.ts";
-import { throttle } from "$sb/lib/async.ts";
-import { DataStore } from "../plugos/lib/datastore.ts";
-import { LimitedMap } from "../common/limited_map.ts";
 
 const pageWatchInterval = 5000;
 
 export class Space {
-  imageHeightCache = new LimitedMap<number>(100); // url -> height
-  widgetHeightCache = new LimitedMap<number>(100); // bodytext -> height
-  cachedPageList: PageMeta[] = [];
-
-  debouncedImageCacheFlush = throttle(() => {
-    this.ds.set(["cache", "imageHeight"], this.imageHeightCache).catch(
-      console.error,
-    );
-    console.log("Flushed image height cache to store");
-  }, 5000);
-
-  setCachedImageHeight(url: string, height: number) {
-    this.imageHeightCache.set(url, height);
-    this.debouncedImageCacheFlush();
-  }
-  getCachedImageHeight(url: string): number {
-    return this.imageHeightCache.get(url) ?? -1;
-  }
-
-  debouncedWidgetCacheFlush = throttle(() => {
-    this.ds.set(["cache", "widgetHeight"], this.widgetHeightCache.toJSON())
-      .catch(
-        console.error,
-      );
-    // console.log("Flushed widget height cache to store");
-  }, 5000);
-
-  setCachedWidgetHeight(bodyText: string, height: number) {
-    this.widgetHeightCache.set(bodyText, height);
-    this.debouncedWidgetCacheFlush();
-  }
-  getCachedWidgetHeight(bodyText: string): number {
-    return this.widgetHeightCache.get(bodyText) ?? -1;
-  }
-
   // We do watch files in the background to detect changes
   // This set of pages should only ever contain 1 page
   watchedPages = new Set<string>();
@@ -56,36 +18,19 @@ export class Space {
 
   constructor(
     readonly spacePrimitives: SpacePrimitives,
-    private ds: DataStore,
-    private eventHook: EventHook,
+    eventHook: EventHook,
   ) {
-    // super();
-    this.ds.batchGet([["cache", "imageHeight"], ["cache", "widgetHeight"]])
-      .then(([imageCache, widgetCache]) => {
-        if (imageCache) {
-          this.imageHeightCache = new LimitedMap(100, imageCache);
-        }
-        if (widgetCache) {
-          // console.log("Loaded widget cache from store", widgetCache);
-          this.widgetHeightCache = new LimitedMap(100, widgetCache);
-        }
-      });
-    eventHook.addLocalListener("file:listed", (files: FileMeta[]) => {
-      // console.log("Files listed", files);
-      this.cachedPageList = files.filter(this.isListedPage).map(
-        fileMetaToPageMeta,
-      );
-    });
     eventHook.addLocalListener("page:deleted", (pageName: string) => {
       if (this.watchedPages.has(pageName)) {
         // Stop watching deleted pages already
         this.watchedPages.delete(pageName);
       }
     });
+    this.updatePageList().catch(console.error);
   }
 
   public async updatePageList() {
-    // This will trigger appropriate events automatically
+    // The only reason to do this is to trigger events
     await this.fetchPageList();
   }
 
@@ -98,10 +43,6 @@ export class Space {
     return fileMetaToPageMeta(
       await this.spacePrimitives.getFileMeta(`${name}.md`),
     );
-  }
-
-  listPages(): PageMeta[] {
-    return this.cachedPageList;
   }
 
   async listPlugs(): Promise<FileMeta[]> {
@@ -135,10 +76,6 @@ export class Space {
           selfUpdate,
         ),
       );
-      if (!this.cachedPageList.find((page) => page.name === pageMeta.name)) {
-        // New page, let's cache it
-        this.cachedPageList.push(pageMeta);
-      }
       // Note: we don't do very elaborate cache invalidation work here, quite quickly the cache will be flushed anyway
       return pageMeta;
     } finally {
@@ -224,7 +161,6 @@ export class Space {
         }
       });
     }, pageWatchInterval);
-    this.updatePageList().catch(console.error);
   }
 
   unwatch() {
@@ -248,7 +184,7 @@ export function fileMetaToPageMeta(fileMeta: FileMeta): PageMeta {
     return {
       ...fileMeta,
       ref: name,
-      tags: ["page"],
+      tag: "page",
       name,
       created: new Date(fileMeta.created).toISOString(),
       lastModified: new Date(fileMeta.lastModified).toISOString(),

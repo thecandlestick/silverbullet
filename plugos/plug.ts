@@ -1,7 +1,7 @@
 import { Manifest } from "./types.ts";
-import { Sandbox } from "./sandbox.ts";
 import { System } from "./system.ts";
 import { AssetBundle } from "./asset_bundle/bundle.ts";
+import { Sandbox, SandboxFactory } from "./sandboxes/sandbox.ts";
 
 export class Plug<HookT> {
   readonly runtimeEnv?: string;
@@ -21,10 +21,9 @@ export class Plug<HookT> {
 
   constructor(
     private system: System<HookT>,
-    public workerUrl: URL,
     readonly name: string,
     private hash: number,
-    private sandboxFactory: (plug: Plug<HookT>) => Sandbox<HookT>,
+    private sandboxFactory: SandboxFactory<HookT>,
   ) {
     this.runtimeEnv = system.env;
 
@@ -44,7 +43,7 @@ export class Plug<HookT> {
 
   // Invoke a syscall
   syscall(name: string, args: any[]): Promise<any> {
-    return this.system.syscallWithContext({ plug: this }, name, args);
+    return this.system.syscall({ plug: this.name }, name, args);
   }
 
   /**

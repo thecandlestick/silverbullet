@@ -2,4 +2,5 @@ This page contains settings for configuring SilverBullet and its plugs. Any chan
 
 ```yaml
 indexPage: index
+customStyles: "[[STYLES]]"
 ```

@@ -1,7 +1,7 @@
 
 |  |  |  |  |
 |----------|----------|----------|----------|
-| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+| [[CS1575|Home]] | [[CS1200 Calendar|Calendar]] | [[CS1200 Syllabus|Syllabus]] | [[Lecture Notes]] |
 
 ---
 
@@ -78,3 +78,4 @@ Do not copy code from the internet, fellow students, or Large Language Models. S
 In this course, we will use an automatic code formatting tool (clang-format) to ensure a consistent style. You are encouraged to write quality comments alongside your code, but will not be graded on your documentation / organization.
 
 [Official University-wide Policies](https://registrar.mst.edu/academicregs/conductofstudents/)
+

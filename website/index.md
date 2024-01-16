@@ -7,6 +7,11 @@ course-hub
 render [[template/basic]]
 ```
 
+```query
+course-hub
+```
+
+
 # Navigating this site
 
 This site renders **Markdown** _on the fly_, hovering over a stylized snippet will reveal the underlying syntax. Feel free to play around with it, ==your changes will not be saved==

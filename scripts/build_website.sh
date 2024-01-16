@@ -48,7 +48,4 @@ echo > website_build/empty.md
 deno task bundle
 cp dist/silverbullet.js website_build/
 cp web/images/logo.ico website_build/
-<<<<<<< HEAD
-=======
 cp install.sh website_build/
->>>>>>> b3d5af360b3f6705917d6587fcb08c0684a4c300

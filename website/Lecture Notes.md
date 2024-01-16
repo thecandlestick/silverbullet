@@ -12,7 +12,7 @@ page
 name =~ /notes-1575/
 order by lastModified
 limit 4
-render [[template/lecture-notes]]
+render [[template/basic]]
 ```
 
 

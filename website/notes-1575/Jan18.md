@@ -1,6 +1,25 @@
----
-tags: template
-trigger: "cpp-review"
+#cs1575LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1575task
+where done = false
+render [[template/task]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1575 Calendar" and done = false
+limit 3
+render [[template/topic]]
+```
 ---
 
 # Quick Review of C++
@@ -67,7 +86,8 @@ int main()
   int b(3);   //(Copy Constructor)    initial value: 3
   int c{2};   //(Uniform Init)        initial value: 2
   int result; //                      initial value: ???
-
+  std::cout << result;
+  
   a = a + b;  //(Assignment operator)
   result = a - c;
 
@@ -90,8 +110,8 @@ int main()  //The Assignment Operator (operator=)
   int a, b;    // a:?,  b:?
   a = 10;      // a:10, b:?
   b = 4;       // a:10, b:4
-  a = b;       // a:,  b:
-  b = 7;       // a:,  b:
+  a = b;       // a:4,  b:4
+  b = 7;       // a:4,  b:7
 
   std::cout << "a: " << a << std::endl
             << "b: " << b << std::endl;
@@ -113,11 +133,6 @@ Compound Assignment Operators
 Increment and Decrement
 
 ```a++ b-- ++a --b```
-
-if (a++ == 10)
-  cout << a
-  
-if(++a == 10)
 
 Comparison Operators
 
@@ -217,7 +232,7 @@ int main()
   while( n>0 )  // check condition
   {
     cout << n << ", ";  // execute body
-    --n;
+    n--;
   }  // repeat
 
   cout << "liftoff! \n"
@@ -393,6 +408,7 @@ void even(int x)
 #include <iostream>
 using namespace std;
 
+
 int main() 
 {
   // "outer" scope
@@ -429,6 +445,7 @@ using namespace std;
 int main()
 {
   int foo [] = {16, 2, 77, 40, 12071};
+  char bar[10];
   int n, result = 0;
 
   for ( n=0 ; n<5 ; ++n )
@@ -516,7 +533,7 @@ void Rectangle::set_values(int x, int y)
 
 constant functions
 ```c++
-int Rectangle::area()
+int Rectangle::area();
 //vs.
 int Rectangle::area() const; // area() cannot alter width/height
 
@@ -581,4 +598,25 @@ int main()
   return 0;
 }
 ```
+
+# Memory Model
+
+The programming in this course will have you directly manipulating _memory_. Before that, we first need to clarify what exactly we mean by _memory_. 
+
+Your program, and any variables it creates, live in the memory of your computer. This memory is a limited resource. Use too much and the computer slows; use more than you have and the program crashes!
+
+## Memory as a Tape
+
+You can think of memory as a continuous tape of addressable _cells_
+
+```c++
+int x; float y = 3.14; char z = 'z';
+```
+| Addr. | 0x009 | 0x00A | 0x00B | 0x00C | ... |
+|----------|----------|----------|----------|----------|----------|
+| Value | ? | ‘z’ | ? | 3.14 | ... |
+| Variable | x | z | | y | ... |
+
+
+Of course, not all datum fit neatly into a fixed-size _cell_, but this model is good enough to discuss what happens during code execution.
 

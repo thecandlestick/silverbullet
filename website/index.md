@@ -7,10 +7,6 @@ course-hub
 render [[template/basic]]
 ```
 
-```query
-course-hub
-```
-
 
 # Navigating this site
 

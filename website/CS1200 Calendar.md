@@ -1,18 +1,21 @@
 
 # Schedule of Topics
 
-
-* [ ] logic
+* [ ] propositional-logic
+* [ ] predicate-logic
+* [ ] argument-validity
 * [ ] proofs
-* [ ] graphs
+**Exam 1**
 
+* [ ] sequences
+* [ ] induction
+* [ ] set-theory
+* [ ] functions
+* [ ] relations
+**Exam 2**
 
-
-
-```query
-task
-where page = "CS1200 Calendar"
-render [[template/task]]
-```
-
+* [ ] counting-and-probability
+* [ ] graph-theory
+* Bonus Topics
+**Exam 3**
 

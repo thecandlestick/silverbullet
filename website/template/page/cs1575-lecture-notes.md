@@ -23,6 +23,7 @@ render [[template/task]]
 task
 where page = "CS1575 Calendar" and done = false
 limit 3
-render [[template/task]]
+order by pos
+render [[template/topic]]
 ```
 ---

@@ -1,7 +1,7 @@
 
-|  |  |  |  |
-|----------|----------|----------|----------|
-| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+|  |  |
+|----------|----------|
+| [[CS1575]] | [[CS1200]] |
 
 ---
 
@@ -11,8 +11,15 @@
 page
 name =~ /notes-1575/
 order by lastModified
-limit 4
 render [[template/basic]]
 ```
 
+## CS1200
+
+```query
+page
+name =~ /notes-1200/
+order by lastModified
+render [[template/basic]]
+```
 

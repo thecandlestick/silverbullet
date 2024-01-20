@@ -21,8 +21,9 @@ render [[template/task]]
 
 ```query
 task
-where page = "CS1200-Calendar" and done = false
+where page = "CS1200 Calendar" and done = false
 limit 3
-render [[template/task]]
+order by pos
+render [[template/topic]]
 ```
 ---

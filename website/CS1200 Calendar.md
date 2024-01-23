@@ -1,7 +1,7 @@
 
 # Schedule of Topics
 
-* [ ] propositional-logic
+* [x] propositional-logic
 * [ ] predicate-logic
 * [ ] argument-validity
 * [ ] proofs
@@ -18,4 +18,8 @@
 * [ ] graph-theory
 * Bonus Topics
 **Exam 3**
+
+
+Zybooks Assignments:
+
 

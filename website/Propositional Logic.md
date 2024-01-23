@@ -139,7 +139,7 @@ means “if r, then s”, or **r -> s**
 #Definition The statement: “r is a _necessary_ condition for s”
 means “if not r, then not s”, or **~r -> ~s**
 
-#Definition The statement: “r is a _necessary & sufficient_ condition for s” means “r if and only s”, or **r <-> s**
+#Definition The statement: “r is a _necessary & sufficient_ condition for s” means “r if and only if s”, or **r <-> s**
 
 ---
 

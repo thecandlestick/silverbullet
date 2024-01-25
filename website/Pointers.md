@@ -354,24 +354,28 @@ Some good rules-of-thumb to avoid pointer problems:
 
 Other issues to watch out for include **double-free** errors (de-allocating the same piece of dynamic memory twice) and **shallow copies** (copying a memory address when you intended to copy the object at that memory address).
 
-_KC: The code below has a bug, which of the following best describes the issue?_
+_#KnowledgeCheck The code below has a bug, which of the following best describes the issue?_
 
 ```c++
 1. int arr_size = 24;
-2. int *ptr_1 = new int[arr_size];
+2.  int *ptr_1 = new int[arr_size];
 3. 
-4. for (int k = 0; k < arr_size; k++)
-5.   ptr_1[k] = k*k;
+4.  for (int k = 0; k < arr_size; k++)
+5.    ptr_1[k] = k*k;
 6. 
-7. int *ptr_2 = new int[arr_size];
-8. ptr_1 = ptr_2;
-9. delete [] ptr_1;
+7.  int *ptr_2 = new int[arr_size];
+8.  ptr_1 = ptr_2;
+9.  delete [] ptr_1;
+10. 
+11. ptr_1 = nullptr;
+12. ptr_2 = nullptr;
 ```
 
 * A) Dangling Pointer
 * B) Invalid Assignment
 * C) Memory Leak
 * D) No Issue
+_hint: trace a memory diagram if you’re unsure_
 
 ## 2D-Dynamic Array
 

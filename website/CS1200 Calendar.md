@@ -22,4 +22,33 @@
 
 Zybooks Assignments:
 
-
+* [ ] R2 (zybooks) 📅2024-01-26 #cs1200task
+* [ ] R3 (zybooks) 📅2024-01-29 #cs1200task
+* [ ] R4 (zybooks) 📅2024-01-31 #cs1200task
+* [ ] R5 (zybooks) 📅2024-02-02 #cs1200task
+* [ ] R6 (zybooks) 📅2024-02-05 #cs1200task
+* [ ] R7 (zybooks) 📅2024-02-07 #cs1200task
+* [ ] R8 (zybooks) 📅2024-02-09 #cs1200task
+* [ ] R9 (zybooks) 📅2024-02-12 #cs1200task
+* [ ] R10 (zybooks) 📅2024-02-14 #cs1200task
+* [ ] R11 (zybooks) 📅2024-02-16 #cs1200task
+* [ ] R12 (zybooks) 📅2024-02-21 #cs1200task
+* [ ] R13 (zybooks) 📅2024-02-23 #cs1200task
+* [ ] R14 (zybooks) 📅2024-02-26 #cs1200task
+* [ ] R15 (zybooks) 📅2024-02-28 #cs1200task
+* [ ] R16 (zybooks) 📅2024-03-01 #cs1200task
+* [ ] R17 (zybooks) 📅2024-03-04 #cs1200task
+* [ ] R18 (zybooks) 📅2024-03-06 #cs1200task
+* [ ] R19 (zybooks) 📅2024-03-08 #cs1200task
+* [ ] R20 (zybooks) 📅2024-03-11 #cs1200task
+* [ ] R21 (zybooks) 📅2024-03-18 #cs1200task
+* [ ] R22 (zybooks) 📅2024-03-20 #cs1200task
+* [ ] R23 (zybooks) 📅2024-04-01 #cs1200task
+* [ ] R24 (zybooks) 📅2024-04-05 #cs1200task
+* [ ] R25 (zybooks) 📅2024-04-08 #cs1200task
+* [ ] R26 (zybooks) 📅2024-04-10 #cs1200task
+* [ ] R27 (zybooks) 📅2024-04-12 #cs1200task
+* [ ] R28 (zybooks) 📅2024-04-15 #cs1200task
+* [ ] R29 (zybooks) 📅2024-04-17 #cs1200task
+* [ ] R30 (zybooks) 📅2024-04-19 #cs1200task
+* [ ] R31 (zybooks) 📅2024-04-22 #cs1200task

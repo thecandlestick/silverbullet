@@ -197,6 +197,8 @@ is an _existential statement_ with the form:
 \exists x \text{ such that } (P(x) \land \sim Q(x))
 ```
 
+#DiscussionQuestion Suppose you have an empty bowl and various-colored balls beside it. If you make the claim “all the balls in the bowl are blue”, have you made a _true_ statement or a _false_ statement?
+
 ---
 
 # Statements with Multiple Quantifiers
@@ -230,13 +232,21 @@ _examples:_
 \exists m \in \R^+ \text{ such that } \forall n \in \R^+, m \leq n
 ```
 ```latex
-\forall m \in \R^+ , \exists n \in \R^+ \text{ such that } \sim (m \leq n)
+\forall m \in \R^+ , \exists n \in \R^+ \text{ such that } m \leq n
 ```
 ```latex
-\forall m \in \R^+, \exists n \in \R^+ \text{ such that } m > n
+\forall m \in \mathbb{Q}^+, \exists n \in \mathbb{Q}^+ \text{ such that } m > n\\
+
 ```
 
 #DiscussionQuestion Are the statements given above _true_? What would be sufficient evidence to declare them as _false_?
+
+#DiscussionQuestion Translate the following sentences using quantified statements:
+* “Every nonzero real number has a *reciprocal”
+* “There is a real number with no reciprocal”
+
+*_the **reciprocal** of a real number a is a real number b such that_ 
+**a x b = 1**
 
 ## Negating Statements with Multiple Quantifiers
 
@@ -258,7 +268,7 @@ is a _quantified statement_ with the form:
 \forall x \in D, \exists y \in E \text{ such that } \sim P(x,y)
 ```
 
-The negations of more complex _quantified statements_ such as these can be computed manually using a substitution of variables
+The negations of more complex _quantified statements_ can be computed manually using a careful substitution of variables
 
 #BoardQuestion Give the negation of the following _quantified statement_:
 ```latex

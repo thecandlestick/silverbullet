@@ -14,6 +14,8 @@ type: page
 ```query
 cs1200task
 where done = false
+order by pos
+limit 4
 render [[template/task]]
 ```
 

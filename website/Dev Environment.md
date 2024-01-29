@@ -47,7 +47,7 @@ Default user/password: classVM/cs1575
 _Note: CS 1585 students are required to set-up their own VM. If you have not completed the lab on virtual machines, do not simply import this one or you will risk getting no points for that assignment_
 
 ---
-## Docker
+# Option 3: Docker
 
 [Docker](https://www.docker.com/) is a tool that allows you to deploy a customized OS environment with no installation required. Provided inside the assignment repository is a _Dockerfile_ which will allow you to deploy and interact with the exact environment that your code will be graded in. This can be helpful if you do not wish to or cannot install the required packages.
 
@@ -65,3 +65,10 @@ Inside the assignment folder, 3 scripts are provided:
 Execute each of these in order, following the instructions to install docker and create a Linux container. Once successful, you will have terminal access to a Linux environment where you can run the auto-grader, complete your code and submit your assignment.
 
 These scripts will also create a shared folder between the Linux environment and your personal device, which you can utilize to edit the code using whatever tools you like.
+
+_Shown: how to navigate to the shared folder_
+![](img/shared-folder.png)
+Any changes made to files in the **your_code/** directory (in the docker container) will be reflected in the files in the assignment folder (on your device). Git-actions (git push / git pull) will not work inside **your_code/**, however, unless you configure a SSH-key/personal-access-token for each assignment.
+
+The suggested workflow is to use your own device to edit and submit code, but use the docker container to run the autograder and check progress.
+

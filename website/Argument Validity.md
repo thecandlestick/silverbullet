@@ -54,25 +54,37 @@ _hint: think carefully about how validity is defined. Start by converting to the
 ---
 # Rules of Inference
 
-Some _argument forms_ are very common. It’s helpful to memorize and recognize these common forms to quickly determine the _validity_ of an argument. All of the _argument forms_ below are known to be valid
+Some _argument forms_ are very common. It’s helpful to memorize and recognize these common forms to quickly determine the _validity_ of an argument.
 
-Modus Ponens
+#Definition An argument consisting of two _premises_ and a _conclusion_ is known as a **syllogism**. The first premise is the **major premise** and the second premise is the **minor premise**
+
+All of the _argument forms_ below are known to be valid
+
+### Modus Ponens
 ```latex
 p \rightarrow q\\
 p\\
 \therefore q
 ```
 
+_example:_
+* If geese are coming towards me, then I must flee
+* Geese are coming towards me
+* Therefore, I must flee
 
-Modus Tollens
+### Modus Tollens
 ```latex
 p \rightarrow q\\
 \sim q\\
 \therefore \sim p
 ```
 
+_example:_
+* If my dog is awake, then he will bark when I come home
+* My dog did not bark when I came home
+* Therefore, my dog is not awake 
 
-Generalization
+**Generalization**
 ```latex
 p\\
 \therefore p \lor q
@@ -84,7 +96,7 @@ q\\
 ```
 
 
-Specialization
+**Specialization**
 ```latex
 p \land q\\
 \therefore p
@@ -95,7 +107,7 @@ p \land q\\
 \therefore q
 ```
 
-Conjunction
+**Conjunction**
 ```latex
 p\\
 q\\
@@ -103,7 +115,7 @@ q\\
 ```
 
 
-Elimination
+**Elimination**
 ```latex
 p \lor q\\
 \sim q\\
@@ -116,15 +128,19 @@ p \lor q\\
 \therefore q
 ```
 
-Transitivity
+**Transitivity**
 ```latex
 p \rightarrow q\\
 q \rightarrow r\\
 \therefore p \rightarrow r
 ```
 
+_example:_
+* If you don’t study logic, then you will commit fallacies
+* If you commit fallacies, then you will look silly
+* Therefore, if you don’t study logic, you will look silly!
 
-Division into Cases
+**Division into Cases**
 ```latex
 p \lor q\\
 p \rightarrow r\\
@@ -132,27 +148,47 @@ q \rightarrow r\\
 \therefore r
 ```
 
-### Contradiction Rule
+_example:_
+* John did all his homework or John studied his notes
+* If John does all his homework, he will pass the exam
+* If John studies his notes, he will pass the exam
+* Therefore, John will pass the exam
+
+## Contradiction Rule
+
+#Theorem According to the **contradiction rule**: If you show that the supposition that a statement **p** is _false_ leads to a _logical contradiction_, then you can conclude that **p** is _true_ 
+
 ```latex
 \sim p \rightarrow c\\
 \therefore p
 ```
 
+The same rule applies if supposing **p** is _true_ leads to a _logical contradiction_. You can conclude that **p** is _false_
 
+```latex
+p \rightarrow c\\
+\therefore \sim p
+```
+
+_example:_ **[Knights & Knaves](https://philosophy.hku.hk/think/logic/knights.php)**. On a distant island, everyone is either a knight or a knave (but not both). _Knights_ only make _true statements_. _Knaves_ only make _false statements_
+
+#DiscussionQuestion Two natives, **A** and **B**, approach from the island and make the following statements:
+* _A claims: “B is a knight”_
+* _B claims: “A and I are of opposite type”_
+Is A a knight or a knave? Is B a knight or a knave?
 
 ## Arguments from Quantified Statements
 
-The law of **Universal Instantiation** says that if some property is true of _everything_ in a set, then it is true of _any particular_ thing in the set
+The law of **Universal Instantiation** says that if some property is true of _everything_ in a set, then it is true of _any particular_ thing in the set. This concept can be combined with other _rules of inference_ to create new _valid argument forms_.
 
-Universal Modus Ponens
+**Universal Modus Ponens**
 ```latex
 \forall x \in D, P(x) \rightarrow Q(x)\\
 a \in D \land P(a)\\
 \therefore Q(a)
 ```
 
-
-Universal Modus Tollens
+**Universal Modus Tollens**
 ```latex
 \forall x \in D, P(x) \rightarrow Q(x)\\
 a \in D \land \sim Q(a)\\
@@ -163,18 +199,54 @@ a \in D \land \sim Q(a)\\
 
 Don’t fall into these common fallacies. The _argument forms_ featured below are ==invalid!==
 
-Converse Error
+### Converse Error
 ```latex
 p \rightarrow q\\
 q\\
 \therefore p
 ```
 
+This fallacy is also known as _affirming the consequent_
 
-Inverse Error
+_example:_
+* If it’s storming outside, then it’s windy
+* It’s windy outside
+* Therefore, it’s storming
+
+### Inverse Error
 ```latex
 p \rightarrow q\\
 \sim p\\
 \therefore \sim q
 ```
+
+This fallacy is also known as _denying the antecedent_
+
+_example:_
+* If interest rates are going up, then stock prices will go down
+* Interest rates are not going up
+* Therefore, stock prices will not go down
+
+_other common fallacies to watch out for include:_
+* **Ambiguous Premises**
+When an ambiguous statement is used as a premise without clarification
+
+* **Circular Reasoning**
+When the conclusion being argued is the same as one of the premises. While this mistake can produce a valid argument, it relies on the assumption that the _conclusion_ is true to prove that the conclusion is true!
+
+* **Jumping to a Conclusion**
+When the conclusion isn’t properly justified via the use of truth tables or known rules of inference.
+
+
+# Argument Diagrams
+
+An alternative method of determining the validity of arguments is by constructing an **argument diagram**. In this method, circles are drawn to represent _sets_ and points are drawn to represent _individual elements_. Doing so can help visualize why an argument is _valid_ or help identify a _counterexample_ that suggests an argument is _invalid_
+
+#BoardQuestion Construct an _argument diagram_ for the argument below:
+```latex
+\forall x \in \R, x \in \Z \rightarrow x \in \mathbb{Q}\\
+y \in \Z\\
+\therefore y \in \mathbb{Q}
+```
+
 

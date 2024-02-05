@@ -1,3 +1,7 @@
+---
+tags: template
+trigger: polymorphism
+---
 
 # Polymorphism in C++
 

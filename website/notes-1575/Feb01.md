@@ -1,11 +1,46 @@
+#cs1575LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1575task
+where done = false
+render [[template/task]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1575 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
-tags: template
-trigger: inheritance
----
+
+# Object Oriented Programming
+
+OOP is a _programming paradigm_ centered around the idea of organizing your code through _objects_. Objects are a coupling of data and the code that is meant to act on that data. (variables + functions)
+
+## The 3 Pillars of OOP
+
+There are three (generally) agreed upon aspects OOP design
+
+* [[Encapsulation]]
+* [[Inheritance]]
+* [[Polymorphism]]
+
+
+Different programming languages will express these ideas in different ways. Some languages may support only some aspects of OOP design, and others may be incompatible with OOP entirely.  
 
 # Inheritance in C++
 
-Definition:
+#Definition
   The ability to declare a class as an _extension_ of another class
 
 Through this process, a **derived class** inherits all member variables and all member functions of a **base class** (except for constructors/destructors). The derived class may then extend the functionality through additional members.
@@ -30,7 +65,7 @@ class 🐩 : public 🐶
 
 _**evilllll**_
 ```c++
-class 🌭 : public 🐶, public 🌞
+class 🌭 : public 🐶, public 🌞, public 🐩
 {
   // multiple inheritance is possible... but ill-advised ⚠️
 };
@@ -95,7 +130,83 @@ As a general rule, objects of a _derived type_ can be used anywhere that an obje
 
 An (somewhat) exception to this rule is that base and derived types are distinguished for the purpose of [[Encapsulation]] levels. 
 
+
+
 ---
+
+#Definition Encapsulation refers to the ability for an object to hide or restrict access to its data. Its purpose is to help ensure that the data belonging to an object remains in a _valid state_ for functions operating on that object and to enforce a layer of abstraction between the class structure and the end-programmer.
+
+# Encapsulation in C++
+
+C++ has three levels of encapsulation that can be applied to both _member variables_ and _member functions_:
+
+* **Public**: members at this level can be accessed anywhere
+* **Private**: members at this level can be accessed by objects of the _exact_ same type as the owner object 
+* **Protected:** members at this level can be accessed by objects of the same type _or a derived type_ of the owner
+
+
+## Derived Classes Inherit Encapsulation Levels
+
+This is particularly important to note when inheriting private members from the base class.
+
+```c++
+class 🐶
+{
+  private:
+    bool tagged;
+};
+
+class 🐩 : public 🐶 
+{
+  public:
+    bool is_stray() { return !tagged; }
+    // ERROR! cannot access private member `tagged`
+};
+```
+
+A simple fix for this problem is to use the _protected_ level for classes that are intended to be extended via inheritance.
+
+```c++
+class 🐶
+{
+  protected:
+    bool tagged;
+};
+
+class 🐩 : public 🐶 
+{
+  public:
+    bool is_stray() { return !tagged; }
+};
+
+void adopt( 🐶& good_dog );
+
+int main()
+{
+  🐩 fifi;
+
+  if (fifi.is_stray()) 
+    adopt(fifi);
+}
+```
+
+
+## Levels of Inheritance
+
+Though it is a rarely used feature, you can select between _public, protected, and private_ inheritance in C++. Public inheritance is preferable for 99.99% of use cases, the others are very rarely seen 🦄
+
+```c++
+class 🐩 : public 🐶 {};
+
+class 🐕‍🦺 : protected 🐶 {};
+
+class 🌭 : private 🐶 {};
+```
+
+* **public**: all inherited members retain their encapsulation levels
+* **protected**: _public_ members are elevated to _protected_ encapsulation
+* **private**: all inherited members are elevated to _private_ encapsulation
+
 
 When inheriting members of the base class, derived classes can redefine that member for their own purposes. The base version is still retained, however, in a separate _namespace_
 
@@ -124,14 +235,14 @@ int main() {
   spot.🐶::bark();
 
   spot.bark_volume = 1.5;  // Defaults to 🐩::
-  spot.bark();
+  spot.🐩::bark();
 
 }
 ```
 
 ---
 
-Constructors are not technically inherited from base to derived class, but a constructor for the derived class will implicitly make a call to the constructor for the base class _before_ executing its own. In other words, when creating an object of class GrannySmithApple below, the order of execution is:
+Constructors are not technically inherited from base to derived class, but ==a constructor for the derived class will implicitly make a call to a constructor for the base class _before_ executing its own.== In other words, when creating an object of class GrannySmithApple below, the order of execution is:
 
 ```Apple Constr. -> GreenApple Constr. -> GrannySmithApple Constr.```
 
@@ -165,21 +276,20 @@ class GrannySmithApple : public GreenApple
 
 int main()
 {
-  GreenApple myApple(3);  // 🌳 = ?  🍎 = ?  🍏 = ?
-  GreenApple myOtherApple();  // 🌳 = ?  🍎 = ?  🍏 = ?
+  GreenApple myApple(3);  // 🌳 = 0  🍎 = 0  🍏 = 3
+  GreenApple myOtherApple();  // 🌳 = 1  🍎 = 1  🍏 = 1
 
-  GrannySmithApple maternalApple(); // 🌳 = ?  🍎 = ?  🍏 = ?  👵🏻 = ?
-  GrannySmithApple paternalApple(7); // 🌳 = ?  🍎 = ?  🍏 = ?  👵🏻 = ?
+  GrannySmithApple maternalApple(); // 🌳 = 1  🍎 = 1  🍏 = 1  👵🏻 = 0
+  GrannySmithApple paternalApple(7); // 🌳 = 0  🍎 = 0  🍏 = 7  👵🏻 = 7
 
 }
 ```
-
 #KnowledgeCheck: 
 For variable paternalApple, what are the values of 🌳, 🍎, 🍏, 👵🏻?
 
 ---
 
-Destructors follow a similar rule. The destructor of a derived class will implicitly make a call to the destructor of the base class _after_ executing its own. In other words, when an object of class GrannySmithApple leaves it’s scope, the order of execution is:
+Destructors follow a similar rule. ==The destructor of a derived class will implicitly make a call to the destructor of the base class _after_ executing its own.== In other words, when an object of class GrannySmithApple leaves it’s scope, the order of execution is:
 
 ```~GrannySmithApple() -> ~GreenApple() -> ~Apple()```
 
@@ -229,9 +339,13 @@ class 🐯 : public 🐈<T>
   T tiger_template;
 }
 
+🐯<char> tony;
+
 template <typename T, typename U>
 class 🦁 : public 🐈<T>
 {
   U lion_template;
 }
+
+🦁<int, long> simba;
 ```

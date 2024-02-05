@@ -17,9 +17,9 @@ email: jackmanhardt@mst.edu
 12:30pm - 1:45pm T/Th (CS 222)
 
 ## Office Hours
-TBA
 
-Individual meetings by email appointment
+Open Office Hours: MWF 4-5pm, **CS213**
+Individual Meetings: by appointment, **CS317**
 
 ---
 
@@ -42,6 +42,18 @@ The breakdown of your grade will be as follows:
 Your assignments in this course will be graded by an open-source autograding tool developed right here at S&T. Some exciting features include the ability to receive ==immediate feedback== on your current progress and built-in tools to help you incrementally develop your code.
 
 ---
+# Topics Covered
+
+  [[C++]]
+  [[Data Structures]]
+  [[Lists]]
+  [[Algorithm Complexity]]
+  [[Stacks & Queues]]
+  [[Recursion]]
+  [[Trees]]
+  [[Maps]]
+  [[Priority Queues]]
+  [[Graphs]]
 
 # Resources
 

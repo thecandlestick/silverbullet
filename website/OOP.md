@@ -1,3 +1,7 @@
+---
+tags: template
+trigger: oop
+---
 
 # Object Oriented Programming
 

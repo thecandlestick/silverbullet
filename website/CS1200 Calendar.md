@@ -2,7 +2,7 @@
 # Schedule of Topics
 
 * [x] propositional-logic
-* [ ] predicate-logic
+* [x] predicate-logic
 * [ ] argument-validity
 * [ ] proofs
 **Exam 1**
@@ -24,8 +24,8 @@ Zybooks Assignments:
 
 * [x] R2 (zybooks) 📅2024-01-26 #cs1200task
 * [x] R3 (zybooks) 📅2024-01-29 #cs1200task
-* [ ] R4 (zybooks) 📅2024-01-31 #cs1200task
-* [ ] R5 (zybooks) 📅2024-02-02 #cs1200task
+* [x] R4 (zybooks) 📅2024-01-31 #cs1200task
+* [x] R5 (zybooks) 📅2024-02-02 #cs1200task
 * [ ] R6 (zybooks) 📅2024-02-05 #cs1200task
 * [ ] R7 (zybooks) 📅2024-02-07 #cs1200task
 * [ ] R8 (zybooks) 📅2024-02-09 #cs1200task

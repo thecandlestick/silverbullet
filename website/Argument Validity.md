@@ -170,12 +170,27 @@ p \rightarrow c\\
 \therefore \sim p
 ```
 
+**Identifying a Contradiction**
+
+_Recall:_ A _statement form_ is a _contradiction_ if it is always false regardless of what is substituted for each statement variable.
+
+#DiscussionQuestion Take the statement form: **r ^ (~r ^ s)** , is this a _contradiction_?
+
+| r | s | ~r ^ s | r ^ (~r ^ s) |
+|----------|----------|----------|----------|
+| T | T | F | F |
+| T | F | F | F |
+| F | T | T | F |
+| F | F | F | F |
+
+
 _example:_ **[Knights & Knaves](https://philosophy.hku.hk/think/logic/knights.php)**. On a distant island, everyone is either a knight or a knave (but not both). _Knights_ only make _true statements_. _Knaves_ only make _false statements_
 
-#DiscussionQuestion Two natives, **A** and **B**, approach from the island and make the following statements:
+#KnowledgeCheck Two natives, **A** and **B**, approach from the island and make the following statements:
 * _A claims: “B is a knight”_
 * _B claims: “A and I are of opposite type”_
-Is A a knight or a knave? Is B a knight or a knave?
+Is **A** a knight or a knave? Is **B** a knight or a knave?
+_hint: try applying the contradiction rule_
 
 ## Arguments from Quantified Statements
 
@@ -188,6 +203,11 @@ a \in D \land P(a)\\
 \therefore Q(a)
 ```
 
+_example:_
+* All knights tell the truth
+* Arthur is a knight
+* Arthur tells the truth
+
 **Universal Modus Tollens**
 ```latex
 \forall x \in D, P(x) \rightarrow Q(x)\\
@@ -195,6 +215,11 @@ a \in D \land \sim Q(a)\\
 \therefore \sim P(a)
 ```
 
+_example:_
+* All knaves tell only lies
+* Lancelot tells the truth
+* Lancelot is not a knave
+  
 # Logical Fallacies
 
 Don’t fall into these common fallacies. The _argument forms_ featured below are ==invalid!==
@@ -227,26 +252,21 @@ _example:_
 * Interest rates are not going up
 * Therefore, stock prices will not go down
 
-_other common fallacies to watch out for include:_
-* **Ambiguous Premises**
-When an ambiguous statement is used as a premise without clarification
-
-* **Circular Reasoning**
-When the conclusion being argued is the same as one of the premises. While this mistake can produce a valid argument, it relies on the assumption that the _conclusion_ is true to prove that the conclusion is true!
-
-* **Jumping to a Conclusion**
-When the conclusion isn’t properly justified via the use of truth tables or known rules of inference.
-
-
 # Argument Diagrams
 
-An alternative method of determining the validity of arguments is by constructing an **argument diagram**. In this method, circles are drawn to represent _sets_ and points are drawn to represent _individual elements_. Doing so can help visualize why an argument is _valid_ or help identify a _counterexample_ that suggests an argument is _invalid_
+An alternative method of determining the validity of arguments is by constructing an **argument diagram**. In this method, circles are drawn to represent _sets_ and points are drawn to represent _individual elements_. 
 
-#BoardQuestion Construct an _argument diagram_ for the argument below:
+A diagram is drawn for each _premise_, and then they are all combined into a single diagram. If the argument is valid, then any diagram produced this way must illustrate the conclusion. 
+
+Doing so can help visualize why an argument is _valid_ or help identify a _counterexample_ that suggests an argument is _invalid_
+
+#BoardQuestion Construct an _argument diagram_ for the argument(s) below:
 ```latex
-\forall x \in \R, x \in \Z \rightarrow x \in \mathbb{Q}\\
+\forall x \in \Z, x \in \mathbb{Q}\\
 y \in \Z\\
 \therefore y \in \mathbb{Q}
 ```
 
-
+* All human beings need oxygen to survive
+* Mushrooms need oxygen to survive
+* therefore, mushrooms are human beings

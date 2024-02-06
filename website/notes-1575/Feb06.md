@@ -1,7 +1,42 @@
+#cs1575LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1575task
+where done = false
+render [[template/task]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1575 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
-tags: template
-trigger: polymorphism
----
+
+# Object Oriented Programming
+
+OOP is a _programming paradigm_ centered around the idea of organizing your code through _objects_. Objects are a coupling of data and the code that is meant to act on that data. (variables + functions)
+
+## The 3 Pillars of OOP
+
+There are three (generally) agreed upon aspects OOP design
+
+* [[Encapsulation]]
+* [[Inheritance]]
+* [[Polymorphism]]
+
+
+Different programming languages will express these ideas in different ways. Some languages may support only some aspects of OOP design, and others may be incompatible with OOP entirely.  
 
 # Polymorphism in C++
 
@@ -24,8 +59,8 @@ int main()
 ```
 
 Objects in C++ actually possess two different types, a **static type** and a **dynamic type**.
-  * The _static type_ of an object is a _by-the-text_ interpretation, what the object appears to be when inspecting the code (the type of the variable referencing that object).
-  * The _dynamic type_ of an object is a _by-the-execution_ interpretation, what the object actually is in the context of the program. For objects accessed through pointers specifically, this dynamic type can often differ from the static type.
+  * #Definition The _static type_ of an object is a _by-the-text_ interpretation, what the object appears to be when inspecting the code (the type of the variable referencing that object).
+  * #Definition The _dynamic type_ of an object is a _by-the-execution_ interpretation, what the object actually is in the context of the program. For objects accessed through pointers specifically, this dynamic type can often differ from the static type.
 
 ## Dynamic Cast
 
@@ -50,7 +85,7 @@ int main()
 }
 ```
 
-When invoked, dynamic_cast will check the dynamic type of the object being pointed to. If the dynamic type matches, it will return a pointer of the requested type which can be used to access derived-type members. If the dynamic type does not match what is requested, dynamic_cast will return _nullptr_.
+When invoked, dynamic_cast will check the dynamic type of the object being pointed to. If the dynamic type matches, it will return a pointer of the requested type which can be used to access derived-type members. If the dynamic type does not match what is requested, dynamic_cast will ==return _nullptr_.==
 
 **Definition-1:** The ability for an object of a certain _static type_ to behave differently according to its _dynamic type_
 
@@ -65,12 +100,12 @@ class FarmAnimal
 
 class 🐄 : public FarmAnimal
 {
-  void speak() { cout << "Mooo "; }
+  virtual void speak() { cout << "Mooo "; }
 };
 
 class 🐖 : public FarmAnimal
 {
-  void speak() { cout << "Oink "; }
+  virtual void speak() { cout << "Oink "; }
 };
 
 class 🐎 : public FarmAnimal
@@ -85,7 +120,7 @@ int main()
   farm[1] = new 🐖;
   farm[2] = new 🐎;
 
-  for (int k=0; k < 4; k++)
+  for (int k=0; k < 3; k++)
   {
     farm[k] -> speak();  // output: "... ... ... "
   }
@@ -120,8 +155,8 @@ class 🐮💢 : public 🐄
 
 int main()
 {
-  FarmAnimal *my_cow = new 🐮💢;
-  my_cow -> speak();  // output: 
+  🐄 *my_cow = new 🐮💢;
+  my_cow -> speak();  // output: Grrr!
 }
 ```
 
@@ -136,7 +171,7 @@ When working with polymorphic classes, it is important to always make destructor
 class FarmAnimal
 {
   public:
-    ~FarmAnimal() {}
+    virtual ~FarmAnimal() {}
 }
 
 class 🐔 : pubic FarmAnimal
@@ -164,6 +199,8 @@ A **pure virtual function** is a function with no accompanying code body, it is 
 ```c++
 class FarmAnimal
 {
+  int weight;
+  void eat();
   virtual void speak() = 0;  // speak is a pure virtual function 
 }
 ```
@@ -185,3 +222,82 @@ int main()
 A class that contains _only_ pure virtual functions are known as **interfaces**. These interfaces are a powerful tool for enforcing an organizational structure for large software projects 
 
 (ex. The C++ Standard Library uses polymorphism extensively!)
+
+
+# Exception Handling in C++
+
+As computer scientists, we study and admire elegant and iron-clad algorithms that can be trusted to predictably arrive at the desired result. In reality, code is never so air-tight. There will always be **exceptions**, some foreseeable (_edge cases_) and others... unexpected 🐞.
+
+The best that we can do is anticipate when and where something might go wrong, and fortify our program with exception-handling code.
+
+## Keywords
+
+There are 3 C++ keywords that are used in exception handling.
+
+* **try** - defines a code block that _could_ fail
+* **throw** <variable> - used to signal a failure
+* **catch** (type var) - defines a code block to handle an error
+
+A try-block is always followed immediately by one or more catch-blocks. When a throw statement is reached inside a try-block, the program jumps directly to a matching catch-block where the exception can be handled safely.
+
+[[examples/except-basics]]
+<!-- #include [[examples/except-basics]] -->
+```c++
+#include <vector>
+#include <utility>
+using namespace std;
+
+typedef Vector<pair<float,float>> ranges;
+// Got a tongue-twister of a type? Use a typedef!
+
+ranges partition(float begin, float end, int p)
+{
+  //Returns a vector of p equal partitions in range [begin, end]
+  ranges partitions;
+  float partition_size = (end - begin) / p;
+
+  pair<float, float> range;
+  range.first = begin;
+  range.second = begin + partition_size;
+  for (int i=0; i < p; i++)
+  {
+    partitions.push_back(pair<float,float>(range));
+    range.first = range.second;
+    range.second += partition_size;
+  }
+
+  return partitions;
+}
+```
+
+**Now let's add some exception handling!**
+```c++
+ranges partition(float begin, float end, int p)
+{
+  //Returns a vector of p equal partitions in range [begin, end]
+  ranges partitions;
+  try {  // exception may occur in this block!
+    if (p <= 0) throw p;  // throwing exception, jump to catch block!
+
+    float partition_size = (end - begin) / p;
+
+  
+    pair<float, float> range;
+    range.first = begin;
+    range.second = begin + partition_size;
+    for (int i=0; i < p; i++)
+    {
+      partitions.push_back(pair<float,float>(range));
+      range.first = range.second;
+      range.second += partition_size;
+    }
+  }  // end try-block
+  catch(int bad_p)  //code execution resumes here if exception thrown
+  { 
+    cout << "invalid number of partitions: " << bad_p <<
+         << "returning empty vector!" << endl; 
+  }
+  return partitions;
+}
+```
+<!-- /include -->

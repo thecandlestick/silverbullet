@@ -1,3 +1,7 @@
+---
+tags: template
+trigger: exception-handling
+---
 
 # Exception Handling in C++
 

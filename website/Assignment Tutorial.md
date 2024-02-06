@@ -82,7 +82,27 @@ Finish by running the command ```git commit -m “<describe your changes>“``` 
 
 ![submitting code](img/commit-push.png)
 
+After submitting, you may receive an email stating “Pipeline Failed” if your score for that submission was < 70%. It does not mean that there was a problem with your submission.
+
 **Notes:**
 * Do not create any additional files, use the files provided
 * You may create additional functions if you wish, but all assigned functions must operate as specified for full points
 * Unless otherwise stated, **do not** use any libraries that aren’t included in the assignment to begin with
+
+---
+## How to Check Your Grade
+
+The grade displayed by the autograder when ran locally on your machine is not _necessarily_ the grade you will receive. Sometimes you may forget to submit all your changes, or your code might have problems that weren’t apparent on your device.
+
+**To check your official score:**
+1. Navigate to your assignment on git-classes
+2. Go to the _Build > jobs_ tab
+3. Click “Status” for the latest(highest) job
+
+![](img/jobs.png)
+
+---
+
+![](img/official-score.png)
+
+Here, you will see your official score. Verify that it matches what you expect. If not, scroll up to see which tests are failing and resubmit

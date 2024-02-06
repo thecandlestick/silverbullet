@@ -166,7 +166,6 @@ Therefore, by definition, **m+n** is even.
 
 There are often many ways to prove a given statement, but there are also several ways to write an _invalid_ proof. Here, will go over some common pitfalls to watch out for
 
----
 **Giving a specific example for a universal statement**
 
 _example:_
@@ -230,3 +229,44 @@ Suppose **m** and **n** are any odd integers.
 When adding two odd numbers, the result is always even.
 
 Therefore, **m + n** is even
+
+---
+# Indirect Proofs
+
+#Definition An **indirect proof** attempts to prove a statement which is either _logically equivalent_ to the statement being proved or leads logically to the statement being proved by rules of inference
+
+These methods are valuable when the _direct proof_ of a statement is particularly difficult or cumbersome
+
+## Proof by Contradiction
+
+A _proof by contradiction_ is structured as follows:
+
+1. **Suppose the statement to be proven is _false_**
+  2. Formally state the negation, which is assumed _true_
+3. **Show that this supposition leads to a _logical contradiction_**
+4. **Conclude that the original statement is true by the _contradiction rule_**
+
+---
+## Proof by Contrapositive
+
+A _proof by contrapositive_ is structured as follows:
+
+1. **Construct the statement to be proved as a _conditional statement_**
+```latex
+P(x) \rightarrow Q(x)
+```  
+2. **Rewrite the conditional statement in its _contrapositive_ form**
+```latex
+\sim Q(x) \rightarrow \sim P(x)
+```
+3. **Prove the _contrapositive_ form directly**
+
+---
+## Proof by Division into Cases
+
+A _proof by division into cases_ is structured as follows:
+
+1. **Divide the domain, D, of the statement to be proved into two or more sub-domains**
+  2. You must be able to show that these sub-domains together contain every element of D
+3. **Prove the statement for each sub-domain individually**
+4. **Conclude the statement must be true for the whole domain, D**

@@ -6,7 +6,7 @@ type: page
 #cs1200LN
 |  |  |  |  |
 |----------|----------|----------|----------|
-| [[CS1200|Home]] | [[CS1200-Calendar|Calendar]] | [[course syllabus|Syllabus]] | [[course lec notes|Lecture Notes]] |
+| [[CS1200|Home]] | [[CS1200 Calendar|Calendar]] | [[CS1200 Syllabus]] | [[Lecture Notes]] |
 
 |^|
 ## Reminders
@@ -16,7 +16,7 @@ cs1200task
 where done = false
 order by pos
 limit 4
-render [[template/task]]
+render [[template/topic]]
 ```
 
 ## Objectives

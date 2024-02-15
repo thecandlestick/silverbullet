@@ -11,9 +11,13 @@
 * [x] pointers
 * [x] oop
 * [x] inheritance
-* [ ] polymorphism
-* [ ] exception-handling
-
+* [x] polymorphism
+* [x] exception-handling
+* [x] data-structures
+* [ ] lists
+* [ ] arraylist
+* [ ] linkedlist
+* [ ] algorithm-complexity
 
 ---
 # Schedule of Topics

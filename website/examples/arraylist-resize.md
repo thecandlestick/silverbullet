@@ -11,7 +11,7 @@ void ArrayList<T>::reserve(int new_max_elems)
   //De-allocate old storage array
   delete [] data;
   //Redirect data pointer
-  data = tmp;
+  data = temp;
   //Update capacity
   max_elems = new_max_elems;
 }

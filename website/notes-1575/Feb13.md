@@ -1,6 +1,26 @@
----
-tags: template
-trigger: list
+#cs1575LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1575task
+where done = false
+render [[template/task]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1575 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
 
 # The List Abstract Data Type
@@ -15,7 +35,7 @@ where:
 a_i \text{ is element i in the sequence}\\
 a_0 \text{ is the \textbf{head} of the List}\\
 a_n \text{ is the \textbf{tail} of the List}\\
-n \text{ is the \textbf{size} of the List}
+n+1 \text{ is the \textbf{size} of the List}
 ```
 
 ## Operations
@@ -33,15 +53,15 @@ We shall define the following operations for the List A.D.T.:
 * **Find(L, x)**       -> _true_ if x is in L, _false_ otherwise
 
 
-_KC: What will be the result of each operation below_
-* Size(L1) -> ?
-* Get(L1, 2) -> ?
-* Set(L1, 1, y) -> ?
-* Insert(L1, 1, y) -> ?
-* Erase(L1, 3) -> ?
-* Find(L1, h) -> ?
+_#KnowledgeCheck: What will be the result of each operation below_
+* Size(L1) -> 5
+* Get(L1, 2) -> e
+* Set(L1, 1, y) -> <a, y, e, u, i>
+* Insert(L1, 1, y) -> <a, y, o, e, u, i>
+* Erase(L1, 3) -> <a, o, e, i>
+* Find(L1, h) -> false
 
-_Discussion Questions:_
+#DiscussionQuestion
 * What similarities exist between a List and an Array?
 * Which operations do they share?
 
@@ -50,7 +70,7 @@ Remember that an A.D.T. is a theoretical concept that has **nothing to do with C
 ---
 ## The Iterator
 
-An _iterator_ is used to traverse and refer to specific pieces of data within a data structure without needing any knowledge of the internal structure. In C++, they provide an abstract interface that can be used alongside polymorphism to work with any specific implementation of a list.
+An _iterator_ is used to traverse and refer to specific pieces of data within a data structure ==without needing any knowledge of the internal structure.== In C++, they provide an abstract interface that can be used alongside polymorphism to work with any specific implementation of a list.
 
 **List-Iterator Functions:**
 | Function | Use |
@@ -101,6 +121,7 @@ class List
 
 ## C++ standard library implementations:
 * Vector
+* forward_list
 * List
 
 ## Our Implementations:
@@ -108,4 +129,45 @@ class List
 [[ArrayList]] : Array-based implementation
 
 [[LinkedList]] : Pointer-based implementation
+
+# ArrayList Class & Diagram
+
+The key idea behind the ArrayList/Vector is to use a dynamically-allocated _storage array_ that can be re-sized as necessary
+
+[[examples/arraylist-class]]
+
+
+![class diagram](img/arrlist-diagram.png)
+
+
+---
+
+# Operations (member functions)
+
+## Size
+
+```c++
+template <typename T>
+int ArrayList<T>::size()
+{
+  return num_elems;
+}
+
+myArrayList.size();
+```
+
+
+## Get/Set
+
+In C++ classes, Get & Set can be bundled together!
+
+[[examples/arraylist-bracket-op]]
+
+
+## Re-size (Auxiliary Functions)
+
+These functions change the size of the storage array pointed to by _data_. They allow us to continue adding more data when full, or to shrink our storage array so as to not waste memory.
+
+[[examples/arraylist-resize]]
+
 

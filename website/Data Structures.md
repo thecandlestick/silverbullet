@@ -1,3 +1,7 @@
+---
+tags: template
+trigger: data-structures
+---
 
 What is it that computer scientists do?
 

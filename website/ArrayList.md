@@ -1,3 +1,9 @@
+---
+tags: template
+trigger: arraylist
+---
+
+
 # ArrayList Class & Diagram
 
 The key idea behind the ArrayList/Vector is to use a dynamically-allocated _storage array_ that can be re-sized as necessary

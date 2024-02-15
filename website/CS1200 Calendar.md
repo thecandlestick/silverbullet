@@ -4,7 +4,7 @@
 * [x] propositional-logic
 * [x] predicate-logic
 * [x] argument-validity
-* [ ] proofs
+* [x] proofs
 **Exam 1**
 
 * [ ] sequences
@@ -27,8 +27,8 @@ Zybooks Assignments:
 * [x] R4 (zybooks) 📅2024-01-31 #cs1200task
 * [x] R5 (zybooks) 📅2024-02-02 #cs1200task
 * [x] R6 (zybooks) 📅2024-02-05 #cs1200task
-* [ ] R7 (zybooks) 📅2024-02-07 #cs1200task
-* [ ] R8 (zybooks) 📅2024-02-09 #cs1200task
+* [x] R7 (zybooks) 📅2024-02-07 #cs1200task
+* [x] R8 (zybooks) 📅2024-02-09 #cs1200task
 * [ ] R9 (zybooks) 📅2024-02-12 #cs1200task
 * [ ] R10 (zybooks) 📅2024-02-14 #cs1200task
 * [ ] R11 (zybooks) 📅2024-02-16 #cs1200task

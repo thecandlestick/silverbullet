@@ -45,7 +45,7 @@ _example:_
 
 ---
 
-* [ ] direct-proofs  📅2024-02-12 #cs1200task
+* [x] direct-proofs  📅2024-02-12 #cs1200task
 
 **STATEMENT:** The sum of any two even integers is even
 ```latex

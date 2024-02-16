@@ -197,6 +197,8 @@ Which leaves us with a formula of
 \sum_{k=1}^n\frac{1}{k(k+1)} = 1 - \frac{1}{n+1}
 ```
 
+#Definition A sum is said to have a **closed form** expression if it can be shown to be equal to a formula not containing ellipsis(**...**) or summation symbols(**∑**)
+
 ## Product notation
 
 #Definition If m and n are integers and m <= n, then the symbol

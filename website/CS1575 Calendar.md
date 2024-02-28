@@ -14,8 +14,8 @@
 * [x] polymorphism
 * [x] exception-handling
 * [x] data-structures
-* [ ] lists
-* [ ] arraylist
+* [x] lists
+* [x] arraylist
 * [ ] linkedlist
 * [ ] algorithm-complexity
 

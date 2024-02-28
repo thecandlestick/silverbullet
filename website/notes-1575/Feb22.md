@@ -1,6 +1,26 @@
----
-tags: template
-trigger: linkedlist
+#cs1575LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1575task
+where done = false
+render [[template/task]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1575 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
 
 # LinkedList Class & Diagram
@@ -74,7 +94,7 @@ _#DiscussionQuestion: The begin() and end() functions create iterators to the fr
 template <typename T>
 LinkedListIterator<T> LinkedList<T>::begin()
 {
-  return LinkedListIterator<T>(___);
+  return LinkedListIterator<T>(head);
 }
 ```
 
@@ -83,7 +103,7 @@ template <typename T>
 LinkedListIterator<T> LinkedList<T>::end()
 {
   ListNode<T> *runner = head; // create a pointer to advance
-  while(___)
+  while(runner->next != nullptr)
   {
     runner = runner->next; // "advance" the pointer to next node
   }

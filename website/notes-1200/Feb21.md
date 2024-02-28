@@ -1,6 +1,28 @@
----
-tags: template
-trigger: induction
+#cs1200LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1200|Home]] | [[CS1200 Calendar|Calendar]] | [[CS1200 Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1200task
+where done = false
+order by pos
+limit 4
+render [[template/topic]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1200 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
 
 #Quote _Mathematical induction is the standard proof technique in computer science
@@ -37,7 +59,7 @@ _A proof by induction is structured as follows:_
 _example:_
 
 Prove the following by mathematical induction:
-**For all integers n >= 8, exact change for n¢s can be made using  only 3¢ and 5¢ coins**
+**For all integers n >= 8, exact change for n¢ can be made using  only 3¢ and 5¢ coins**
 
 Let us begin by defining our property, **P(x)**
 ```latex

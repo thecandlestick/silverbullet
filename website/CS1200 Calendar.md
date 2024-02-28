@@ -7,7 +7,7 @@
 * [x] proofs
 **Exam 1**
 
-* [ ] sequences
+* [x] sequences
 * [ ] induction
 * [ ] set-theory
 * [ ] functions
@@ -31,8 +31,8 @@ Zybooks Assignments:
 * [x] R8 (zybooks) 📅2024-02-09 #cs1200task
 * [x] R9 (zybooks) 📅2024-02-12 #cs1200task
 * [x] R10 (zybooks) 📅2024-02-14 #cs1200task
-* [ ] R11 (zybooks) 📅2024-02-16 #cs1200task
-* [ ] R12 (zybooks) 📅2024-02-21 #cs1200task
+* [x] R11 (zybooks) 📅2024-02-16 #cs1200task
+* [x] R12 (zybooks) 📅2024-02-21 #cs1200task
 * [ ] R13 (zybooks) 📅2024-02-23 #cs1200task
 * [ ] R14 (zybooks) 📅2024-02-26 #cs1200task
 * [ ] R15 (zybooks) 📅2024-02-28 #cs1200task

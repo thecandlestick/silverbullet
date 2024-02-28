@@ -7,6 +7,6 @@ void LinkedList<T>::insert(LinkedListIterator<T> it, const T& value)
   tmp -> next = it -> next;
   it -> data = value; // store val in node
   it -> next = tmp; // redirect it->next
-  size++; // increment num_elems/size
+  num_elems++; // increment num_elems/size
 }
 ```

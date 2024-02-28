@@ -11,7 +11,7 @@ void LinkedList<T>::clear()  //useful aux. function to have
     tmp = head -> next;
   }
 
-  size = 0;
+  num_elems = 0;
 }
 
 template <typename T>

@@ -12,6 +12,6 @@ class LinkedList
 {
   private:
     ListNode<T> *head;  // ptr to first node
-    int size;
+    int num_elems;
 };
 ```

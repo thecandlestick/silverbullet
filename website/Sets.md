@@ -217,7 +217,7 @@ _hint: Quotient-remainder theorem_
 
 #Definition For elements **a** and **b**, the set **{{a},{a,b}}**, also denoted **(a,b)**, is the **ordered pair** where **a** is the _first element_ and **b** is the _second element_
 
-Two _ordered pairs_, **(a,b)** and **(c,d)**, are _equal_ if and only if **a = c** and **c = d**
+Two _ordered pairs_, **(a,b)** and **(c,d)**, are _equal_ if and only if **a = c** and **b = d**
 
 This concept of an ordered pair becomes very important as sets in general have no way of expressing an order to the elements within.
 

@@ -35,8 +35,8 @@ Zybooks Assignments:
 * [x] R12 (zybooks) 📅2024-02-21 #cs1200task
 * [x] R13 (zybooks) 📅2024-02-23 #cs1200task
 * [x] R14 (zybooks) 📅2024-02-26 #cs1200task
-* [ ] R15 (zybooks) 📅2024-02-28 #cs1200task
-* [ ] R16 (zybooks) 📅2024-03-01 #cs1200task
+* [x] R15 (zybooks) 📅2024-02-28 #cs1200task
+* [x] R16 (zybooks) 📅2024-03-01 #cs1200task
 * [ ] R17 (zybooks) 📅2024-03-04 #cs1200task
 * [ ] R18 (zybooks) 📅2024-03-06 #cs1200task
 * [ ] R19 (zybooks) 📅2024-03-08 #cs1200task

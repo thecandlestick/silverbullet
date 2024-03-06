@@ -1,36 +1,29 @@
+#cs1575LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1575task
+where done = false
+render [[template/task]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1575 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
-tags: template
-trigger: complexity
----
 
-# Intro to Algorithm Complexity
-
-## Motivation
-
-Consider the following scenario: 
-You have access to two algorithms, Algo A and Algo B.
-
-Algo A and Algo B both produce identical outputs from identical inputs, and they are both always correct. How then can we compare these algorithms? Does it matter which one we choose?
-
-What differs between Algo A and Algo B?
-* Speed?
-* Memory Consumption?
-* What else?
-
-We need an objective way to take these characteristics and decide which algorithm is the _better method_ for our purposes.
-
----
-## Empirical vs. Analytical Testing
-
-Let’s focus on speed (or _time complexity_), but these techniques can be applied to practically anything.
-
-One approach that we could take is **empirical testing**, in terms of speed this could entail literally running the two algorithms and timing how long they take to complete. ⏱️
-
-In order to make this a fair and objective comparison, what factors would you need to hold constant?
-
-Some of these things aren’t so easy to ensure, and empirical testing in general is prone to producing biased results. **Analytical testing** gives us an often more useful method of ranking the two algorithms with mathematical certainty. To do so, we first need to convert the algorithms into functions representing their performance.
-
----
+# 
 ## Runtime Functions
 
 A **runtime function** is a function that, given the size of an input, approximates the number of _operations_ an algorithm will take to produce the output.
@@ -152,30 +145,3 @@ And from those theorems:
 * A polynomial of degree k is O( n^k )
 
 **Note: The theorems above also work for big-Θ**
-
----
-## Complexity & Data Structures
-
-For the following comparison, assume that both lists accept a ListIterator to access data with operations:
-* prev() - move to previous data element
-* next() - move to next data element
-* moveTo(i) - move to element i
-
-For get, insert, erase, assume that you have a valid ListIterator
-
-| Operation | ArrayList | LinkedList |
-|----------|----------|----------|
-| get | O(1) | O(1) |
-| prev | O(?) | O(?) |
-| next | O(?) | O(?) |
-| moveTo | O(?) | O(?) |
-| insert | O(?) | O(?) |
-| erase | O(?) | O(?) |
-
-
-What conclusions can you draw about which list to use?
-
-_KC:
-Fill in the table above for a Doubly-LinkedList. A Doubly-LinkedList uses nodes that store the memory address of the next and the previous node_
-
-

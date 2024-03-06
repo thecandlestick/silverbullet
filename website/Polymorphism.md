@@ -19,7 +19,9 @@ class 🐩 : public 🐶 {};
 
 int main()
 {
+
   🐶 *dog_ptr = new 🐩;  // What is the type of (*dog_ptr)?
+
 }
 ```
 

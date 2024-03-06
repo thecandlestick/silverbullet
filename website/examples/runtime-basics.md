@@ -1,12 +1,12 @@
 ```c++
 template <typename T>
-void ArrayList<T>::swap(int i, int j)
+void ArrayList<T>::switch_elem(int i, int j)
 {
-  T tmp = data[i];
-  data[i] = data[j];
-  data[j] = tmp;
+  T tmp = data[i];  // 2 ops
+  data[i] = data[j]; // 3 ops
+  data[j] = tmp; // 2 ops
 }
 
 How many operations?
-Tswap(n) = 
+Ts_e(n) = 7
 ```

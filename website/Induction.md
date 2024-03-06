@@ -153,4 +153,3 @@ For particularly challenging proofs, the assumption that P(k) is true may not ne
 P(a) \land P(a+1) \land ... \land P(k-1) \land P(k) \rightarrow P(k+1)
 ```
 
-Allowing 

@@ -2,7 +2,7 @@
 template <typename T>
 bool ArrayList<T>::find( const T &value )
 {
-  //     Init ; Test ; Update
+  //     Init ; Test ; Advance
   for(int k=0; k < num_elements; k++)
     if ( data[k] == value ) // Loop Body
       return true; 
@@ -11,7 +11,11 @@ bool ArrayList<T>::find( const T &value )
 }
 ```
 
-RTF : Init + Σ(Body + Test + Update) = ?
+let n be num_elements
+
+RTF : Init + Σ(Body + Test + Advance) = ?
+RTF : 1 + num_elements(2 + 1 + 1) = 4n + 1
+
 
 ```c++
 template <typename T>
@@ -20,15 +24,19 @@ ListNode<T>* LinkedList<T>::find( const T& value )
   ListNode<T> *p = head; // 1 op
   while( p -> next != nullptr )  // Test
   {  // Loop Body
-    if (value == p -> data )
+    if (value == p -> data ) //2
       return p;
-    p = p -> next;
+    p = p -> next; //2
   }
   return nullptr;
 }
 ```
 
-RTF : 1 + Σ(Body + Test) = ?
+let n = num_elements
+
+RTF : 1 + Σ(4 + 2) = 6n + 1
+
+
 
 ```c++
 int sum_sqrm(int a**, int n)  // return sum of n-by-n matrix
@@ -37,13 +45,13 @@ int sum_sqrm(int a**, int n)  // return sum of n-by-n matrix
   for (int k= 0; k < n; k++) // Outer Loop
   {
     for(int j=0; j < n; j++) // Inner Loop
-      sum = sum += a[k][j];
+      sum += a[k][j];
   }
   return sum;
 }
 ```
 
-Cost of Inner : ? + Σ(?) = ?
-Cost of Outer : ? + Σ(?) = ?
+Cost of Inner : 1 + n(1 + 1 + 3) = 5n + 1
+Cost of Outer : 1 + n(1 + 1 + (5n + 1)) = 5n^2 + 3n + 1
 
-RTF : 
+RTF :==5n^2 + 3n + 2==

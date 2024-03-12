@@ -1,3 +1,8 @@
+---
+tags: template
+trigger: linkedqueue
+---
+
 Consider the following queue:
 
   _front_ -> **< a0, a1, a2, ... , an >** <- back

@@ -17,7 +17,8 @@
 * [x] lists
 * [x] arraylist
 * [x] linkedlist
-* [ ] algorithm-complexity
+* [x] algorithm-complexity
+* [ ] stacks-and-queues
 
 ---
 # Schedule of Topics

@@ -1,6 +1,28 @@
----
-tags: template
-trigger: relations
+#cs1200LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1200|Home]] | [[CS1200 Calendar|Calendar]] | [[CS1200 Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1200task
+where done = false
+order by pos
+limit 4
+render [[template/topic]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1200 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
 
 # Relations
@@ -34,9 +56,11 @@ X \times Y = \{(2,2),(2,6),(2,8),\\
 \qquad \qquad \quad (4,2),(4,6),(4,8)\}
 ```
 
-Then **R** = { ? }
+Then **R** = { (2,2), (2,6), (2,8), (3,6), (4,8) }
 
-... And the inverse **R’** = **(y,x)** where _y is divisible by x_ = { ? }
+... And the inverse **R’** = **(y,x)** where _y is divisible by x_ 
+
+  = { (2,2), (6,2), (8,2), (6,3), (8,4) }
 
 **The _absolute value_ Relation**
 
@@ -135,89 +159,3 @@ x R y \Leftrightarrow 2|(x-y)
 ```
 
 #BoardQuestion Draw a graph with arrows indicating related elements
-
-_Extra example:_
-Let **B = {2,3,4,6,7,9}**
-Define relation **R** on **B** such that:
-```latex
-xRy \Leftrightarrow 3 \mid (x-y)
-```
-
-
-## Reflexivity
-
-#Definition A relation **R** on a set **A** is **reflexive** if and only if for all **x** in **A**, **x R x**
-```latex
-R\text{ is reflexive} \Leftrightarrow \forall x \in A, (x,x) \in R
-```
-
-Another way of wording this property is that in a _reflexive relation_, each element is related to itself.
-
-To demonstrate that a relation is not _reflexive_, you must find an element of **A** that is not related to itself.
-```latex
-R\text{ is not reflexive} \Leftrightarrow \exists x \in A \text{ such that } (x,x) \notin R
-```
-
-#DiscussionQuestion Is the following relation on the set of integers _reflexive_?
-```latex
-xRy \Leftrightarrow x \times y \text{ is positive}
-```
-
-## Symmetry
-
-#Definition A relation **R** on a set **A** is **symmetric** if and only if for all **x,y** in **A**, if **x R y** then **y R x**
-```latex
-R\text{ is symmetric} \Leftrightarrow \forall x,y \in A, (x,y) \in R \rightarrow (y,x) \in R
-```
-
-Another way of wording this property is that in a _symmetric relation_, if any one element is related to another, then the second element is also related to the first.
-
-To demonstrate that a relation is not _symmetric_, you must find two elements of **A** that violate this.
-```latex
-R\text{ is not symmetric} \Leftrightarrow \exists x,y \in A \text{ such that }(x,y) \in R \land (y,x) \notin R
-```
-
-#Definition A relation **R** on a set **A** is **anti-symmetric** if and only if for all **x,y** in **A**, if **x R y** and **y R x** then **x = y**
-
-Another way of wording this property is that the relation **R** has exactly zero _symmetric_ relationships
-
-#DiscussionQuestion Is the following relation on the set of reals _anti-symmetric_?
-```latex
-xRy \Leftrightarrow x \leq y
-```
-
-
-## Transitivity
-
-#Definition A relation **R** on a set **A** is **transitive** if and only if for all **x,y,z** in **A**, if **x R y** and **y R z** then **x R z**
-```latex
-R\text{ is transitive} \Leftrightarrow \forall x,y,z \in A, (x,y) \in R \land (y,z) \in R \rightarrow (x,z) \in R
-```
-
-Another way of wording this property is that in a _transitive relation_, If any one element is related to a second and that second element is related to a third, then the first element is also related to the third
-
-To demonstrate that a relation is not _transitive_ you must find three elements of **A** that violate this
-```latex
-R\text{ is not transitive} \Leftrightarrow \exist x,y,z \in A \text{ such that }(x,y) \in R \land (y,z) \in R \land (x,z) \notin R
-```
-
-
-#DiscussionQuestion Let **A = {0,1,2,3}** and 
-**R = {(0,0),(0,1),(0,3),(1,0),(1,1),(2,2),(3,0),(3,3)}**
-* Is **R** _reflexive_? yes
-* Is **R** _symmetric_? yes
-* Is **R** _transitive_? no
-
-Let **R** be a relation on the set of reals such that
-```latex
-xRz \Leftrightarrow x \leq z
-```
-* Is **R** _reflexive_? yes
-* Is **R** _symmetric_? no 
-* Is **R** _transitive_? yes
-
-
-#KnowledgeCheck Let **A = {0,1,2,3}** and **S = {(0,0),(0,2),(0,3),(2,3)}**
-* Is **S** _reflexive_?
-* Is **S** _symmetric_?
-* Is **S** _transitive_?

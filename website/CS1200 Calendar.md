@@ -9,8 +9,8 @@
 
 * [x] sequences
 * [x] induction
-* [ ] set-theory
-* [ ] functions
+* [x] set-theory
+* [x] functions
 * [ ] relations
 **Exam 2**
 
@@ -37,9 +37,9 @@ Zybooks Assignments:
 * [x] R14 (zybooks) 📅2024-02-26 #cs1200task
 * [x] R15 (zybooks) 📅2024-02-28 #cs1200task
 * [x] R16 (zybooks) 📅2024-03-01 #cs1200task
-* [ ] R17 (zybooks) 📅2024-03-04 #cs1200task
-* [ ] R18 (zybooks) 📅2024-03-06 #cs1200task
-* [ ] R19 (zybooks) 📅2024-03-08 #cs1200task
+* [x] R17 (zybooks) 📅2024-03-04 #cs1200task
+* [x] R18 (zybooks) 📅2024-03-06 #cs1200task
+* [x] R19 (zybooks) 📅2024-03-08 #cs1200task
 * [ ] R20 (zybooks) 📅2024-03-11 #cs1200task
 * [ ] R21 (zybooks) 📅2024-03-18 #cs1200task
 * [ ] R22 (zybooks) 📅2024-03-20 #cs1200task

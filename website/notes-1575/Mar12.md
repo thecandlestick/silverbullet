@@ -1,6 +1,26 @@
----
-tags: template
-trigger: stack-queue
+#cs1575LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1575task
+where done = false
+render [[template/task]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1575 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
 
 In this section we’ll see how some limited, minimal data structures can still be a powerful tool. We’ll also see how having fewer operations can lead to enhanced performance through clever engineering
@@ -65,8 +85,8 @@ void foo()
 int main()
 {
   int x = 1;
-  foo();
-  foo();
+  foo(); 
+  foo(); 
   bar();
 
   return 0;
@@ -87,6 +107,8 @@ CS = [  ]
 [[ArrayStack]]
 [[LinkedStack]]
 
+
+
 ---
 
 # Queues
@@ -99,15 +121,15 @@ One end of the sequence is designated as the _front_, the other is the _back_. A
 
 ### Operations:
 
-_Let Q1 = < a, o, e, u, i >_
+_Let Q1 = **front** -> < a, o, e, u, i >_ <- **back**
 * front(Q) -> the front element of Q
-  * front(Q1) -> ?
+  * front(Q1) -> a
     
 * enqueue(Q, x) -> Q’ with new back element, x
-  * enqueue(Q1, y) -> ?
+  * enqueue(Q1, y) -> < a, o, e, u, i, y >
     
 * dequeue(Q) -> Q’ with front element removed
-  * dequeue(Q1) -> ?
+  * dequeue(Q1) -> < o, e, u, i >
 
 ## Applications for Queues
 
@@ -120,3 +142,50 @@ _Let Q1 = < a, o, e, u, i >_
 
 [[ArrayQueue]]
 [[LinkedQueue]]
+
+Consider the following queue:
+
+  _front_ -> **< a0, a1, a2, ... , an >** <- _back_
+
+Can [[ArrayList]] operations efficiently implement _front, enqueue, dequeue?_ 
+
+![ArrayList diagram](img/arrlist-diagram.png)
+
+How might we re-engineer the ArrayQueue to make all 3 operations into constant-time algorithms?
+
+  _front / head_ -> **< a0, a1, a2, ... , an >** <- _back / tail_ 
+
+Offers quick enqueue operations, but dequeue requires shifting elements... _or does it..._ enter the _circular array_
+
+[[examples/arrayqueue-class]]
+<!-- #include [[examples/arrayqueue-class]] -->
+```c++
+#define MIN_CAPACITY 4
+template <typename T>
+class ArrayQueue
+{
+  private:
+    int m_front;      // index-of start of valid data
+    int m_back;       // index-of next available space   
+    int m_capacity;   // length of storage array
+    int m_size;       // # of valid data elements
+    T *m_data;        // pointer to storage array
+    void resize(int new_capacity);
+  public:
+    ArrayList() : m_front (0), m_back (0), m_capacity (MIN_CAPACITY) 
+                { m_data = new T[m_capacity]; } // default constructor
+
+    //OPERATIONS
+    T& top();
+    void enqueue(const T& value);
+    void dequeue();
+};
+```
+<!-- /include -->
+
+
+[Visualization](https://www.cs.usfca.edu/~galles/visualization/QueueArray.html)
+
+
+[[examples/arrayqueue-ops]]
+

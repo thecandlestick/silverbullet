@@ -25,7 +25,7 @@ render [[template/topic]]
 ```
 ---
 
-* [ ] inductive proofs (6pm)  📅2024-03-06 #cs1200task
+* [x] inductive proofs (6pm)  📅2024-03-06 #cs1200task
 
 # Functions
 

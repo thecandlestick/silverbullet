@@ -99,12 +99,14 @@ This would correspond to the table:
 
 | ID | Name | Grad-Year | Major |
 |----------|----------|----------|----------|
+| ... | ... | SP 24 | ... |
 | 00000001 | Joe Miner | SP 24 | Mining Engineering |
 | 12876543 | Joe Schmo | SP 24 | Applied Mathematics |
 | 12812096 | Joe Dirt | SP 24 | Mechanical Engineering |
 | 12833378 | Joe Mama | SP 24 | Computer Science |
 | 18097865 | Joe King | SP 24 | Computer Engineering |
 | 18001239 | Joe Joestar | SP 24 | Biology |
+| ... | ... | SP 24 | ... |
 
 Now take the _intersection_ of **R** and **Q**. This result will contain only elements from the original set **R** where _Grad-Year = SP 24_
 
@@ -221,3 +223,146 @@ xRz \Leftrightarrow x \leq z
 * Is **S** _reflexive_?
 * Is **S** _symmetric_?
 * Is **S** _transitive_?
+
+### Transitive Closure
+
+#Definition Let **R** be a relation on a set **A**, the **Transitive Closure** of **R** is the relation on **A** that satisfies the following:
+```latex
+R^t \text{ is transitive}\\
+R \subseteq R^t\\
+\text{If }S\text{ is any other transitive relation that contains }R\text{, then }R^t \subseteq S
+```
+
+Another way of wording this is that the _transitive closure_ is the relation with the minimum number of additional elements to convert **R** into a _transitive_ relation
+
+#BoardQuestion
+Let **A = {0,1,2,3}** and **R = {(0,1),(1,2),(2,3)}**
+Graph the _transitive closure_ of **R**
+
+# Equivalence Relations
+
+#Definition Let **R** be a relation on a set **A**. **R** is an **equivalence relation** if and only if **R** is _reflexive, symmetric,_ and _transitive_
+
+_example:_
+Let **A** be a set with partition **{A_0, A_1, ..., A_n}** and let **R** be a relation on **A** such that:
+```latex
+xRy \Leftrightarrow \exists A_i \text{ such that }x,y \in A_i
+```
+
+This relation has a special name. It is the **relation induced by the partition** given.
+
+If we let **A = {0,1,2,3,4}** and consider the partition **{{0,3,4},{1},{2}}**, then the _relation induced by the partition_ is 
+
+**R = {(0,0), (0,3), (0,4), (1,1), (2,2), (3,0), (3,3), (3,4), (4,0), (4,3), (4,4)}**
+
+#DiscussionQuestion Is **R** an _equivalence relation_? Is this the same for all _relations induced by partitions_?
+
+## Equivalence Classes
+
+#Definition Suppose **R** is a relation on a set **A**. For each element **a** in **A**, the **equivalence class** of **a**, denoted [a], is the set of all elements **x** in **A** such that **x** is related to **a** by **R**  
+```latex
+[a] = \{x\in A\mid xRa\}
+```
+
+In general, a relation **R** has as many _equivalence classes_ as there are elements in **A**. Oftentimes, however, we are concerned only with the **distinct equivalence classes** of **R**. That is, all possible sets representing an _equivalence class_ but not tied to a particular element in **A**
+
+_example:_
+Let **A = {{1},{2},{3},{1,2},{1,3},{2,3},{1,2,3}}**
+Define a relation **R** on **A** such that:
+```latex
+aRb \Leftrightarrow \text{least element in }a = \text{ least element in }b
+```
+
+Then **R = {({1},{1}), ({1},{1,2}), ({1,2},{1}), ({1},{1,3}), 
+({1,3},{1}), ({1},{1,2,3}), ({1,2,3},{1}), ({1,2},{1,3}), 
+({1,3},{1,2}), ({1,2},{1,2,3}), ({1,2,3},{1,2}), ({1,3},{1,2,3}), ({1,2,3},{1,3}), ({2},{2,3}), ({2,3},{2})}**
+
+List the following _equivalence classes_:
+* [{1}] = {{1}, {1,2}, {1,3}, {1,2,3}} **({1,2},{1})**
+* [{2}] = {{2}, {2,3}}
+* [{3}] = {{3}}
+
+### Properties of Equivalence Classes
+
+#Theorem The following statements are true of all _equivalence relations_ **R** on a set **A**
+
+```latex
+\text{If }aRb, \text{ then }[a] = [b]
+```
+
+```latex
+\text{If }a,b \in A,\text{ then either } [a] \cap [b] = \emptyset \text{ or }[a] = [b]
+```
+
+```latex
+\{[a] \mid a \in A\} \text{ is a partition of A}
+```
+
+#DiscussionQuestion Think carefully about the definition of _reflexive, symmetric, and transitive_. Do they provide some intuition on why the theorems above are true?
+
+## Congruence & Modulo
+
+Consider a relation **R** defined on the set of integers such that:
+```latex
+mRn \Leftrightarrow k|(m-n)
+```
+where **k** is some positive integer
+
+This relation is known as **congruence modulo k** due to the fact that it possesses the property that any two integers **m,n** are related if and only if **m _mod_ k = n _mod_ k = 0**.
+
+* Is _congruence modulo k_ a _reflexive_ relation?
+
+```latex
+mRm \Leftrightarrow k|(m-m)\\
+\Leftrightarrow k|0\\
+\Leftrightarrow \exists i \in \Z \text{ such that } i\times k = 0
+```
+
+Regardless of the choice of **m** or **k**, it is clear to see that the choice of **i = 0** demonstrates that **R** is _reflexive_
+
+* Is _congruence modulo k_ a _symmetric_ relation?
+
+```latex
+\text{Suppose }mRn \Leftrightarrow \exists i \in \Z \text{ such that }i \times k = (m - n)\\
+\Leftrightarrow i = \frac{m-n}{k} \text{ is an integer}\\
+\text{Now consider the symmetric relationship }nRm \Leftrightarrow \exists j \in \Z \text{ such that }j \times k = (n - m)\\
+\text{Let }j = -i, \text{ then }j \times k = -i \times k\\
+ = -(\frac{m-n}{k})k = \frac{n-m}{k}k = (n-m)  
+```
+
+Therefore, regardless of the choice of **m,n,k**. We can select **i,j** to demonstrate that **R** is _symmetric_
+
+* Is _congruence modulo k_ a _transitive_ relation?
+
+Using the property:
+```latex
+mRn \Leftrightarrow m \% k = n \% k = 0
+```
+
+We can see that,
+```latex
+mRn \land nRw \Leftrightarrow (m \% k = n \% k = 0) \land (n \% k = w \% k = 0)\\
+ \Leftrightarrow m \% k = n \% k = w \% k = 0 
+```
+
+And by specification,
+```latex
+m \% k = w \% k = 0 \Leftrightarrow mRw
+```
+
+Therefore, regardless of the choice of **m,n,w**, the properties of _congruence modulo k_ dictate that it must be _transitive_
+
+#DiscussionQuestion What are the _distinct equivalence classes_ of _congruence modulo 3_?
+
+```latex
+mRn \Leftrightarrow 3|(m-n)\\
+
+[a] = \{x \in \Z \mid xRa\} = \{x \in \Z \mid 3|(x-a)\} = \{x \in \Z \mid \exists k \in \Z \text{ such that } 3k = x-a\} = \{x \in \Z \mid \exists k \in \Z \text{ such that } x = 3k+a\}\\
+[0] = \{x \in \Z \mid \exists k \in \Z \text{ such that } x = 3k+0\}\\
+[1] = \{x \in \Z \mid \exists k \in \Z \text{ such that } x = 3k+1\}\\
+[2] = \{x \in \Z \mid \exists k \in \Z \text{ such that } x = 3k+2\}\\
+[3] = \{x \in \Z \mid \exists k \in \Z \text{ such that } x = 3k+3\}\\
+...
+```
+
+dl

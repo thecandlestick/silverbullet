@@ -12,6 +12,7 @@
 * [x] set-theory
 * [x] functions
 * [ ] relations
+* [ ] partial-order
 **Exam 2**
 
 * [ ] counting-and-probability
@@ -40,7 +41,7 @@ Zybooks Assignments:
 * [x] R17 (zybooks) 📅2024-03-04 #cs1200task
 * [x] R18 (zybooks) 📅2024-03-06 #cs1200task
 * [x] R19 (zybooks) 📅2024-03-08 #cs1200task
-* [ ] R20 (zybooks) 📅2024-03-11 #cs1200task
+* [x] R20 (zybooks) 📅2024-03-11 #cs1200task
 * [ ] R21 (zybooks) 📅2024-03-18 #cs1200task
 * [ ] R22 (zybooks) 📅2024-03-20 #cs1200task
 * [ ] R23 (zybooks) 📅2024-04-01 #cs1200task

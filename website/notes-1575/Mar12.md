@@ -79,15 +79,15 @@ void bar()
 void foo()
 {
   int y = 2;
-  bar();
+  bar(); // (2)
 }
 
 int main()
 {
   int x = 1;
-  foo(); 
-  foo(); 
-  bar();
+  foo(); // (1)
+  foo(); // (3)
+  bar(); // (4)
 
   return 0;
 }

@@ -87,7 +87,7 @@ We can also think of execution with some helpful rules-of-thumb:
 * Code _before_ a recursive call will resolve before anything else
 * Code _after_ a recursive call will resolve only **after all recursive calls** have returned. This means that the return statement of the _initial_ call is actually be the _last_ to be executed.
 
-_KC: Trace the execution of recursive_pow(2,65), how many total multiplications occur across all recursive calls? (do not try to calculate the value, just count the number of * operations)_
+#KnowledgeCheck Trace the execution of recursive_pow(2,65), how many total multiplications occur across all recursive calls? (do not try to calculate the value, just count the number of * operations)
 
 ---
 # Classifying Recursion

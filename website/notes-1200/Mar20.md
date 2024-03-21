@@ -1,6 +1,28 @@
----
-tags: template
-trigger: partial-order
+#cs1200LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1200|Home]] | [[CS1200 Calendar|Calendar]] | [[CS1200 Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1200task
+where done = false
+order by pos
+limit 4
+render [[template/topic]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1200 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
 
 # Partial Order Relations
@@ -160,6 +182,8 @@ Element **a** is the **Minimal element** if and only if
 
 In general, partial order relations can have at most one _greatest_ or _least_ element. When it comes to _maximal_ and _minimal_ elements, however, a single partial order relation can have multiple.
 
+![](img/hasse-subset.png)
+
 #DiscussionQuestion Consider the Hasse diagram of the _Subset_ relation on the powerset of **{a,b,c}**.
 * Which elements (if any) are the _greatest element(s)_?
 * Which elements (if any) are the _least element(s)_?
@@ -192,4 +216,11 @@ We will define a _topological sorting_, **R’**
 
 ---
 #BoardQuestion Perform the algorithm above using the Hasse diagram below
-![](img/hasse-cs-courses.png)
+![](../img/hasse-cs-courses.png)
+
+1. **Select any minimal element x in A**
+2. **Let A’ := A - {x}** _(remove x from A)_
+3. **Repeat steps 4-6 while A’ is _nonempty_**
+  4. **Select any minimal element y in A**
+  5. **Define x R’ y**
+  6. **Set A’ = A’ - {y} and x = y**

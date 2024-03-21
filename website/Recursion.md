@@ -1,3 +1,7 @@
+---
+tags: template
+trigger: recursion
+---
 
 # What is Recursion
 

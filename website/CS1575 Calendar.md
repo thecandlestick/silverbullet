@@ -19,6 +19,8 @@
 * [x] linkedlist
 * [x] algorithm-complexity
 * [ ] stacks-and-queues
+* [ ] recursion
+
 
 ---
 # Schedule of Topics

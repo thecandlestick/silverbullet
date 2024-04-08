@@ -1,11 +1,12 @@
 ```c++
 LinkedList<T>* LinkedList<T>::find(const T& value)
 {
-  if (m_data == value)
+  if (data == value)
     return this;
-  if (m_next == nullptr)
+  if (next == nullptr)
     return nullptr;
 
-  return m_next->find(value);
+  return next->find(value);
+  //(*next).find(value);
 }
 ```

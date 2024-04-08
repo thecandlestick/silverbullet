@@ -1,3 +1,7 @@
+---
+tags: template
+trigger: bst
+---
 
 # Binary Search Trees
 
@@ -85,4 +89,4 @@ O(height) = O(?), where n is the number of nodes.
 
 When operating on a BST in a data structure, we have the opportunity to strategically add and remove nodes in a way that will maintain the balance of the tree. There are many methods of building these _self-balancing_ trees (scapegoat trees, treaps, Red-Black Trees, AVL trees, etc.). We will therefore make the assumption of a roughly balanced tree when utilizing a BST in our data structures.
 
-[[Honors Project]]
+[[Honors Project - Self Balancing BST]]

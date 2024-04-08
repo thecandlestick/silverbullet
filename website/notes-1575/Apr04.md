@@ -1,7 +1,87 @@
+#cs1575LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1575task
+where done = false
+render [[template/task]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1575 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
-tags: template
-trigger: trees
+
+
 ---
+# Recursive Backtracking
+
+Another interesting use for recursion is for solving multi-step problems via systematically _guessing_ the right answer for each step and _backtracking_ to a previous step when it becomes clear that a mistake has been made. While this approach is not always the most efficient approach, it is still a clever improvement over blindly _brute-forcing_ a solution as it can allow us to avoid testing combinations of steps that we know won’t lead to the solution.
+
+It relates to the classic problem-solving technique _Trial-and-Error_ and can be applied to puzzles, mazes, decision-making games, and more! A classic example of a game where recursive backtracking is applied is the _n-Queens_ problem.
+
+The **N-Queens problem** is as follows:
+  _Given a n-by-n chessboard, place n queen pieces such that no two queens can attack each other_
+
+Pseudocode for the _n-Queens_ problem:
+```
+1. try-queen(int row):
+2.   int col <- first valid column
+3.   while valid columns remaining
+4.     place i-th queen at `col`
+5.     if no more queens
+6.       return success
+7.     trial <- try-queen(i+1)
+8.     if trial is success
+9.       return success
+10.     else
+11.       retract i-th queen placement
+12.      col <- next valid column
+13.   return failure
+```
+
+Try to follow the algorithm yourself [here](http://eightqueen.becher-sundstroem.de/). Visualize each row as it’s own recursive function call and picture the call stack as you go.
+
+**General recursive backtracking blueprint**
+
+```c++
+bool solve()
+{
+
+  if finished // check base case
+    return true // success!
+  
+  possible_moves = {move1, move2, ..., moveN}
+
+  for move in possible_moves // exhaust all valid options
+  {
+    if valid(move)
+    {
+      select(move)
+      found_solution = solve() // continue to next step
+      if found_solution
+        return true // future moves were successful!
+      else
+        undo(move) // current move led to dead end ☠️
+     }
+   } 
+
+  // If here, no moves were valid/successful
+  return false; // dead end
+    
+}
+```
 
 Trees are a very special mathematical object that have inspired many data structures and algorithms. Trees appear all throughout the field of computer science in the most unexpected of places.
 
@@ -18,7 +98,7 @@ Trees consist of **nodes** and **edges**. Nodes represent individual elements an
   * A tree with _n_ nodes has exactly _n-1_ edges
 * A node with no children is called a **leaf**
 
-![](img%2Ftree-terminology.png)
+![](../img%2Ftree-terminology.png)
 
 * The **degree** of a node is the number of children that it has
 * The **degree** of a tree is the highest degree of any node
@@ -38,20 +118,20 @@ For any given node _N_
 
 There are many ways of defining the properties of Trees, but for this class we are most interested in their _recursive_ structure.
 
-  * a single node is a tree
+  * a single node is a tree (base case)
   * two trees joined by a single edge is also a tree
 
-What does this tell us? _Any_ node in a tree forms a **sub-tree** with its descendants... recursion ensues!
+What does this tell us? ==_Any_ node in a tree forms a **sub-tree** with its descendants==... recursion ensues!
 
 # Applications for Trees
 
 **Expression trees**
 
-![](img/expression-tree.png)
+![](../img/expression-tree.png)
 
 **File systems**
 
-![](img%2Fdirectory-tree.png)
+![](../img%2Fdirectory-tree.png)
 
 **Data structures & Algorithms!**
 
@@ -82,3 +162,14 @@ A tree for optimizing _search/find_ operations
 
 A tree for optimizing _getMax/getMin_ operations
 [[Heaps]]
+
+* cody peters
+* kush solanki
+* john wheeler
+* edward hett
+* kayla barret
+* saif shaffie
+* connor peterson
+* hayden joyce
+* trevor davis
+* xavier

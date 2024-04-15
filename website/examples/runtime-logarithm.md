@@ -1,4 +1,4 @@
-![](img%2FBinarySearch.png)
+![](../img%2FBinarySearch.png)
 ```c++
 bool binarySearch(int A*, int n, int x) //find x in array A of size n
 {

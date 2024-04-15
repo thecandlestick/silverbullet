@@ -1,3 +1,7 @@
+---
+tags: template
+trigger: map
+---
 
 # The Map Abstract Data Type
 

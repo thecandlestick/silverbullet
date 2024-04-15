@@ -19,7 +19,11 @@
 * [x] linkedlist
 * [x] algorithm-complexity
 * [x] stacks-and-queues
-* [ ] recursion
+* [x] recursion
+* [x] trees
+* [ ] BST
+* [ ] maps
+* [ ] treemap
 
 
 ---

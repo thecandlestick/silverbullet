@@ -162,14 +162,3 @@ A tree for optimizing _search/find_ operations
 
 A tree for optimizing _getMax/getMin_ operations
 [[Heaps]]
-
-* cody peters
-* kush solanki
-* john wheeler
-* edward hett
-* kayla barret
-* saif shaffie
-* connor peterson
-* hayden joyce
-* trevor davis
-* xavier

@@ -1,7 +1,56 @@
+#cs1575LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1575task
+where done = false
+render [[template/task]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1575 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
-tags: template
-trigger: bst
----
+
+* [ ] PA04  📅2024-04-12 #cs1575task
+
+# Trees and Data Structures
+
+Instead of a _linear ordering_ of the data like that of the _sequence-based_ abstract data types we’ve seen before (stack, queue, list), tree-based ADT make use of a _hierarchical_ relationship. 
+
+It is common to define a general-purpose _Tree_ Abstract Data Type for interacting with data that has an inherent hierarchical structure (see: Applications for Trees). For this course, however, we will focus on _Tree-inspired_ ADT and Data Structures that can be applied to any collection of data but utilize a hierarchy for efficiency purposes
+
+## Working with unordered data
+
+Because there is no linear ordering to a tree, we need to devise algorithms for _enumerating_ the data whenever we want to traverse through it. There are a number of ways to do this and each one gives us a different _order_. 
+
+[[examples/pre-order-traversal]]
+
+
+[[examples/post-order-traversal]]
+
+
+You can experiment with these algorithms for binary trees [here](https://tree-visualizer.netlify.app/)
+
+## Special Trees
+
+A tree for optimizing _search/find_ operations
+[[BST]]
+
+A tree for optimizing _getMax/getMin_ operations
+[[Heaps]]
+
 
 # Binary Search Trees
 
@@ -18,15 +67,15 @@ A BST is a **binary tree** that possesses the **search property**
 
 _#KnowledgeCheck: Which of the following are valid Binary Search Trees?_
 
-![](img%2Ftree1.png)
+![](../img%2Ftree1.png)
 
 ---
 
-![](img%2Ftree2.png)
+![](../img%2Ftree2.png)
 
 ---
 
-![](img%2Ftree3.png)
+![](../img%2Ftree3.png)
 
 The primary benefit of designing data structures that maintain these properties is that it allows for efficient searching of the data by use of the [[examples/runtime-logarithm|Binary Search]] algorithm.
 
@@ -79,10 +128,10 @@ A similar argument can be made for removal of nodes in a BST. We must first find
 
 The height of our tree plays a key role in the efficiency of our operations, and the height of a tree is correlated with how _balanced_ it is (the difference in size of its sub-trees).
 
-![](img%2Fdegen-tree.png)
+![](../img%2Fdegen-tree.png)
 For a _degenerate_ BST like the one above, the cost of search is O(height) = O(n), where n is the number of nodes.
 
-![](img%2Fbalanced-tree.png)
+![](../img%2Fbalanced-tree.png)
 For a _perfect_ BST like the one above, the cost of search is
 O(height) = O(?), where n is the number of nodes.
 
@@ -97,3 +146,11 @@ O(height) = O(?), where n is the number of nodes.
 When operating on a BST in a data structure, we have the opportunity to strategically add and remove nodes in a way that will maintain the balance of the tree. There are many methods of building these _self-balancing_ trees (scapegoat trees, treaps, Red-Black Trees, AVL trees, etc.). We will therefore make the assumption of a roughly balanced tree when utilizing a BST in our data structures.
 
 [[Honors Project - Self Balancing BST]]
+
+# The Map Abstract Data Type
+
+A Map is an _unordered collection(set)_ of pairs. Each pair consists of a **key** and a **value**. 
+
+{ <key1, val1>, <key2, val2>, ... , <keyn, valn> }
+
+Keys in a Map must be _unique_ so that no two pairs have the same _key_, but there is no such restriction on _values_.

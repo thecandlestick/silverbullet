@@ -1,9 +1,15 @@
+---
+tags: template
+trigger: treemap
+---
+
 # TreeMap Class & Diagram
 
 [[examples/treemap-class]]
 
 
 ![](img%2Ftreemap-diagram.png)
+
 
 
 ---

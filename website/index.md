@@ -1,5 +1,4 @@
    
-
 Here you can find course material, syllabi, lecture notes, upcoming assignments, and more! Powered by the free and open-source [Silverbullet](https://silverbullet.md)
 
 # Course Hubs

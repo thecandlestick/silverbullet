@@ -15,7 +15,7 @@
 * [x] partial-order
 **Exam 2**
 
-* [ ] counting-and-probability
+* [x] counting-and-probability
 * [ ] graph-theory
 * Bonus Topics
 **Exam 3**
@@ -45,11 +45,11 @@ Zybooks Assignments:
 * [x] R21 (zybooks) 📅2024-03-18 #cs1200task
 * [x] R22 (zybooks) 📅2024-03-20 #cs1200task
 * [x] R23 (zybooks) 📅2024-04-01 #cs1200task
-* [ ] R24 (zybooks) 📅2024-04-05 #cs1200task
-* [ ] R25 (zybooks) 📅2024-04-08 #cs1200task
-* [ ] R26 (zybooks) 📅2024-04-10 #cs1200task
-* [ ] R27 (zybooks) 📅2024-04-12 #cs1200task
-* [ ] R28 (zybooks) 📅2024-04-15 #cs1200task
+* [x] R24 (zybooks) 📅2024-04-05 #cs1200task
+* [x] R25 (zybooks) 📅2024-04-08 #cs1200task
+* [x] R26 (zybooks) 📅2024-04-10 #cs1200task
+* [x] R27 (zybooks) 📅2024-04-12 #cs1200task
+* [x] R28 (zybooks) 📅2024-04-15 #cs1200task
 * [ ] R29 (zybooks) 📅2024-04-17 #cs1200task
 * [ ] R30 (zybooks) 📅2024-04-19 #cs1200task
 * [ ] R31 (zybooks) 📅2024-04-22 #cs1200task

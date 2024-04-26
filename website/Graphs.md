@@ -108,14 +108,7 @@ A Graph is a pair of sets _G = <V, E>_. V is the set of _vertices_ (or nodes), E
 Anything you can imagine! With a bit of creativity, you can see the world through the abstract lens of graphs. Graphs differ slightly from some of the other data structures we’ve seen, as they are most often used to support a problem-solving _algorithm_ rather than simply providing fast and efficient operations on arbitrary data.
 
 Modeling:
-* Communication in computer networks
-* Optimal traveling on real world roads
-* Social networks
-* Circuit design
-* Outbreak of disease
-* Traffic flow in transportation networks
-* Possible decision-making routes to goal condition
-* _and more!_
+
 
 Some classics:
 * [Seven-Bridges of Königsberg](https://en.wikipedia.org/wiki/Seven_Bridges_of_K%C3%B6nigsberg)

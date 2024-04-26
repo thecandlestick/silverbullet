@@ -1,7 +1,11 @@
+---
+tags: template
+trigger: priority-queue
+---
 
 # The Priority Queue Abstract Data Type
 
-A Prioriry Queue is a collection of data, together with a _function_ mapping each element to its _priority_.
+A Priority Queue is a collection of data, together with a _function_ mapping each element to its _priority_.
 
 { <val1>, <val2>, ... , <val_n> }
 

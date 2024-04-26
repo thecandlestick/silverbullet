@@ -9,7 +9,5 @@ void MaxBinaryHeap<T>::pop()
   num_elems--; // Remove last element
   siftdown(0); // Restore heap property
 
-  if (num_elems < max_elems / 4)
-    shrink_to_fit();
 }
 ```

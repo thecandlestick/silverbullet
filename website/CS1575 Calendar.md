@@ -21,10 +21,11 @@
 * [x] stacks-and-queues
 * [x] recursion
 * [x] trees
-* [ ] BST
-* [ ] maps
-* [ ] treemap
-
+* [x] BST
+* [x] maps
+* [x] treemap
+* [ ] priority-queue
+* [ ] heaps
 
 ---
 # Schedule of Topics

@@ -1,3 +1,7 @@
+---
+tags: template
+trigger: binary-heap
+---
 
 # Class & Diagram
 
@@ -19,6 +23,9 @@ class MaxBinaryHeap : public ArrayList<T>
 
 
 The fast random-access provided by an [[ArrayList]] is sufficient for implementing a heap/priority-queue.
+
+_Note:_
+In the c++ standard library, inheritance is not used to create a priority queue from existing structures. A concept known as _adapters_ are used instead. See https://en.cppreference.com/w/cpp/container for reference
 
 ---
 # Operations

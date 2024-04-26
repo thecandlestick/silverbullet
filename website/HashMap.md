@@ -1,7 +1,11 @@
+---
+tags: template
+trigger: hashmap
+---
 
 We’ve seen how to implement a map that runs in logarithmic-time as a [[TreeMap]]. This already scales extremely well, but can we do even better?
 
-The _Hash Map_ (or _Hash Table_) is one of the most widely used data structures in existence, as it offers the unique ability to perform constant-time lookup of the data (in the average case). This means that regardless of the size of your collection, a _find_ operation will take (roughly) the same amount of time!
+The _Hash Map_ (or _Hash Table_) is one of the most widely used data structures, as it offers the unique ability to perform constant-time lookup of the data (in the average case). This means that regardless of the size of your collection, a _find_ operation will take (roughly) the same amount of time!
 
 How will we achieve this best-possible speed? Trade-offs, of course!
 
@@ -81,7 +85,7 @@ There are two basics strategies to follow in the event of a collision. In either
 
 ### Open Hashing (chaining)
 
-In _open hashing_, a collision results in one of the two values being stored outside of the table. Each entry in the hash table is then a linked list of values, and lookup/insertion may involve searching through two or more nodes to find the desired _record_.
+In _open hashing_, a collision results in one of the two values being stored outside of the table. Each entry in the hash table is then a linked list of values, and lookup/insertion may involve searching through multiple nodes to find the desired _record_.
 
 ![](img%2FOpenHash.gif)_KC: What is the worst-case time complexity for finding a key in a hash map using open hashing?_
 

@@ -16,9 +16,10 @@ void TreeMap<K,V>::erase_helper(MapNode<K,V> *&root, const K &erase_key)
   
     /// Degree 0 ///
     if (root->m_left == nullptr && root->m_right == nullptr)
+    {
       delete root;
       root = nullptr;
-  
+    }
     /// Degree 1 ///
     else if (root->m_left == nullptr)
     {

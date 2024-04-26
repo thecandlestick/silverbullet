@@ -6,16 +6,18 @@ void MaxBinaryHeap<T>::push(const T& val)
     reserve(max_elems*2);
 
   data[num_elems] = val; // start val at first-available space 
-  int curr = num_elems;
+  int c_index = num_elems;
   T temp;
-  while(curr > 0 && (data[curr] > data[(curr - 1) / 2]))
+  while(c_index > 0 && (data[c_index] > data[(c_index - 1) / 2]))
   // sift-up to restore heap-property
   {
-      temp = data[curr];
-      data[curr] = data[(curr - 1) / 2];
-      data[(curr - 1) / 2] = temp;
-      curr = (curr-1)/2;
+      temp = data[c_index];
+      data[c_index] = data[(c_index - 1) / 2];
+      data[(c_index - 1) / 2] = temp;
+      
+      c_index = (c_index - 1)/2;
   }
   num_elems++;
+  
 }
 ```

@@ -1,3 +1,7 @@
+---
+tags: template
+trigger: heaps
+---
 
 # Properties of Heaps
 
@@ -9,7 +13,7 @@ The **min-heap property** means that given any node _N_ in the tree, _N_ is _les
 
 The **max-heap property** means that given any node _N_ in the tree, _N_ is _greater than_ all of its descendants. In a max-heap, the root node is the maximum element.
 
-KC: Which of the following are valid heaps?
+#KnowledgeCheck: Which of the following are valid heaps?
 
 ![](img/balanced-tree.png)
 
@@ -18,13 +22,10 @@ KC: Which of the following are valid heaps?
 
 ---
 
-![](img%2Ftree5.png)
 
----
+An interesting property of heaps is that they provide a **partial ordering** of the data. In informal terms, this simply means that not all elements are directly _comparable_ (nodes that are neither ancestor nor descendant are incomparable), but comparisons among elements is _transitive_ (if a > b && b > c then a > c). 
 
-An interesting property of heaps is that they provide a **weak ordering** of the data. In informal terms, this simply means that not all elements are directly _comparable_ (nodes that are neither ancestor nor descendant are incomparable), but comparisons among elements is _transitive_ (if a > b && b > c then a > c). 
-
-This matters because for use in a priority queue, we care only about the maximum/minimum element. A weak ordering like that of a heap is cheaper to maintain than a **total ordering** that would be given by a fully sorted collection.
+This matters because for use in a priority queue, we care only about the maximum/minimum element. A partial ordering like that of a heap is cheaper to maintain than a **total ordering** that would be given by a fully sorted collection.
 
 # Building a Heap
 

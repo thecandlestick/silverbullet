@@ -585,7 +585,7 @@ Now we can consider how many such strings of three (_r_) **X** and three (_n - 1
 
 For this, we need only consider of ways to select the positions of the **X**‘s as the **|**‘s will always occupy the remaining positions. This leads us to the theorem below:
 
-#Theorem The number of _r-combinations_ (unordered selections) from a set of **n** elements is 
+#Theorem The number of _r-combinations_ (unordered selections) from a set of **n** elements with replacement is 
 ```latex
 {r+n-1 \choose r}
 ```

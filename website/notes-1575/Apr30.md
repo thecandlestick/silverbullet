@@ -1,6 +1,26 @@
----
-tags: template
-trigger: hashmap
+#cs1575LN
+|  |  |  |  |
+|----------|----------|----------|----------|
+| [[CS1575|Home]] | [[CS1575 Calendar|Calendar]] | [[CS1575 Syllabus|Syllabus]] | [[Lecture Notes]] |
+
+
+## Reminders
+
+```query
+cs1575task
+where done = false
+render [[template/task]]
+```
+
+## Objectives
+
+```query
+task
+where page = "CS1575 Calendar" and done = false
+limit 3
+order by pos
+render [[template/topic]]
+```
 ---
 
 We’ve seen how to implement a map that runs in logarithmic-time as a [[TreeMap]]. This already scales extremely well, but can we do even better?
@@ -87,7 +107,8 @@ There are two basics strategies to follow in the event of a collision. In either
 
 In _open hashing_, a collision results in one of the two values being stored outside of the table. Each entry in the hash table is then a container (for example, a _linked list_) of values, and lookup/insertion may involve searching through that container to find the desired _record_.
 
-![](img%2FOpenHash.gif)_#KnowledgeCheck: What is the worst-case time complexity for finding a key in a hash map using open hashing? Give your answer in terms of **n** where **n** is the number of **records** in the table_
+Hash(X) = X % 10
+![](../img%2FOpenHash.gif)_#KnowledgeCheck: What is the worst-case time complexity for finding a key in a hash map using open hashing? Give your answer in terms of **n** where **n** is the number of **records** in the table_
 
 
 As long as the number of collisions at the same hash code is relatively small, then this is a fairly intuitive and easy-to-manage approach. The primary downside, however, is that every collision results in allocating more memory on top of what is already being used.
@@ -106,7 +127,7 @@ Linear probing involves searching through a predefined sequence, called a **prob
 
 Searching in a (closed-hashing) hash map follows a two-step process
 
-  1. Compute Hash(X)
+  1. Compute Hash(X) - home position
   2. Starting at index _Hash(X)_, find the record containing key _X_ by following the collision policy if necessary
 
 This process terminates when either the record is found or an empty index is encountered.
@@ -151,7 +172,7 @@ Deletion in a (closed-hashing) Hash Map works in a very similar way to search. F
 | 3 | 993 |
 | 4 | - |
 | 5 | - |
-| 6 | 846 |
+| 6 | 💀 |
 | 7 | 356 |
 | 8 | - |
 | 9 | - |
@@ -177,8 +198,11 @@ _#DiscussionQuestion: What would be the time complexity of a re-hash operation?_
 
 Because the hash table is a fixed size, when new records are inserted the _load factor_ (L = N/M where N is # of records, M is table size) increases.
 
-![](img%2Fload-factor.png)
+![](../img%2Fload-factor.png)
 
 As this load factor approaches 1.0, the performance of the table is _severely_ reduced. This tells us that unlike the [[ArrayList]], we should resize our table before it becomes full.
 
 A good rule of thumb is to wait until the load factor becomes ~0.5, then double the table size and re-hash all records using a new hash function.
+
+* [ ]  pa06 📅2024-05-10 #cs1575task
+

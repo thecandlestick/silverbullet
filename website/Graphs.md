@@ -1,3 +1,7 @@
+---
+tags: template
+trigger: graph-adt
+---
 
 A Graph is a collection of **vertices** (or _nodes_), and **edges** between them. The previously introduced [[Trees]] are a special case of graphs with restrictions placed on the edges to enforce a _hierarchical_ relationship between nodes. Graphs generalize this concept by having no such restrictions, allowing us to represent any arbitrary relationship for the nodes. 
 
@@ -133,7 +137,7 @@ Part of the challenge of creating an efficient _general-purpose_ graph implement
 [[AdjacencyList]]
 
 
-DQ: Which implementation would you choose for the following application?
+#DiscussionQuestion: Which implementation would you choose for the following application?
 
 
 Suppose you are writing a navigational software (think google maps) for the city of Rolla. You want to represent the _intersections_ between streets as vertices, and edges between adjacent intersections

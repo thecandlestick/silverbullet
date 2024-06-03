@@ -1,7 +1,7 @@
-```
+```c++
 DepthFirstTraversal(G, v0):
-  df-stack
-  marked
+  df-stack := stack
+  marked := map
 
   push v0 -> df-stack
   add v0 -> marked

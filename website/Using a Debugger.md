@@ -61,6 +61,8 @@ _Debugging symbols_
 
 You may simply forgotten to compile a _debug-version_ of your program   (```g++ -g mycode.cpp```). If you neglect this step, you will be faced with an unreadable mess of memory addresses and very little useful information. If you’re still at a loss, you may just need more practice picking out the relevant parts of what GDB shows you. Check out the [full tutorial](pdf%2FDebuggingwithGDB.pdf) for help with interpreting output.
 
+_Hint:_ Try using the command “layout next” to switch to a different view. You can continue running this command until you get one that you like
+
 ### Help! It’s showing me code I didn’t write!
 
 GDB is giving you a glimpse of the 🔮 arcane inner-workings of C++ 🔮. Turn-back now, it’s too much for mortal eyes! Put simply, what you’re seeing is lower-level instructions or library code that your program relies on. 

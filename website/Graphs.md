@@ -82,7 +82,7 @@ Does this algorithm seem familiar? It is closely related to the post-order trave
 
 [[graph-bfs]]
 
-[BFS Visualization]()
+[BFS Visualization](https://www.cs.usfca.edu/~galles/visualization/BFS.html)
 
 BFS actually visits nodes in order of distance from the starting point, which gives it the interesting property of always finding the shortest path
 
@@ -111,8 +111,6 @@ A Graph is a pair of sets _G = <V, E>_. V is the set of _vertices_ (or nodes), E
 
 Anything you can imagine! With a bit of creativity, you can see the world through the abstract lens of graphs. Graphs differ slightly from some of the other data structures we’ve seen, as they are most often used to support a problem-solving _algorithm_ rather than simply providing fast and efficient operations on arbitrary data.
 
-Modeling:
-
 
 Some classics:
 * [Seven-Bridges of Königsberg](https://en.wikipedia.org/wiki/Seven_Bridges_of_K%C3%B6nigsberg)
@@ -128,7 +126,7 @@ Some classics:
 
 The C++ standard library does not currently provide a standard graph implementation, but a graph can be built from other existing standard lib containers.
 
-Part of the challenge of creating an efficient _general-purpose_ graph implementation is that the efficiency of operations can’t necessarily be inferred from the size of the data. The context of how the data is related is of critical importance when selecting a data structure for your graph.  
+Part of the challenge of creating an efficient _general-purpose_ graph implementation is that the efficiency of operations can’t necessarily be inferred from the size of the data (_vertex-set_). The context of how the data is related (_edge-set_) is of critical importance when selecting a data structure for your graph.  
 
 ### Our Implementations:
 

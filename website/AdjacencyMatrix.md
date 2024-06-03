@@ -16,7 +16,7 @@ In the adjacency matrix A, coordinate ```A[i][j]``` will be 1 if there is an edg
 
 This concept also extends to weighted graphs, the weights of each edge being stored at their unique coordinate in place of 1 or 0. Note that you must have some way of distinguishing edges from non-edges. Common choices are to give non-edges a weight of 0, -1, or infinity depending on the range of possible values.
 
-![](directed-weighted-adj-matrix.png)
+![](img/directed-weighted-adj-matrix.png)
 
 How would you perform operations:
 

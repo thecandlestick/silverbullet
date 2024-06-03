@@ -1,7 +1,7 @@
-```
+```c++
 BreadthFirstTraversal(G, v0):
-  bf-queue
-  marked
+  bf-queue := queue
+  marked := map
 
   enqueue v0 -> bf-queue
   add v0 -> marked

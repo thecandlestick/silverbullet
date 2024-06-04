@@ -1,8 +1,8 @@
-import type { CompleteEvent } from "$sb/app_event.ts";
+import type { CompleteEvent } from "../../plug-api/types.ts";
 import { events } from "$sb/syscalls.ts";
 import { queryObjects } from "./api.ts";
-import { ObjectValue, QueryExpression } from "$sb/types.ts";
-import { determineTags } from "../../plug-api/lib/cheap_yaml.ts";
+import { ObjectValue, QueryExpression } from "../../plug-api/types.ts";
+import { determineTags } from "$lib/cheap_yaml.ts";
 
 export type AttributeObject = ObjectValue<{
   name: string;
@@ -51,7 +51,7 @@ export async function objectAttributeCompleter(
     distinct: true,
     select: [{ name: "name" }, { name: "attributeType" }, { name: "tag" }, {
       name: "readOnly",
-    }],
+    }, { name: "tagName" }],
   }, 5);
   return allAttributes.map((value) => {
     return {

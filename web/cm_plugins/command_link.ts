@@ -1,6 +1,6 @@
-import { commandLinkRegex } from "../../common/markdown_parser/parser.ts";
-import { ClickEvent } from "$sb/app_event.ts";
-import { Decoration, syntaxTree } from "../deps.ts";
+import { ClickEvent } from "../../plug-api/types.ts";
+import { syntaxTree } from "@codemirror/language";
+import { Decoration } from "@codemirror/view";
 import { Client } from "../client.ts";
 import {
   ButtonWidget,
@@ -8,6 +8,7 @@ import {
   invisibleDecoration,
   isCursorInRange,
 } from "./util.ts";
+import { commandLinkRegex } from "$common/command.ts";
 
 /**
  * Plugin to hide path prefix when the cursor is not inside.
@@ -55,7 +56,7 @@ export function cleanCommandLinkPlugin(editor: Client) {
                 }
                 // Dispatch click event to navigate there without moving the cursor
                 const clickEvent: ClickEvent = {
-                  page: editor.currentPage!,
+                  page: editor.currentPage,
                   ctrlKey: e.ctrlKey,
                   metaKey: e.metaKey,
                   altKey: e.altKey,

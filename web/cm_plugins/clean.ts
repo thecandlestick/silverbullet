@@ -1,5 +1,5 @@
-import type { ClickEvent } from "../../plug-api/app_event.ts";
-import type { Extension } from "../deps.ts";
+import type { ClickEvent } from "../../plug-api/types.ts";
+import type { Extension } from "@codemirror/state";
 import type { Client } from "../client.ts";
 import { blockquotePlugin } from "./block_quote.ts";
 import { admonitionPlugin } from "./admonition.ts";
@@ -28,7 +28,7 @@ export function cleanModePlugins(client: Client) {
       // TODO: Move this logic elsewhere?
       onCheckboxClick: (pos) => {
         const clickEvent: ClickEvent = {
-          page: client.currentPage!,
+          page: client.currentPage,
           altKey: false,
           ctrlKey: false,
           metaKey: false,

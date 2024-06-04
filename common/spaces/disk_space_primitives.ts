@@ -1,9 +1,8 @@
-import * as path from "https://deno.land/std@0.189.0/path/mod.ts";
-import { readAll } from "https://deno.land/std@0.165.0/streams/conversion.ts";
+import * as path from "$std/path/mod.ts";
+import { readAll } from "$std/streams/read_all.ts";
 import { SpacePrimitives } from "./space_primitives.ts";
-import { mime } from "https://deno.land/x/mimetypes@v1.0.0/mod.ts";
-import { walk } from "https://deno.land/std@0.198.0/fs/walk.ts";
-import { FileMeta } from "$sb/types.ts";
+import { mime } from "mimetypes";
+import { FileMeta } from "../../plug-api/types.ts";
 
 function lookupContentType(path: string): string {
   return mime.getType(path) || "application/octet-stream";
@@ -48,7 +47,7 @@ export class DiskSpacePrimitives implements SpacePrimitives {
 
       const f = await Deno.open(localPath, { read: true });
       const data = await readAll(f);
-      Deno.close(f.rid);
+      f.close();
 
       return {
         data,
@@ -85,11 +84,11 @@ export class DiskSpacePrimitives implements SpacePrimitives {
       });
 
       // Actually write the file
-      await Deno.write(file.rid, data);
+      await file.write(data);
 
       if (meta?.lastModified) {
         // console.log("Seting mtime to", new Date(meta.lastModified));
-        await Deno.futime(file.rid, new Date(), new Date(meta.lastModified));
+        await file.utime(new Date(), new Date(meta.lastModified));
       }
       file.close();
 
@@ -126,21 +125,10 @@ export class DiskSpacePrimitives implements SpacePrimitives {
 
   async fetchFileList(): Promise<FileMeta[]> {
     const allFiles: FileMeta[] = [];
-    for await (
-      const file of walk(this.rootPath, {
-        includeDirs: false,
-        // Exclude hidden directories
-        skip: [
-          // Dynamically builds a regexp that matches hidden directories INSIDE the rootPath
-          // (but if the rootPath is hidden, it stil lists files inside of it, fixing #130)
-          new RegExp(`^${escapeRegExp(this.rootPath)}.*\\/\\..+$`),
-        ],
-      })
-    ) {
+    for await (const file of walkPreserveSymlinks(this.rootPath)) {
       const fullPath = file.path;
       try {
         const s = await Deno.stat(fullPath);
-        // console.log(fullPath, s.isSymlink);
         const name = fullPath.substring(this.rootPath.length + 1);
         if (excludedFiles.includes(name)) {
           continue;
@@ -166,6 +154,33 @@ export class DiskSpacePrimitives implements SpacePrimitives {
   }
 }
 
-function escapeRegExp(string: string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+async function* walkPreserveSymlinks(
+  dirPath: string,
+): AsyncIterableIterator<{ path: string; entry: Deno.DirEntry }> {
+  for await (const dirEntry of Deno.readDir(dirPath)) {
+    const fullPath = `${dirPath}/${dirEntry.name}`;
+    if (dirEntry.name.startsWith(".")) {
+      // Skip hidden files and folders
+      continue;
+    }
+
+    let entry: Deno.DirEntry | Deno.FileInfo = dirEntry;
+
+    if (dirEntry.isSymlink) {
+      try {
+        entry = await Deno.stat(fullPath);
+      } catch (e) {
+        console.error("Error reading symlink", fullPath, e.message);
+      }
+    }
+
+    if (entry.isFile) {
+      yield { path: fullPath, entry: dirEntry };
+    }
+
+    if (entry.isDirectory) {
+      // If it's a directory or a symlink, recurse into it
+      yield* walkPreserveSymlinks(fullPath);
+    }
+  }
 }

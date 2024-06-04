@@ -191,7 +191,10 @@ export function nodeAtPos(tree: ParseTree, pos: number): ParseTree | null {
 }
 
 // Turn ParseTree back into text
-export function renderToText(tree: ParseTree): string {
+export function renderToText(tree?: ParseTree): string {
+  if (!tree) {
+    return "";
+  }
   const pieces: string[] = [];
   if (tree.text !== undefined) {
     return tree.text;
@@ -211,16 +214,22 @@ export function cloneTree(tree: ParseTree): ParseTree {
   return newTree;
 }
 
-export function parseTreeToAST(tree: ParseTree): AST {
+export function parseTreeToAST(tree: ParseTree, omitTrimmable = true): AST {
+  const parseErrorNodes = collectNodesOfType(tree, "⚠");
+  if (parseErrorNodes.length > 0) {
+    throw new Error(
+      `Parse error in: ${renderToText(tree)}`,
+    );
+  }
   if (tree.text !== undefined) {
     return tree.text;
   }
   const ast: AST = [tree.type!];
   for (const node of tree.children!) {
     if (node.type && !node.type.endsWith("Mark")) {
-      ast.push(parseTreeToAST(node));
+      ast.push(parseTreeToAST(node, omitTrimmable));
     }
-    if (node.text && node.text.trim()) {
+    if (node.text && (omitTrimmable && node.text.trim() || !omitTrimmable)) {
       ast.push(node.text);
     }
   }

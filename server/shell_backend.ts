@@ -1,15 +1,18 @@
-import { ShellRequest, ShellResponse } from "./rpc.ts";
+import type { SpaceServerConfig } from "./instance.ts";
+import { ShellRequest, ShellResponse } from "../type/rpc.ts";
 
 /**
  * Configuration via environment variables:
  * - SB_SHELL_BACKEND: "local" or "off"
  */
 
-export function determineShellBackend(path: string): ShellBackend {
+export function determineShellBackend(
+  spaceServerConfig: SpaceServerConfig,
+): ShellBackend {
   const backendConfig = Deno.env.get("SB_SHELL_BACKEND") || "local";
   switch (backendConfig) {
     case "local":
-      return new LocalShell(path);
+      return new LocalShell(spaceServerConfig.pagesPath);
     default:
       console.info(
         "Running in shellless mode, meaning shell commands are disabled",
@@ -22,7 +25,7 @@ export interface ShellBackend {
   handle(shellRequest: ShellRequest): Promise<ShellResponse>;
 }
 
-class NotSupportedShell implements ShellBackend {
+export class NotSupportedShell implements ShellBackend {
   handle(): Promise<ShellResponse> {
     return Promise.resolve({
       stdout: "",
@@ -32,7 +35,7 @@ class NotSupportedShell implements ShellBackend {
   }
 }
 
-class LocalShell implements ShellBackend {
+export class LocalShell implements ShellBackend {
   constructor(private cwd: string) {
   }
 

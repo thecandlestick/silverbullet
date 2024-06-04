@@ -20,10 +20,13 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.38
+          deno-version: v1.42
 
       - name: Run build
         run: deno task build
+
+      - name: Run type check
+        run: deno task check
 
       - name: Run tests
         run: deno task test --trace-ops

@@ -1,10 +1,10 @@
-import { DataStore } from "../plugos/lib/datastore.ts";
-import { System } from "../plugos/system.ts";
+import { DataStore } from "$lib/data/datastore.ts";
+import { System } from "$lib/plugos/system.ts";
 
 const indexVersionKey = ["$indexVersion"];
 
 // Bump this one every time a full reinxex is needed
-const desiredIndexVersion = 3;
+const desiredIndexVersion = 4;
 
 let indexOngoing = false;
 
@@ -16,12 +16,10 @@ export async function ensureSpaceIndex(ds: DataStore, system: System<any>) {
   if (currentIndexVersion !== desiredIndexVersion && !indexOngoing) {
     console.info("Performing a full space reindex, this could take a while...");
     indexOngoing = true;
-    await system.loadedPlugs.get("index")!.invoke("reindexSpace", []);
+    await system.invokeFunction("index.reindexSpace", [true]); // noClean = true
     console.info("Full space index complete.");
     await markFullSpaceIndexComplete(ds);
     indexOngoing = false;
-  } else {
-    console.info("Space index is up to date");
   }
 }
 

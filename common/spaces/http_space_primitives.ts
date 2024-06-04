@@ -1,6 +1,6 @@
 import { SpacePrimitives } from "./space_primitives.ts";
+import { FileMeta } from "../../plug-api/types.ts";
 import { flushCachesAndUnregisterServiceWorker } from "../sw_util.ts";
-import { FileMeta } from "$sb/types.ts";
 
 export class HttpSpacePrimitives implements SpacePrimitives {
   constructor(
@@ -34,14 +34,22 @@ export class HttpSpacePrimitives implements SpacePrimitives {
         throw new Error("Offline");
       }
       if (result.redirected) {
-        // Got a redirect, we'll assume this is due to invalid credentials and redirecting to an auth page
-        console.log(
-          "Got a redirect via the API so will redirect to URL",
-          result.url,
-        );
-        alert("You are not authenticated, redirecting to login page...");
-        location.href = result.url;
-        throw new Error("Not authenticated");
+        if (result.status === 401) {
+          console.log(
+            "Received unauthorized status and got a redirect via the API so will redirect to URL",
+            result.url,
+          );
+          alert("You are not authenticated, redirecting to login page...");
+          location.href = result.url;
+          throw new Error("Not authenticated");
+        } else {
+          location.href = result.url;
+          throw new Error("Redirected");
+        }
+      }
+      if (result.status === 401) {
+        location.reload();
+        throw new Error("Not authenticated, got 403");
       }
       return result;
     } catch (e: any) {
@@ -57,6 +65,11 @@ export class HttpSpacePrimitives implements SpacePrimitives {
       if (
         errorMessage.includes("fetch") || errorMessage.includes("load failed")
       ) {
+        console.error(
+          "Got error fetching, throwing offline",
+          url,
+          e,
+        );
         throw new Error("Offline");
       }
       throw e;

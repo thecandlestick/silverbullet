@@ -9,20 +9,25 @@ export async function deletePage() {
     return;
   }
   console.log("Navigating to index page");
-  await editor.navigate("");
+  await editor.navigate({ page: "" });
   console.log("Deleting page from space");
   await space.deletePage(pageName);
 }
 
-export async function copyPage(_def: any, predefinedNewName: string) {
-  const oldName = await editor.getCurrentPage();
-  let suggestedName = predefinedNewName || oldName;
+export async function copyPage(
+  _def: any,
+  sourcePage?: string,
+  toName?: string,
+) {
+  const currentPage = await editor.getCurrentPage();
+  const fromName = sourcePage || currentPage;
+  let suggestedName = toName || fromName;
 
-  if (isFederationPath(oldName)) {
-    const pieces = oldName.split("/");
+  if (isFederationPath(fromName)) {
+    const pieces = fromName.split("/");
     suggestedName = pieces.slice(1).join("/");
   }
-  const newName = await editor.prompt(`Copy to new page:`, suggestedName);
+  const newName = await editor.prompt(`Copy to page:`, suggestedName);
 
   if (!newName) {
     return;
@@ -44,11 +49,17 @@ export async function copyPage(_def: any, predefinedNewName: string) {
     }
   }
 
-  const text = await editor.getText();
+  const text = await space.readPage(fromName);
 
   console.log("Writing new page to space");
   await space.writePage(newName, text);
 
-  console.log("Navigating to new page");
-  await editor.navigate(newName);
+  if (currentPage === fromName) {
+    // If we're copying the current page, navigate there
+    console.log("Navigating to new page");
+    await editor.navigate({ page: newName });
+  } else {
+    // Otherwise just notify of success
+    await editor.flashNotification("Page copied successfully");
+  }
 }

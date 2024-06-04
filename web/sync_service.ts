@@ -1,13 +1,10 @@
-import { sleep } from "$sb/lib/async.ts";
-import type { SpacePrimitives } from "../common/spaces/space_primitives.ts";
-import {
-  SpaceSync,
-  SyncStatus,
-  SyncStatusItem,
-} from "../common/spaces/sync.ts";
-import { EventHook } from "../plugos/hooks/event.ts";
-import { DataStore } from "../plugos/lib/datastore.ts";
-import { Space } from "./space.ts";
+import { plugPrefix } from "$common/spaces/constants.ts";
+import type { SpacePrimitives } from "$common/spaces/space_primitives.ts";
+import { SpaceSync, SyncStatus, SyncStatusItem } from "$common/spaces/sync.ts";
+import { sleep } from "$lib/async.ts";
+import { EventHook } from "../common/hooks/event.ts";
+import { DataStore } from "$lib/data/datastore.ts";
+import { Space } from "../common/space.ts";
 
 // Keeps the current sync snapshot
 const syncSnapshotKey = ["sync", "snapshot"];
@@ -49,6 +46,8 @@ export interface ISyncService {
 export class SyncService implements ISyncService {
   spaceSync: SpaceSync;
   lastReportedSyncStatus = Date.now();
+  // If this is set to anything other than undefined, a file is currently saving
+  savingTimeout: number | undefined;
 
   constructor(
     readonly localSpacePrimitives: SpacePrimitives,
@@ -78,7 +77,19 @@ export class SyncService implements ISyncService {
       },
     );
 
+    eventHook.addLocalListener("editor:pageSaving", () => {
+      this.savingTimeout = setTimeout(() => {
+        this.savingTimeout = undefined;
+      }, 1000 * 5);
+    });
+
     eventHook.addLocalListener("editor:pageSaved", (name) => {
+      if (this.savingTimeout) {
+        clearTimeout(this.savingTimeout);
+        this.savingTimeout = undefined;
+      } else {
+        console.warn("This should not happen, savingTimeout was not set");
+      }
       const path = `${name}.md`;
       this.scheduleFileSync(path).catch(console.error);
     });
@@ -91,6 +102,12 @@ export class SyncService implements ISyncService {
   }
 
   async isSyncing(): Promise<boolean> {
+    if (this.savingTimeout !== undefined) {
+      console.log(
+        "Saving a file at the moment, so reporting as isSyncing() = true",
+      );
+      return true;
+    }
     const startTime = await this.ds.get(syncStartTimeKey);
     if (!startTime) {
       return false;
@@ -310,7 +327,7 @@ export class SyncService implements ISyncService {
     primary: SpacePrimitives,
     secondary: SpacePrimitives,
   ): Promise<number> {
-    if (!name.startsWith("_plug/")) {
+    if (!name.startsWith(plugPrefix)) {
       const operations = await SpaceSync.primaryConflictResolver(
         name,
         snapshot,

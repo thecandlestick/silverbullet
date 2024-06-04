@@ -1,7 +1,11 @@
-import { QueryProviderEvent } from "$sb/app_event.ts";
-import { applyQuery } from "$sb/lib/query.ts";
-import { space } from "$sb/syscalls.ts";
+import { space, system } from "$sb/syscalls.ts";
+import { AttachmentMeta } from "$sb/types.ts";
+import { indexObjects } from "./api.ts";
 
-export async function attachmentQueryProvider({ query }: QueryProviderEvent) {
-  return applyQuery(query, await space.listAttachments());
+export async function indexAttachment(name: string) {
+  if (await system.getMode() === "ro") {
+    return;
+  }
+  const fileMeta = await space.getAttachmentMeta(name);
+  await indexObjects<AttachmentMeta>(fileMeta.name, [fileMeta]);
 }

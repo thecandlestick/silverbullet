@@ -1,4 +1,4 @@
-import type { ClickEvent } from "$sb/app_event.ts";
+import type { ClickEvent } from "../../plug-api/types.ts";
 import { editor, markdown, system } from "$sb/syscalls.ts";
 import {
   addParentPointers,
@@ -7,7 +7,9 @@ import {
   nodeAtPos,
   ParseTree,
 } from "$sb/lib/tree.ts";
-import { resolveAttachmentPath, resolvePath } from "$sb/lib/resolve.ts";
+import { isLocalPath, resolvePath } from "$sb/lib/resolve.ts";
+import { parsePageRef } from "$sb/lib/page_ref.ts";
+import { tagPrefix } from "../index/constants.ts";
 
 async function actionClickOrActionEnter(
   mdTree: ParseTree | null,
@@ -16,6 +18,7 @@ async function actionClickOrActionEnter(
   if (!mdTree) {
     return;
   }
+  // console.log("Got a click on", mdTree);
   const navigationNodeFinder = (t: ParseTree) =>
     [
       "WikiLink",
@@ -26,6 +29,7 @@ async function actionClickOrActionEnter(
       "Link",
       "CommandLink",
       "PageRef",
+      "Hashtag",
     ]
       .includes(
         t.type!,
@@ -39,35 +43,33 @@ async function actionClickOrActionEnter(
   const currentPage = await editor.getCurrentPage();
   switch (mdTree.type) {
     case "WikiLink": {
-      let pageLink = mdTree.children![1]!.children![0].text!;
-      let pos: string | number = 0;
-      if (pageLink.includes("@") || pageLink.includes("$")) {
-        [pageLink, pos] = pageLink.split(/[@$]/);
-        if (pos.match(/^\d+$/)) {
-          pos = +pos;
+      const link = mdTree.children![1]!.children![0].text!;
+      // Assume is attachment if it has extension
+      if (/\.[a-zA-Z0-9]+$/.test(link)) {
+        const attachmentPath = resolvePath(
+          currentPage,
+          "/" + decodeURI(link),
+        );
+        return editor.openUrl(attachmentPath);
+      } else {
+        const pageRef = parsePageRef(link);
+        pageRef.page = resolvePath(currentPage, "/" + pageRef.page);
+        if (!pageRef.page) {
+          pageRef.page = currentPage;
         }
+        // This is an explicit navigate, move to the top
+        if (pageRef.pos === undefined) {
+          pageRef.pos = 0;
+        }
+        return editor.navigate(pageRef, false);
       }
-      pageLink = resolvePath(currentPage, pageLink);
-      if (!pageLink) {
-        pageLink = currentPage;
-      }
-      await editor.navigate(pageLink, pos, false, inNewWindow);
-      break;
     }
     case "PageRef": {
-      const bracketedPageRef = mdTree.children![0].text!;
-
-      // Slicing off the initial [[ and final ]]
-      const pageName = bracketedPageRef.substring(
-        2,
-        bracketedPageRef.length - 2,
-      );
-      await editor.navigate(pageName, 0, false, inNewWindow);
-      break;
+      const pageName = parsePageRef(mdTree.children![0].text!).page;
+      return editor.navigate({ page: pageName, pos: 0 }, false, inNewWindow);
     }
     case "NakedURL":
-      await editor.openUrl(mdTree.children![0].text!);
-      break;
+      return editor.openUrl(mdTree.children![0].text!);
     case "Image":
     case "Link": {
       const urlNode = findNodeOfType(mdTree, "URL");
@@ -78,14 +80,19 @@ async function actionClickOrActionEnter(
       if (url.length <= 1) {
         return editor.flashNotification("Empty link, ignoring", "error");
       }
-      if (url.indexOf("://") === -1 && !url.startsWith("mailto:")) {
-        return editor.openUrl(
-          resolveAttachmentPath(currentPage, decodeURI(url)),
-        );
+      if (isLocalPath(url)) {
+        if (/\.[a-zA-Z0-9>]+$/.test(url)) {
+          return editor.openUrl(
+            resolvePath(currentPage, decodeURI(url)),
+          );
+        } else {
+          return editor.navigate(
+            parsePageRef(resolvePath(currentPage, decodeURI(url))),
+          );
+        }
       } else {
-        await editor.openUrl(url);
+        return editor.openUrl(url);
       }
-      break;
     }
     case "CommandLink": {
       const commandName = mdTree.children![1]!.children![0].text!;
@@ -101,6 +108,15 @@ async function actionClickOrActionEnter(
           "error",
         );
       }
+      break;
+    }
+    case "Hashtag": {
+      const hashtag = mdTree.children![0].text!.slice(1);
+      await editor.navigate(
+        { page: `${tagPrefix}${hashtag}`, pos: 0 },
+        false,
+        inNewWindow,
+      );
       break;
     }
   }
@@ -125,5 +141,21 @@ export async function clickNavigate(event: ClickEvent) {
 }
 
 export async function navigateCommand(cmdDef: any) {
-  await editor.navigate(cmdDef.page);
+  await editor.navigate({ page: cmdDef.page, pos: 0 });
+}
+
+export async function navigateToPage(_cmdDef: any, pageName: string) {
+  await editor.navigate({ page: pageName, pos: 0 });
+}
+
+export async function navigateToURL(_cmdDef: any, url: string) {
+  await editor.openUrl(url, false);
+}
+
+export async function navigateBack() {
+  await editor.goHistory(-1);
+}
+
+export async function navigateForward() {
+  await editor.goHistory(1);
 }

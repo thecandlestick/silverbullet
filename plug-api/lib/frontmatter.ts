@@ -1,13 +1,12 @@
-import { YAML } from "$sb/plugos-syscall/mod.ts";
-
 import {
   addParentPointers,
   ParseTree,
   renderToText,
   replaceNodesMatchingAsync,
   traverseTreeAsync,
-} from "$sb/lib/tree.ts";
-import { expandPropertyNames } from "$sb/lib/json.ts";
+} from "./tree.ts";
+import { expandPropertyNames } from "./json.ts";
+import { YAML } from "../syscalls.ts";
 
 export type FrontMatter = { tags?: string[] } & Record<string, any>;
 
@@ -85,6 +84,9 @@ export async function extractFrontmatter(
         if (typeof data.tags === "string") {
           tags.push(...(data.tags as string).split(/,\s*|\s+/));
         }
+        if (Array.isArray(data.tags)) {
+          tags.push(...data.tags);
+        }
 
         if (options.removeKeys && options.removeKeys.length > 0) {
           let removedOne = false;
@@ -113,8 +115,18 @@ export async function extractFrontmatter(
     return undefined;
   });
 
-  // Strip # from tags
-  data.tags = [...new Set([...tags.map((t) => t.replace(/^#/, ""))])];
+  try {
+    data.tags = [
+      ...new Set([...tags.map((t) => {
+        // Always treat tags as strings
+        const tagAsString = String(t);
+        // Strip # from tags
+        return tagAsString.replace(/^#/, "");
+      })]),
+    ];
+  } catch (e) {
+    console.error("Error while processing tags", e);
+  }
 
   // console.log("Extracted tags", data.tags);
   // Expand property names (e.g. "foo.bar" => { foo: { bar: true } })

@@ -1,11 +1,12 @@
-import { copy } from "https://deno.land/std@0.165.0/fs/copy.ts";
+import { copy } from "$std/fs/copy.ts";
 
-import sass from "https://deno.land/x/denosass@1.0.4/mod.ts";
-import { bundleFolder } from "./plugos/asset_bundle/builder.ts";
+import sass from "denosass";
+import { bundleFolder } from "./lib/asset_bundle/builder.ts";
 
-import * as flags from "https://deno.land/std@0.165.0/flags/mod.ts";
-import { patchDenoLibJS } from "./plugos/compile.ts";
-import { denoPlugins, esbuild } from "./plugos/deps.ts";
+import { parse } from "$std/flags/mod.ts";
+import { patchDenoLibJS } from "./cmd/compile.ts";
+import { denoPlugins } from "esbuild_deno_loader";
+import * as esbuild from "esbuild";
 
 export async function bundleAll(
   watch: boolean,
@@ -40,9 +41,6 @@ export async function copyAssets(dist: string) {
     overwrite: true,
   });
   await copy("web/auth.html", `${dist}/auth.html`, {
-    overwrite: true,
-  });
-  await copy("web/logout.html", `${dist}/logout.html`, {
     overwrite: true,
   });
   await copy("web/images/favicon.png", `${dist}/favicon.png`, {
@@ -84,7 +82,7 @@ async function buildCopyBundleAssets() {
 
   console.log("Now ESBuilding the client and service workers...");
 
-  await esbuild.build({
+  const result = await esbuild.build({
     entryPoints: [
       {
         in: "web/boot.ts",
@@ -102,16 +100,20 @@ async function buildCopyBundleAssets() {
     sourcemap: "linked",
     minify: true,
     jsxFactory: "h",
+    // metafile: true,
     jsx: "automatic",
     jsxFragment: "Fragment",
     jsxImportSource: "https://esm.sh/preact@10.11.1",
-    plugins: [
-      ...denoPlugins({
-        importMapURL: new URL("./import_map.json", import.meta.url)
-          .toString(),
-      }),
-    ],
+    plugins: denoPlugins({
+      importMapURL: new URL("./import_map.json", import.meta.url)
+        .toString(),
+    }),
   });
+
+  if (result.metafile) {
+    const text = await esbuild.analyzeMetafile(result.metafile!);
+    console.log("Bundle info", text);
+  }
 
   // Patch the service_worker {{CACHE_NAME}}
   let swCode = await Deno.readTextFile("dist_client_bundle/service_worker.js");
@@ -125,7 +127,7 @@ async function buildCopyBundleAssets() {
 }
 
 if (import.meta.main) {
-  const args = flags.parse(Deno.args, {
+  const args = parse(Deno.args, {
     boolean: ["watch"],
     alias: { w: "watch" },
     default: {

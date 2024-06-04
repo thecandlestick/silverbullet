@@ -1,19 +1,18 @@
-import {
-  cors,
-  deleteCookie,
-  getCookie,
-  Hono,
-  HonoRequest,
-  setCookie,
-} from "./deps.ts";
-import { AssetBundle } from "../plugos/asset_bundle/bundle.ts";
+import { deleteCookie, getCookie, setCookie } from "hono/helper.ts";
+import { cors } from "hono/middleware.ts";
+import { type Context, Hono, type HonoRequest } from "hono/mod.ts";
+import { AssetBundle } from "$lib/asset_bundle/bundle.ts";
 import { FileMeta } from "$sb/types.ts";
-import { ShellRequest } from "./rpc.ts";
-import { determineShellBackend } from "./shell_backend.ts";
+import { ShellRequest } from "$type/rpc.ts";
 import { SpaceServer, SpaceServerConfig } from "./instance.ts";
-import { KvPrimitives } from "../plugos/lib/kv_primitives.ts";
-import { PrefixedKvPrimitives } from "../plugos/lib/prefixed_kv_primitives.ts";
-import { base64Encode } from "../plugos/asset_bundle/base64.ts";
+import { KvPrimitives } from "$lib/data/kv_primitives.ts";
+import { PrefixedKvPrimitives } from "$lib/data/prefixed_kv_primitives.ts";
+import { extendedMarkdownLanguage } from "$common/markdown_parser/parser.ts";
+import { parse } from "$common/markdown_parser/parse_tree.ts";
+import { renderMarkdownToHtml } from "../plugs/markdown/markdown_render.ts";
+import { parsePageRef } from "$sb/lib/page_ref.ts";
+import { base64Encode } from "$lib/crypto.ts";
+import * as path from "$std/path/mod.ts";
 
 const authenticationExpirySeconds = 60 * 60 * 24 * 7; // 1 week
 
@@ -58,7 +57,6 @@ export class HttpServer {
   async bootSpaceServer(config: SpaceServerConfig): Promise<SpaceServer> {
     const spaceServer = new SpaceServer(
       config,
-      determineShellBackend(config.pagesPath),
       this.plugAssetBundle,
       new PrefixedKvPrimitives(this.baseKvPrimitives, [
         config.namespace,
@@ -110,19 +108,70 @@ export class HttpServer {
   }
 
   // Replaces some template variables in index.html in a rather ad-hoc manner, but YOLO
-  renderIndexHtml(spaceServer: SpaceServer) {
-    return this.clientAssetBundle.readTextFileSync(".client/index.html")
-      .replaceAll(
+  async renderHtmlPage(
+    spaceServer: SpaceServer,
+    pageName: string,
+    c: Context,
+  ): Promise<Response> {
+    let html = "";
+    let lastModified = utcDateString(Date.now());
+    if (!spaceServer.auth) {
+      // Only attempt server-side rendering when this site is not protected by auth
+      try {
+        const { data, meta } = await spaceServer.spacePrimitives.readFile(
+          `${pageName}.md`,
+        );
+        lastModified = utcDateString(meta.lastModified);
+
+        if (c.req.header("If-Modified-Since") === lastModified) {
+          // Not modified, empty body status 304
+          return c.body(null, 304);
+        }
+        const text = new TextDecoder().decode(data);
+        const tree = parse(extendedMarkdownLanguage, text);
+        html = renderMarkdownToHtml(tree);
+      } catch (e: any) {
+        if (e.message !== "Not found") {
+          console.error("Error server-side rendering page", e);
+        }
+      }
+    }
+    // TODO: Replace this with a proper template engine
+    html = this.clientAssetBundle.readTextFileSync(".client/index.html")
+      .replace(
         "{{SPACE_PATH}}",
         spaceServer.pagesPath.replaceAll("\\", "\\\\"),
-        // );
-      ).replaceAll(
+      )
+      .replace(
+        "{{DESCRIPTION}}",
+        JSON.stringify(stripHtml(html).substring(0, 255)),
+      )
+      .replace(
+        "{{TITLE}}",
+        pageName,
+      ).replace(
         "{{SYNC_ONLY}}",
         spaceServer.syncOnly ? "true" : "false",
-      ).replaceAll(
+      ).replace(
+        "{{ENABLE_SPACE_SCRIPT}}",
+        spaceServer.enableSpaceScript ? "true" : "false",
+      ).replace(
+        "{{READ_ONLY}}",
+        spaceServer.readOnly ? "true" : "false",
+      ).replace(
+        "{{CONTENT}}",
+        html,
+      ).replace(
         "{{CLIENT_ENCRYPTION}}",
         spaceServer.clientEncryption ? "true" : "false",
       );
+    return c.html(
+      html,
+      200,
+      {
+        "Last-Modified": lastModified,
+      },
+    );
   }
 
   start() {
@@ -134,9 +183,9 @@ export class HttpServer {
     // Fallback, serve the UI index.html
     this.app.use("*", async (c) => {
       const spaceServer = await this.ensureSpaceServer(c.req);
-      return c.html(this.renderIndexHtml(spaceServer), 200, {
-        "Cache-Control": "no-cache",
-      });
+      const url = new URL(c.req.url);
+      const pageName = decodeURI(url.pathname.slice(1));
+      return this.renderHtmlPage(spaceServer, pageName, c);
     });
 
     this.abortController = new AbortController();
@@ -173,10 +222,8 @@ export class HttpServer {
         url.pathname === "/"
       ) {
         // Serve the UI (index.html)
-        // Note: we're explicitly not setting Last-Modified and If-Modified-Since header here because this page is dynamic
-        return c.html(this.renderIndexHtml(spaceServer), 200, {
-          "Cache-Control": "no-cache",
-        });
+        const indexPage = parsePageRef(spaceServer.settings?.indexPage!).page;
+        return this.renderHtmlPage(spaceServer, indexPage, c);
       }
       try {
         const assetName = url.pathname.slice(1);
@@ -196,7 +243,6 @@ export class HttpServer {
         let data: Uint8Array | string = this.clientAssetBundle.readFileSync(
           assetName,
         );
-        c.header("Cache-Control", "no-cache");
         c.header("Content-length", "" + data.length);
         if (assetName !== "service_worker.js") {
           c.header(
@@ -207,6 +253,7 @@ export class HttpServer {
 
         if (req.method === "GET") {
           if (assetName === "service_worker.js") {
+            c.header("Cache-Control", "no-cache");
             const textData = new TextDecoder().decode(data);
             // console.log(
             //   "Swapping out config hash in service worker",
@@ -217,6 +264,8 @@ export class HttpServer {
                 JSON.stringify([
                   spaceServer.clientEncryption,
                   spaceServer.syncOnly,
+                  spaceServer.readOnly,
+                  spaceServer.enableSpaceScript,
                 ]),
               ),
             );
@@ -283,7 +332,7 @@ export class HttpServer {
     this.app.use("*", async (c, next) => {
       const req = c.req;
       const spaceServer = await this.ensureSpaceServer(req);
-      if (!spaceServer.auth) {
+      if (!spaceServer.auth && !spaceServer.authToken) {
         // Auth disabled in this config, skip
         return next();
       }
@@ -344,16 +393,6 @@ export class HttpServer {
       }),
     );
 
-    // For when the day comes...
-    // this.app.use("*", async (c, next) => {
-    //   // if (["POST", "PUT", "DELETE"].includes(c.req.method)) {
-    //   const spaceServer = await this.ensureSpaceServer(c.req);
-    //   return runWithSystemLock(spaceServer.system!, async () => {
-    //     await next();
-    //   });
-    //   // }
-    // });
-
     // File list
     this.app.get(
       "/index.json",
@@ -405,7 +444,7 @@ export class HttpServer {
         const args: string[] = body;
         try {
           const result = await spaceServer.system!.syscall(
-            { plug: plugName },
+            { plug: plugName === "_" ? undefined : plugName },
             syscall,
             args,
           );
@@ -423,7 +462,8 @@ export class HttpServer {
       }
     });
 
-    const filePathRegex = "/:path{[^!].+\\.[a-zA-Z]+}";
+    const filePathRegex = "/:path{[^!].*\\.[a-zA-Z]+}";
+    const mdExt = ".md";
 
     this.app.get(
       filePathRegex,
@@ -436,7 +476,7 @@ export class HttpServer {
           name,
         );
         if (
-          name.endsWith(".md") &&
+          name.endsWith(mdExt) &&
           // This header signififies the requests comes directly from the http_space_primitives client (not the browser)
           !req.header("X-Sync-Mode") &&
           // This Accept header is used by federation to still work with CORS
@@ -448,7 +488,7 @@ export class HttpServer {
           console.warn(
             "Request was without X-Sync-Mode nor a CORS request, redirecting to page",
           );
-          return c.redirect(`/${name.slice(0, -3)}`);
+          return c.redirect(`/${name.slice(0, -mdExt.length)}`, 401);
         }
         if (name.startsWith(".")) {
           // Don't expose hidden files
@@ -480,6 +520,16 @@ export class HttpServer {
             return c.text(e.message, 500);
           }
         }
+
+        const filename = path.posix.basename(name, mdExt);
+        if (filename.trim() !== filename) {
+          const newName = path.posix.join(
+            path.posix.dirname(name),
+            filename.trim(),
+          );
+          return c.redirect(`/${newName}`);
+        }
+
         try {
           if (req.header("X-Get-Meta")) {
             // Getting meta via GET request
@@ -510,10 +560,18 @@ export class HttpServer {
         const req = c.req;
         const name = req.param("path")!;
         const spaceServer = await this.ensureSpaceServer(req);
-        console.log("Saving file", name);
+        if (spaceServer.readOnly) {
+          return c.text("Read only mode, no writes allowed", 405);
+        }
+        console.log("Writing file", name);
         if (name.startsWith(".")) {
           // Don't expose hidden files
           return c.text("Forbidden", 403);
+        }
+
+        const filename = path.posix.basename(name, mdExt);
+        if (filename.trim() !== filename) {
+          return c.text("Malformed filename", 400);
         }
 
         const body = await req.arrayBuffer();
@@ -533,6 +591,9 @@ export class HttpServer {
       const req = c.req;
       const name = req.param("path")!;
       const spaceServer = await this.ensureSpaceServer(req);
+      if (spaceServer.readOnly) {
+        return c.text("Read only mode, no writes allowed", 405);
+      }
       console.log("Deleting file", name);
       if (name.startsWith(".")) {
         // Don't expose hidden files
@@ -553,6 +614,10 @@ export class HttpServer {
       proxyPathRegex,
       async (c, next) => {
         const req = c.req;
+        const spaceServer = await this.ensureSpaceServer(req);
+        if (spaceServer.readOnly) {
+          return c.text("Read only mode, no federation proxy allowed", 405);
+        }
         let url = req.param("uri")!.slice(1);
         if (!req.header("X-Proxy-Request")) {
           // Direct browser request, not explicity fetch proxy request
@@ -623,4 +688,9 @@ function utcDateString(mtime: number): string {
 
 function authCookieName(host: string) {
   return `auth_${host.replaceAll(/\W/g, "_")}`;
+}
+
+function stripHtml(html: string): string {
+  const regex = /<[^>]*>/g;
+  return html.replace(regex, "");
 }

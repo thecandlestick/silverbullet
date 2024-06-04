@@ -1,5 +1,5 @@
 import { YAML } from "$sb/syscalls.ts";
-import type { WidgetContent } from "$sb/app_event.ts";
+import type { WidgetContent } from "../../plug-api/types.ts";
 
 type EmbedConfig = {
   url: string;
@@ -7,7 +7,7 @@ type EmbedConfig = {
   width?: number;
 };
 
-function extractYoutubeVideoId(url: string) {
+export function extractYoutubeVideoId(url: string) {
   let match = url.match(/youtube\.com\/watch\?v=([^&]+)/);
   if (match) {
     return match[1];

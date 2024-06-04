@@ -1,5 +1,5 @@
 import.meta.main = false;
-import { Command } from "https://deno.land/x/cliffy@v0.25.2/command/command.ts";
+import { Command } from "cliffy/command/command.ts";
 
 import { version } from "./version.ts";
 
@@ -9,6 +9,12 @@ import { serveCommand } from "./cmd/server.ts";
 import { plugCompileCommand } from "./cmd/plug_compile.ts";
 import { plugRunCommand } from "./cmd/plug_run.ts";
 import { syncCommand } from "./cmd/sync.ts";
+
+// Unhandled rejection, let's not crash
+globalThis.addEventListener("unhandledrejection", (event) => {
+  console.error("Unhandled rejection:", event);
+  event.preventDefault();
+});
 
 await new Command()
   .name("silverbullet")

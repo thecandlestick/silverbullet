@@ -17,7 +17,7 @@ export async function upgradeCommand() {
     "So, that's done. Now let's see if this actually did anything...",
   );
   const vp = new Deno.Command("deno", {
-    args: ["run", "-A", "--unstable", Deno.mainModule, "version"],
+    args: ["run", "-A", Deno.mainModule, "version"],
   });
   const versionStatus = await vp.output();
   if (!versionStatus.success) {
@@ -37,7 +37,7 @@ export async function upgradeCommand() {
 }
 
 // WIP: This is not yet working, but it's a start
-import { dirname } from "https://deno.land/std@0.186.0/path/mod.ts";
+import { dirname } from "$std/path/mod.ts";
 
 const silverBulletReleases =
   "https://github.com/silverbulletmd/silverbullet/releases";

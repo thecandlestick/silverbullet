@@ -1,9 +1,13 @@
-import type { IndexTreeEvent } from "$sb/app_event.ts";
+import type { IndexTreeEvent } from "../../plug-api/types.ts";
 
-import { collectNodesOfType, ParseTree, renderToText } from "$sb/lib/tree.ts";
+import {
+  collectNodesOfType,
+  ParseTree,
+  renderToText,
+} from "../../plug-api/lib/tree.ts";
 import { extractAttributes } from "$sb/lib/attribute.ts";
 import { rewritePageRefs } from "$sb/lib/resolve.ts";
-import { ObjectValue } from "$sb/types.ts";
+import { ObjectValue } from "../../plug-api/types.ts";
 import { indexObjects } from "./api.ts";
 import { updateITags } from "$sb/lib/tags.ts";
 import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
@@ -23,7 +27,7 @@ export async function indexItems({ name, tree }: IndexTreeEvent) {
 
   const coll = collectNodesOfType(tree, "ListItem");
 
-  for (const n of coll) {
+  for (let n of coll) {
     if (!n.children) {
       continue;
     }
@@ -46,18 +50,20 @@ export async function indexItems({ name, tree }: IndexTreeEvent) {
     collectNodesOfType(n, "Hashtag").forEach((h) => {
       // Push tag to the list, removing the initial #
       tags.add(h.children![0].text!.substring(1));
+      h.children = [];
     });
+
+    // Extract attributes and remove from tree
+    const extractedAttributes = await extractAttributes(
+      ["item", ...tags],
+      n,
+      true,
+    );
 
     for (const child of n.children!.slice(1)) {
       rewritePageRefs(child, name);
       if (child.type === "OrderedList" || child.type === "BulletList") {
         break;
-      }
-      // Extract attributes and remove from tree
-      const extractedAttributes = await extractAttributes(child, true);
-
-      for (const [key, value] of Object.entries(extractedAttributes)) {
-        item[key] = value;
       }
       textNodes.push(child);
     }
@@ -65,6 +71,12 @@ export async function indexItems({ name, tree }: IndexTreeEvent) {
     item.name = textNodes.map(renderToText).join("").trim();
     if (tags.size > 0) {
       item.tags = [...tags];
+    }
+
+    for (
+      const [key, value] of Object.entries(extractedAttributes)
+    ) {
+      item[key] = value;
     }
 
     updateITags(item, frontmatter);

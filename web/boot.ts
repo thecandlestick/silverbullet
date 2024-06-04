@@ -1,4 +1,4 @@
-import { safeRun } from "../common/util.ts";
+import { safeRun } from "../lib/async.ts";
 import { Client } from "./client.ts";
 
 const syncMode = window.silverBulletConfig.syncOnly ||
@@ -10,12 +10,17 @@ safeRun(async () => {
     syncMode ? "in Sync Mode" : "in Online Mode",
   );
 
+  if (window.silverBulletConfig.readOnly) {
+    console.log("Running in read-only mode");
+  }
+
   const client = new Client(
     document.getElementById("sb-root")!,
     syncMode,
+    window.silverBulletConfig.readOnly,
   );
-  await client.init();
   window.client = client;
+  await client.init();
 });
 
 if (navigator.serviceWorker) {

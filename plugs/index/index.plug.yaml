@@ -1,15 +1,4 @@
 name: index
-syntax:
-  Hashtag:
-    firstCharacters:
-      - "#"
-    regex: "#[^#\\d\\s\\[\\]]+\\w+"
-    className: sb-hashtag
-  NamedAnchor:
-    firstCharacters:
-      - "$"
-    regex: "\\$[a-zA-Z\\.\\-\\/]+[\\w\\.\\-\\/]*"
-    className: sb-named-anchor
 functions:
   loadBuiltinsIntoIndex:
     path: builtins.ts:loadBuiltinsIntoIndex
@@ -36,22 +25,22 @@ functions:
   objectSourceProvider:
     path: api.ts:objectSourceProvider
     events:
-    - query:*
+      - query:*
   discoverSources:
     path: api.ts:discoverSources
     events:
-    - query_
+      - query_
   clearIndex:
     path: api.ts:clearIndex
     env: server
 
   clearDSIndex:
-    path: api.ts:clearPageIndex
+    path: api.ts:clearFileIndex
     env: server
     events:
-      - page:saved
-      - page:deleted
-      
+      - file:deleted
+      - file:changed
+
   parseIndexTextRepublish:
     path: "./command.ts:parseIndexTextRepublish"
     env: server
@@ -62,21 +51,21 @@ functions:
     path: "./command.ts:reindexCommand"
     command:
       name: "Space: Reindex"
+      requireMode: rw
   processIndexQueue:
     path: ./command.ts:processIndexQueue
     mqSubscriptions:
-    - queue: indexQueue
-      batchSize: 10
-      autoAck: true
+      - queue: indexQueue
+        batchSize: 3
+        autoAck: true
   reindexSpace:
     path: "./command.ts:reindexSpace"
     env: server
 
-  # Attachments
-  attachmentQueryProvider:
-    path: ./attachment.ts:attachmentQueryProvider
+  indexAttachment:
+    path: "./attachment.ts:indexAttachment"
     events:
-      - query:attachment
+      - attachment:index
 
   indexPage:
     path: page.ts:indexPage
@@ -86,51 +75,79 @@ functions:
   indexParagraphs:
     path: "./paragraph.ts:indexParagraphs"
     events:
-    - page:index
+      - page:index
 
   # Backlinks
   indexLinks:
     path: "./page_links.ts:indexLinks"
     events:
-    - page:index
+      - page:index
 
   attributeComplete:
     path: "./attributes.ts:attributeComplete"
     events:
-    - editor:complete
+      - editor:complete
 
   objectAttributeCompleter:
     path: ./attributes.ts:objectAttributeCompleter
     events:
-    - attribute:complete:*
+      - attribute:complete:*
 
   # Item indexing
   indexItem:
     path: "./item.ts:indexItems"
     events:
-    - page:index
+      - page:index
 
   # Anchors
   indexAnchors:
     path: "./anchor.ts:indexAnchors"
     events:
-    - page:index
+      - page:index
   anchorComplete:
     path: "./anchor.ts:anchorComplete"
     events:
       - editor:complete
-  
+
+  # Tables
+  indexTables:
+    path: "table.ts:indexTables"
+    events:
+      - page:index
+
+  # Headers
+  indexHeaders:
+    path: header.ts:indexHeaders
+    events:
+      - page:index
+  headerComplete:
+    path: header.ts:headerComplete
+    events:
+      - editor:complete
+
   # Data
   indexData:
     path: data.ts:indexData
     events:
-    - page:index
+      - page:index
+
+  # Script
+  indexSpaceScript:
+    path: script.ts:indexSpaceScript
+    events:
+      - page:index
+
+    # Style
+  indexSpaceStyle:
+    path: style.ts:indexSpaceStyle
+    events:
+      - page:index
 
   # Hashtags
   indexTags:
     path: tags.ts:indexTags
     events:
-    - page:index
+      - page:index
   tagComplete:
     path: tags.ts:tagComplete
     events:
@@ -143,16 +160,19 @@ functions:
       mac: Cmd-Alt-r
       key: Ctrl-Alt-r
       page: ""
+      requireMode: rw
   renamePrefixCommand:
     path: "./refactor.ts:renamePrefixCommand"
     command:
       name: "Page: Batch Rename Prefix"
+      requireMode: rw
 
   # Refactoring Commands
   extractToPageCommand:
     path: ./refactor.ts:extractToPageCommand
     command:
       name: "Page: Extract"
+      requireMode: rw
 
   # TOC
   tocWidget:
@@ -162,19 +182,48 @@ functions:
 
   # Template Widgets
   renderTemplateWidgetsTop:
-    path: template_widget.ts:renderTemplateWidgets
+    path: widget.ts:renderTemplateWidgets
     env: client
     panelWidget: top
 
   renderTemplateWidgetsBottom:
-    path: template_widget.ts:renderTemplateWidgets
+    path: widget.ts:renderTemplateWidgets
     env: client
     panelWidget: bottom
 
   refreshWidgets:
-    path: template_widget.ts:refreshWidgets
+    path: widget.ts:refreshWidgets
 
   lintYAML:
     path: lint.ts:lintYAML
     events:
-    - editor:lint
+      - editor:lint
+
+  # Tag file system
+  readFileTag:
+    path: tag_page.ts:readFileTag
+    pageNamespace:
+      pattern: "📌 .+"
+      operation: readFile
+
+  writePageTag:
+    path: tag_page.ts:writeFileTag
+    pageNamespace:
+      pattern: "📌 .+"
+      operation: readFile
+
+  getPageMetaTag:
+    path: tag_page.ts:getFileMetaTag
+    pageNamespace:
+      pattern: "📌 .+"
+      operation: getFileMeta
+
+  syscallSourceProvider:
+    path: builtins.ts:syscallSourceProvider
+    events:
+      - query:syscall
+
+  commandSourceProvider:
+    path: builtins.ts:commandSourceProvider
+    events:
+      - query:command

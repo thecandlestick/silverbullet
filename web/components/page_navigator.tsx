@@ -1,22 +1,25 @@
 import { FilterList } from "./filter.tsx";
-import { FilterOption } from "../types.ts";
-import { CompletionContext, CompletionResult } from "../deps.ts";
-import { PageMeta } from "$sb/types.ts";
+import { FilterOption } from "$lib/web.ts";
+import { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
+import { PageMeta } from "../../plug-api/types.ts";
 import { isFederationPath } from "$sb/lib/resolve.ts";
+import { tagRegex as mdTagRegex } from "$common/markdown_parser/parser.ts";
 
-const tagRegex = /#[^#\d\s\[\]]+\w+/g;
+const tagRegex = new RegExp(mdTagRegex.source, "g");
 
 export function PageNavigator({
   allPages,
   onNavigate,
   completer,
   vimMode,
+  mode,
   darkMode,
   currentPage,
 }: {
   allPages: PageMeta[];
   vimMode: boolean;
   darkMode: boolean;
+  mode: "page" | "template";
   onNavigate: (page: string | undefined) => void;
   completer: (context: CompletionContext) => Promise<CompletionResult | null>;
   currentPage?: string;
@@ -42,26 +45,40 @@ export function PageNavigator({
     if (isFederationPath(pageMeta.name)) {
       orderId = Math.round(orderId / 10); // Just 10x lower the timestamp to push them down, should work
     }
-    let description: string | undefined;
-    let aliases: string[] = [];
-    if (pageMeta.displayName) {
-      aliases.push(pageMeta.displayName);
+
+    if (mode === "page") {
+      // Special behavior for regular pages
+      let description: string | undefined;
+      let aliases: string[] = [];
+      if (pageMeta.displayName) {
+        aliases.push(pageMeta.displayName);
+      }
+      if (Array.isArray(pageMeta.aliases)) {
+        aliases = aliases.concat(pageMeta.aliases);
+      }
+      if (aliases.length > 0) {
+        description = "(a.k.a. " + aliases.join(", ") + ") ";
+      }
+      if (pageMeta.tags) {
+        description = (description || "") +
+          pageMeta.tags.map((tag) => `#${tag}`).join(" ");
+      }
+      options.push({
+        ...pageMeta,
+        description,
+        orderId: orderId,
+      });
+    } else {
+      // Special behavior for templates
+      options.push({
+        ...pageMeta,
+        // Use the displayName or last bit of the path as the name
+        name: pageMeta.displayName || pageMeta.name.split("/").pop()!,
+        // And use the full path as the description
+        description: pageMeta.name,
+        orderId: orderId,
+      });
     }
-    if (Array.isArray(pageMeta.aliases)) {
-      aliases = aliases.concat(pageMeta.aliases);
-    }
-    if (aliases.length > 0) {
-      description = "(a.k.a. " + aliases.join(", ") + ") ";
-    }
-    if (pageMeta.tags) {
-      description = (description || "") +
-        pageMeta.tags.map((tag) => `#${tag}`).join(" ");
-    }
-    options.push({
-      ...pageMeta,
-      description,
-      orderId: orderId,
-    });
   }
   let completePrefix = currentPage + "/";
   if (currentPage && currentPage.includes("/")) {
@@ -72,7 +89,7 @@ export function PageNavigator({
   }
   return (
     <FilterList
-      placeholder="Page"
+      placeholder={mode === "page" ? "Page" : "Template"}
       label="Open"
       options={options}
       vimMode={vimMode}
@@ -83,27 +100,38 @@ export function PageNavigator({
         return phrase;
       }}
       preFilter={(options, phrase) => {
-        const allTags = phrase.match(tagRegex);
-        if (allTags) {
-          // Search phrase contains hash tags, let's pre-filter the results based on this
-          const filterTags = allTags.map((t) => t.slice(1));
+        if (mode === "page") {
+          const allTags = phrase.match(tagRegex);
+          if (allTags) {
+            // Search phrase contains hash tags, let's pre-filter the results based on this
+            const filterTags = allTags.map((t) => t.slice(1));
+            options = options.filter((pageMeta) => {
+              if (!pageMeta.tags) {
+                return false;
+              }
+              return filterTags.every((tag) =>
+                pageMeta.tags.find((itemTag: string) => itemTag.startsWith(tag))
+              );
+            });
+          }
           options = options.filter((pageMeta) => {
-            if (!pageMeta.tags) {
-              return false;
-            }
-            return filterTags.every((tag) =>
-              pageMeta.tags.find((itemTag: string) => itemTag.startsWith(tag))
-            );
+            return !pageMeta.tags?.includes("template");
           });
+          return options;
+        } else {
+          // Filter on pages tagged with "template"
+          options = options.filter((pageMeta) => {
+            return pageMeta.tags?.includes("template");
+          });
+          return options;
         }
-        return options;
       }}
       allowNew={true}
-      helpText="Press <code>Enter</code> to open the selected page, or <code>Shift-Enter</code> to create a new page with this exact name."
-      newHint="Create page"
+      helpText={`Press <code>Enter</code> to open the selected ${mode}, or <code>Shift-Enter</code> to create a new ${mode} with this exact name.`}
+      newHint={`Create ${mode}`}
       completePrefix={completePrefix}
       onSelect={(opt) => {
-        onNavigate(opt?.name);
+        onNavigate(opt?.ref || opt?.name);
       }}
     />
   );

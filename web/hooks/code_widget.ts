@@ -1,11 +1,7 @@
-import { Hook, Manifest } from "../../plugos/types.ts";
-import { System } from "../../plugos/system.ts";
-import { CodeWidgetCallback } from "$sb/types.ts";
-
-export type CodeWidgetT = {
-  codeWidget?: string;
-  renderMode?: "markdown" | "iframe";
-};
+import { Hook, Manifest } from "../../lib/plugos/types.ts";
+import { System } from "../../lib/plugos/system.ts";
+import { CodeWidgetCallback } from "../../plug-api/types.ts";
+import { CodeWidgetT } from "$lib/manifest.ts";
 
 export class CodeWidgetHook implements Hook<CodeWidgetT> {
   codeWidgetCallbacks = new Map<string, CodeWidgetCallback>();

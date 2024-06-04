@@ -1,16 +1,9 @@
 // Forked from https://codeberg.org/retronav/ixora
 // Original author: Pranav Karawale
 // License: Apache License 2.0.
-import {
-  Decoration,
-  DecorationSet,
-  EditorState,
-  EditorView,
-  StateField,
-  Transaction,
-  WidgetType,
-} from "../deps.ts";
-
+import { EditorState, StateField, Transaction } from "@codemirror/state";
+import { DecorationSet } from "@codemirror/view";
+import { Decoration, EditorView, WidgetType } from "@codemirror/view";
 type LinkOptions = {
   text: string;
   href?: string;
@@ -30,13 +23,21 @@ export class LinkWidget extends WidgetType {
     anchor.textContent = this.options.text;
 
     // Mouse handling
-    anchor.addEventListener("mousedown", (e) => {
+    anchor.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    anchor.addEventListener("mouseup", (e) => {
       if (e.button !== 0) {
         return;
       }
       e.preventDefault();
       e.stopPropagation();
-      this.options.callback(e);
+      try {
+        this.options.callback(e);
+      } catch (e) {
+        console.error("Error handling wiki link click", e);
+      }
     });
 
     // Touch handling
@@ -111,7 +112,7 @@ export class ButtonWidget extends WidgetType {
     const anchor = document.createElement("button");
     anchor.className = this.cssClass;
     anchor.textContent = this.text;
-    anchor.addEventListener("click", (e) => {
+    anchor.addEventListener("mouseup", (e) => {
       e.preventDefault();
       e.stopPropagation();
       this.callback(e);

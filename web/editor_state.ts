@@ -1,50 +1,56 @@
-import buildMarkdown, {
-  commandLinkRegex,
-} from "../common/markdown_parser/parser.ts";
 import { readonlyMode } from "./cm_plugins/readonly.ts";
 import customMarkdownStyle from "./style.ts";
+import {
+  history,
+  historyKeymap,
+  indentWithTab,
+  standardKeymap,
+} from "@codemirror/commands";
 import {
   autocompletion,
   closeBrackets,
   closeBracketsKeymap,
-  codeFolding,
   completionKeymap,
-  drawSelection,
-  dropCursor,
-  EditorState,
-  EditorView,
-  highlightSpecialChars,
-  history,
-  historyKeymap,
+} from "@codemirror/autocomplete";
+import {
+  codeFolding,
   indentOnInput,
-  indentWithTab,
-  KeyBinding,
-  keymap,
   LanguageDescription,
   LanguageSupport,
-  markdown,
-  searchKeymap,
-  standardKeymap,
   syntaxHighlighting,
+} from "@codemirror/language";
+import { EditorState } from "@codemirror/state";
+import {
+  drawSelection,
+  dropCursor,
+  EditorView,
+  highlightSpecialChars,
+  KeyBinding,
+  keymap,
   ViewPlugin,
   ViewUpdate,
-} from "../common/deps.ts";
+} from "@codemirror/view";
+import { vim } from "@replit/codemirror-vim";
+import { markdown } from "@codemirror/lang-markdown";
 import { Client } from "./client.ts";
-import { vim } from "./deps.ts";
 import { inlineImagesPlugin } from "./cm_plugins/inline_image.ts";
 import { cleanModePlugins } from "./cm_plugins/clean.ts";
 import { lineWrapper } from "./cm_plugins/line_wrapper.ts";
 import { smartQuoteKeymap } from "./cm_plugins/smart_quotes.ts";
-import { safeRun } from "../common/util.ts";
-import { ClickEvent } from "$sb/app_event.ts";
+import { ClickEvent } from "../plug-api/types.ts";
 import {
   attachmentExtension,
   pasteLinkExtension,
 } from "./cm_plugins/editor_paste.ts";
-import { TextChange } from "$sb/lib/change.ts";
+import { TextChange } from "./change.ts";
 import { postScriptPrefacePlugin } from "./cm_plugins/top_bottom_panels.ts";
-import { languageFor } from "../common/languages.ts";
+import { languageFor } from "$common/languages.ts";
 import { plugLinter } from "./cm_plugins/lint.ts";
+import { Compartment, Extension } from "@codemirror/state";
+import { extendedMarkdownLanguage } from "$common/markdown_parser/parser.ts";
+import { parseCommand } from "$common/command.ts";
+import { safeRun } from "$lib/async.ts";
+import { codeCopyPlugin } from "./cm_plugins/code_copy.ts";
 
 export function createEditorState(
   client: Client,
@@ -52,84 +58,13 @@ export function createEditorState(
   text: string,
   readOnly: boolean,
 ): EditorState {
-  const commandKeyBindings: KeyBinding[] = [];
-
-  // Track which keyboard shortcuts for which commands we've overridden, so we can skip them later
-  const overriddenCommands = new Set<string>();
-  // Keyboard shortcuts from SETTINGS take precedense
-  if (client.settings?.shortcuts) {
-    for (const shortcut of client.settings.shortcuts) {
-      // Figure out if we're using the command link syntax here, if so: parse it out
-      const commandMatch = commandLinkRegex.exec(shortcut.command);
-      let cleanCommandName = shortcut.command;
-      let args: any[] = [];
-      if (commandMatch) {
-        cleanCommandName = commandMatch[1];
-        args = commandMatch[5] ? JSON.parse(`[${commandMatch[5]}]`) : [];
-      }
-      if (args.length === 0) {
-        // If there was no "specialization" of this command (that is, we effectively created a keybinding for an existing command but with arguments), let's add it to the overridden command set:
-        overriddenCommands.add(cleanCommandName);
-      }
-      commandKeyBindings.push({
-        key: shortcut.key,
-        mac: shortcut.mac,
-        run: (): boolean => {
-          client.runCommandByName(cleanCommandName, args).catch((e: any) => {
-            console.error(e);
-            client.flashNotification(
-              `Error running command: ${e.message}`,
-              "error",
-            );
-          }).then(() => {
-            // Always be focusing the editor after running a command
-            client.focus();
-          });
-          return true;
-        },
-      });
-    }
-  }
-
-  // Then add bindings for plug commands
-  for (const def of client.system.commandHook.editorCommands.values()) {
-    if (def.command.key) {
-      // If we've already overridden this command, skip it
-      if (overriddenCommands.has(def.command.key)) {
-        continue;
-      }
-      commandKeyBindings.push({
-        key: def.command.key,
-        mac: def.command.mac,
-        run: (): boolean => {
-          if (def.command.contexts) {
-            const context = client.getContext();
-            if (!context || !def.command.contexts.includes(context)) {
-              return false;
-            }
-          }
-          Promise.resolve([])
-            .then(def.run)
-            .catch((e: any) => {
-              console.error(e);
-              client.flashNotification(
-                `Error running command: ${e.message}`,
-                "error",
-              );
-            })
-            .then(() => {
-              // Always be focusing the editor after running a command
-              client.focus();
-            });
-          return true;
-        },
-      });
-    }
-  }
-
   let touchCount = 0;
 
-  const markdownLanguage = buildMarkdown(client.system.mdExtensions);
+  // Ugly: keep the keyhandler compartment in the client, to be replaced later once more commands are loaded
+  client.keyHandlerCompartment = new Compartment();
+  const keyBindings = client.keyHandlerCompartment.of(
+    createKeyBindings(client),
+  );
 
   return EditorState.create({
     doc: text,
@@ -150,7 +85,7 @@ export function createEditorState(
 
       // The uber markdown mode
       markdown({
-        base: markdownLanguage,
+        base: extendedMarkdownLanguage,
         codeLanguages: (info) => {
           const lang = languageFor(info);
           if (lang) {
@@ -164,19 +99,20 @@ export function createEditorState(
         },
         addKeymap: true,
       }),
-      markdownLanguage.data.of({
+      extendedMarkdownLanguage.data.of({
         closeBrackets: { brackets: ["(", "{", "[", "`"] },
       }),
-      syntaxHighlighting(customMarkdownStyle(client.system.mdExtensions)),
+      syntaxHighlighting(customMarkdownStyle()),
       autocompletion({
         override: [
           client.editorComplete.bind(client),
-          client.system.slashCommandHook.slashCommandCompleter.bind(
-            client.system.slashCommandHook,
+          client.clientSystem.slashCommandHook.slashCommandCompleter.bind(
+            client.clientSystem.slashCommandHook,
           ),
         ],
       }),
       inlineImagesPlugin(client),
+      codeCopyPlugin(client),
       highlightSpecialChars(),
       history(),
       drawSelection(),
@@ -196,6 +132,8 @@ export function createEditorState(
         { selector: "ATXHeading2", class: "sb-line-h2" },
         { selector: "ATXHeading3", class: "sb-line-h3" },
         { selector: "ATXHeading4", class: "sb-line-h4" },
+        { selector: "ATXHeading5", class: "sb-line-h5" },
+        { selector: "ATXHeading6", class: "sb-line-h6" },
         { selector: "ListItem", class: "sb-line-li", nesting: true },
         { selector: "Blockquote", class: "sb-line-blockquote" },
         { selector: "Task", class: "sb-line-task" },
@@ -209,48 +147,13 @@ export function createEditorState(
         { selector: "BulletList", class: "sb-line-ul" },
         { selector: "OrderedList", class: "sb-line-ol" },
         { selector: "TableHeader", class: "sb-line-tbl-header" },
-        { selector: "FrontMatter", class: "sb-frontmatter" },
-      ]),
-      keymap.of([
-        ...commandKeyBindings,
-        ...smartQuoteKeymap,
-        ...closeBracketsKeymap,
-        ...standardKeymap,
-        ...searchKeymap,
-        ...historyKeymap,
-        ...completionKeymap,
-        indentWithTab,
         {
-          key: "Ctrl-k",
-          mac: "Cmd-k",
-          run: (): boolean => {
-            client.startPageNavigate();
-            return true;
-          },
-        },
-        {
-          key: "Ctrl-/",
-          mac: "Cmd-/",
-          run: (): boolean => {
-            client.ui.viewDispatch({
-              type: "show-palette",
-              context: client.getContext(),
-            });
-            return true;
-          },
-        },
-        {
-          key: "Ctrl-.",
-          mac: "Cmd-.",
-          run: (): boolean => {
-            client.ui.viewDispatch({
-              type: "show-palette",
-              context: client.getContext(),
-            });
-            return true;
-          },
+          selector: "FrontMatter",
+          class: "sb-frontmatter",
+          disableSpellCheck: true,
         },
       ]),
+      keyBindings,
       EditorView.domEventHandlers({
         // This may result in duplicated touch events on mobile devices
         touchmove: () => {
@@ -365,4 +268,94 @@ export function createEditorState(
       closeBrackets(),
     ],
   });
+}
+
+export function createCommandKeyBindings(client: Client): KeyBinding[] {
+  const commandKeyBindings: KeyBinding[] = [];
+
+  // Track which keyboard shortcuts for which commands we've overridden, so we can skip them later
+  const overriddenCommands = new Set<string>();
+  // Keyboard shortcuts from SETTINGS take precedense
+  if (client.settings?.shortcuts) {
+    for (const shortcut of client.settings.shortcuts) {
+      // Figure out if we're using the command link syntax here, if so: parse it out
+      const parsedCommand = parseCommand(shortcut.command);
+      if (parsedCommand.args.length === 0) {
+        // If there was no "specialization" of this command (that is, we effectively created a keybinding for an existing command but with arguments), let's add it to the overridden command set:
+        overriddenCommands.add(parsedCommand.name);
+      }
+      commandKeyBindings.push({
+        key: shortcut.key,
+        mac: shortcut.mac,
+        run: (): boolean => {
+          client.runCommandByName(parsedCommand.name, parsedCommand.args).catch(
+            (e: any) => {
+              console.error(e);
+              client.flashNotification(
+                `Error running command: ${e.message}`,
+                "error",
+              );
+            },
+          ).then((returnValue: any) => {
+            // Always be focusing the editor after running a command
+            if (returnValue !== false) {
+              client.focus();
+            }
+          });
+          return true;
+        },
+      });
+    }
+  }
+
+  // Then add bindings for plug commands
+  for (const def of client.clientSystem.commandHook.editorCommands.values()) {
+    if (def.command.key) {
+      // If we've already overridden this command, skip it
+      if (overriddenCommands.has(def.command.name)) {
+        continue;
+      }
+      commandKeyBindings.push({
+        key: def.command.key,
+        mac: def.command.mac,
+        run: (): boolean => {
+          if (def.command.contexts) {
+            const context = client.getContext();
+            if (!context || !def.command.contexts.includes(context)) {
+              return false;
+            }
+          }
+          Promise.resolve([])
+            .then(def.run)
+            .catch((e: any) => {
+              console.error(e);
+              client.flashNotification(
+                `Error running command: ${e.message}`,
+                "error",
+              );
+            }).then((returnValue: any) => {
+              // Always be focusing the editor after running a command
+              if (returnValue !== false) {
+                client.focus();
+              }
+            });
+
+          return true;
+        },
+      });
+    }
+  }
+
+  return commandKeyBindings;
+}
+
+export function createKeyBindings(client: Client): Extension {
+  return keymap.of([
+    ...createCommandKeyBindings(client),
+    ...smartQuoteKeymap,
+    ...closeBracketsKeymap,
+    ...standardKeymap,
+    ...completionKeymap,
+    indentWithTab,
+  ]);
 }

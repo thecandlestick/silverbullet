@@ -20,10 +20,16 @@
     &.sb-line-h1,
     &.sb-line-h2,
     &.sb-line-h3,
-    &.sb-line-h4 {
+    &.sb-line-h4,
+    &.sb-line-h5,
+    &.sb-line-h6 {
       font-weight: bold;
       padding: 2px;
     }
+  }
+
+  .cm-line:has(.sb-directive) {
+    background-color: var(--editor-directive-background-color);
   }
 
   .sb-line-h1 {
@@ -38,7 +44,9 @@
     font-size: 1.1em;
   }
 
-  .sb-line-h4 {
+  .sb-line-h4,
+  .sb-line-h5,
+  .sb-line-h6 {
     font-size: 1em;
   }
 
@@ -230,6 +238,14 @@
     text-indent: -5ch;
   }
 
+  .sb-header-inside.sb-line-h5 {
+    text-indent: -6ch;
+  }
+
+  .sb-header-inside.sb-line-h6 {
+    text-indent: -7ch;
+  }
+
   .sb-checkbox>input[type="checkbox"] {
     width: 3ch;
   }
@@ -306,7 +322,7 @@
   }
 
   .sb-wiki-link {
-    cursor: pointer;
+    // cursor: pointer;
   }
 
   .sb-task-mark {
@@ -315,6 +331,10 @@
 
   .sb-task-state {
     font-size: 91%;
+  }
+
+  .sb-task-deadline {
+    background-color: rgba(22, 22, 22, 0.07)
   }
 
   .sb-line-frontmatter-outside,
@@ -387,6 +407,17 @@
     padding-right: 7px;
   }
 
+  .sb-code-copy-button {
+    float: right;
+    cursor: pointer;
+    margin: 0 3px;
+  }
+
+  .sb-code-copy-button>svg {
+    height: 1rem;
+    width: 1rem;
+  }
+
   .sb-line-fenced-code .sb-code {
     background-color: transparent;
   }
@@ -410,6 +441,10 @@
 
   .sb-markdown-widget {
     margin: 0 0 -4ch 0;
+
+    ::selection {
+      background-color: var(--editor-selection-background-color) !important;
+    }
   }
 
   .sb-markdown-top-widget h1,
@@ -559,10 +594,16 @@
   }
 
   .sb-admonition-icon {
+    mask: var(--admonition-icon) no-repeat;
+    -webkit-mask: var(--admonition-icon) no-repeat;
+    mask-size: cover;
+    -webkit-mask-size: cover;
+    width: 1.1em;
+    height: 1.1em;
     display: inline-flex;
     vertical-align: middle;
-    padding-left: 16px;
-    padding-right: 8px;
+    margin-left: 16px;
+    margin-right: 8px;
   }
 
   .sb-frontmatter-marker {

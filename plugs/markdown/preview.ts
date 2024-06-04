@@ -1,6 +1,6 @@
 import { asset, clientStore, editor, markdown, system } from "$sb/syscalls.ts";
 import { renderMarkdownToHtml } from "./markdown_render.ts";
-import { resolveAttachmentPath } from "$sb/lib/resolve.ts";
+import { isLocalPath, resolvePath } from "$sb/lib/resolve.ts";
 import { expandCodeWidgets } from "./api.ts";
 
 export async function updateMarkdownPreview() {
@@ -19,17 +19,35 @@ export async function updateMarkdownPreview() {
     smartHardBreak: true,
     annotationPositions: true,
     translateUrls: (url) => {
-      if (!url.includes("://")) {
-        url = resolveAttachmentPath(currentPage, decodeURI(url));
+      if (isLocalPath(url)) {
+        url = resolvePath(currentPage, decodeURI(url));
       }
       return url;
     },
   });
+  const customStyles = await editor.getUiOption("customStyles");
+  const darkMode = await clientStore.get("darkMode");
+  const theme = darkMode ? "dark" : "light";
   await editor.showPanel(
     "rhs",
     2,
-    `<html><head><style>${css}</style></head><body><div id="root">${html}</div></body></html>`,
-    js,
+    `<html>
+      <head>
+        <link rel="stylesheet" href="/.client/main.css" />
+        <style>
+          ${css}
+          ${customStyles ?? ""}
+        </style>
+      </head>
+      <body>
+        <div id="root" class="sb-preview">${html}</div>
+      </body>
+    </html>`,
+    `
+      document.documentElement.dataset.theme = ${JSON.stringify(theme)};
+
+      ${js}
+    `,
   );
 }
 

@@ -1,36 +1,8 @@
 name: tasks
-syntax:
-  DeadlineDate:
-    firstCharacters:
-      - "📅"
-    regex: "📅\\s*\\d{4}\\-\\d{2}\\-\\d{2}"
-    styles:
-      backgroundColor: "rgba(22,22,22,0.07)"
-  CompletedDate:
-    firstCharacters:
-      - "✅"
-    regex: "✅\\s*\\d{4}\\-\\d{2}\\-\\d{2}"
-    styles:
-      backgroundColor: "rgba(22,22,22,0.07)"
-  RepeatInterval:
-    firstCharacters:
-      - "🔁"
-    regex: "🔁\\s*every\\s+\\w+"
-    styles:
-      backgroundColor: "rgba(22,22,22,0.07)"
 functions:
   # API
   updateTaskState:
     path: task.ts:updateTaskState
-
-
-  turnIntoTask:
-    redirect: template.applyLineReplace
-    slashCommand:
-      name: task
-      description: Turn into task
-      match: "^(\\s*)[\\-\\*]?\\s*(\\[[ xX]\\])?\\s*"
-      replace: "$1* [ ] "
 
   indexTasks:
     path: "./task.ts:indexTasks"
@@ -45,11 +17,13 @@ functions:
     command:
       name: "Task: Cycle State"
       key: Alt-t
+      requireMode: rw
   taskPostponeCommand:
     path: ./task.ts:postponeCommand
     command:
       name: "Task: Postpone"
       key: Alt-+
+      requireMode: rw
       contexts:
         - DeadlineDate
   previewTaskToggle:
@@ -61,3 +35,9 @@ functions:
     path: ./complete.ts:completeTaskState
     events:
     - editor:complete
+
+  removeCompletedTasksCommand:
+    path: task.ts:removeCompletedTasksCommand
+    command:
+      name: "Task: Remove Completed"
+      requireMode: rw

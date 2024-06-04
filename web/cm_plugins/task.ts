@@ -1,4 +1,6 @@
-import { Decoration, NodeType, syntaxTree, WidgetType } from "../deps.ts";
+import { syntaxTree } from "@codemirror/language";
+import { Decoration, WidgetType } from "@codemirror/view";
+import { NodeType } from "@lezer/common";
 import { decoratorStateField, isCursorInRange } from "./util.ts";
 
 /**
@@ -19,9 +21,11 @@ class CheckboxWidget extends WidgetType {
     checkbox.type = "checkbox";
     checkbox.checked = this.checked;
     checkbox.addEventListener("click", (e) => {
-      // Let the click handler handle this
       e.stopPropagation();
-
+      e.preventDefault();
+    });
+    checkbox.addEventListener("mouseup", (e) => {
+      e.stopPropagation();
       this.clickCallback(this.pos);
     });
     wrap.appendChild(checkbox);

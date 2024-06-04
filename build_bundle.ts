@@ -1,4 +1,5 @@
-import { denoPlugins, esbuild } from "./plugos/deps.ts";
+import { denoPlugins } from "esbuild_deno_loader";
+import * as esbuild from "esbuild";
 
 await Deno.mkdir("dist", { recursive: true });
 await esbuild.build({
@@ -11,30 +12,12 @@ await esbuild.build({
   bundle: true,
   treeShaking: true,
   sourcemap: false,
-  minify: false,
-  plugins: [
-    // ESBuild plugin to make npm modules external
-    {
-      name: "npm-external",
-      setup(build: any) {
-        build.onResolve({ filter: /^npm:/ }, (args: any) => {
-          return {
-            path: args.path,
-            external: true,
-          };
-        });
-      },
-    },
-    {
-      name: "json",
-      setup: (build) =>
-        build.onLoad({ filter: /\.json$/ }, () => ({ loader: "json" })),
-    },
-    ...denoPlugins({
-      importMapURL: new URL("./import_map.json", import.meta.url)
-        .toString(),
-    }),
-  ],
+  logLevel: "error",
+  minify: true,
+  plugins: denoPlugins({
+    importMapURL: new URL("./import_map.json", import.meta.url)
+      .toString(),
+  }),
 });
 const bundleJs = await Deno.readTextFile("dist/silverbullet.js");
 // Patch output JS with import.meta.main override to avoid ESBuild CLI handling

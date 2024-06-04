@@ -3,9 +3,9 @@ import {
   ParseTree,
   renderToText,
   replaceNodesMatchingAsync,
-} from "$sb/lib/tree.ts";
+} from "../../plug-api/lib/tree.ts";
 import { codeWidget } from "$sb/syscalls.ts";
-import { parseMarkdown } from "$sb/silverbullet-syscall/markdown.ts";
+import { parseMarkdown } from "../../plug-api/syscalls/markdown.ts";
 import {
   MarkdownRenderOptions,
   renderMarkdownToHtml,
@@ -54,6 +54,7 @@ export async function expandCodeWidgets(
         // 'not found' is to be expected (no code widget configured for this language)
         // Every other error should probably be reported
         if (!e.message.includes("not found")) {
+          console.trace();
           console.error("Error rendering code", e.message);
         }
       }

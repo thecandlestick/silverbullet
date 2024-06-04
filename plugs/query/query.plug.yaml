@@ -1,29 +1,44 @@
 name: query
 functions:
+  # API
+  queryParsed:
+    path: api.ts:queryParsed
+  query:
+    path: api.ts:query
+  renderQuery:
+    path: api.ts:renderQuery
+
   queryWidget:
-    path: query.ts:widget
+    path: widget.ts:widget
     codeWidget: query
     renderMode: markdown
 
-  lintQuery:
-    path: query.ts:lintQuery
-    events:
-    - editor:lint
+  # Query widget buttons
+  editButton:
+    path: widget.ts:editButton
 
-  templateWidget:
-    path: template.ts:widget
-    codeWidget: template
-    renderMode: markdown
+  bakeButton:
+    path: widget.ts:bakeButton
+
+  lintQuery:
+    path: lint.ts:lintQuery
+    events:
+      - editor:lint
 
   queryComplete:
     path: complete.ts:queryComplete
     events:
-    - editor:complete
+      - editor:complete
+
+  queryAttributeComplete:
+    path: complete.ts:queryAttributeComplete
+    events:
+      - editor:complete
 
   languageComplete:
     path: complete.ts:languageComplete
     events:
-    - editor:complete
+      - editor:complete
 
   refreshAllWidgets:
     path: widget.ts:refreshAllWidgets
@@ -31,26 +46,7 @@ functions:
       name: "Live Queries and Templates: Refresh All"
       key: "Alt-q"
 
-  # Query widget buttons
-  editButton:
-    path: widget.ts:editButton
-
-  # Slash commands
-  insertQuery:
-    redirect: template.insertTemplateText
-    slashCommand:
-      name: query
-      description: Insert a query
-      value: |
-        ```query
-        |^|
-        ```
-  insertUseTemplate:
-    redirect: template.insertTemplateText
-    slashCommand:
-      name: template
-      description: Use a template
-      value: |
-        ```template
-        page: "[[|^|]]"
-        ```
+  bakeAllWidgets:
+    path: widget.ts:bakeAllWidgets
+    command:
+      name: "Page: Bake live blocks"

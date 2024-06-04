@@ -1,5 +1,6 @@
 import { FileMeta } from "$sb/types.ts";
-import { EventHook } from "../../plugos/hooks/event.ts";
+import { EventHook } from "$common/hooks/event.ts";
+import { plugPrefix } from "$common/spaces/constants.ts";
 
 import type { SpacePrimitives } from "./space_primitives.ts";
 
@@ -12,8 +13,10 @@ import type { SpacePrimitives } from "./space_primitives.ts";
  * - page:deleted (string)
  */
 export class EventedSpacePrimitives implements SpacePrimitives {
-  // Avoid file listing while performing another fetch (read, write, meta) operation
-  alreadyFetching = false;
+  // Various operations may be going on at the same time, and we don't want to trigger events unnessarily.
+  // Therefore we use this variable to track if any operation is in flight, and if so, we skip event triggering.
+  // This is ok, because any event will be picked up in a following iteration.
+  operationInProgress = false;
 
   initialFileListLoad = true;
 
@@ -29,13 +32,21 @@ export class EventedSpacePrimitives implements SpacePrimitives {
   }
 
   async fetchFileList(): Promise<FileMeta[]> {
-    const newFileList = await this.wrapped.fetchFileList();
-    if (this.alreadyFetching) {
-      // Avoid race conditions, let's just skip this in terms of event triggering: that's ok
-      return newFileList;
+    if (this.operationInProgress) {
+      // Some other operation (read, write, list, meta) is already going on
+      // this will likely trigger events, so let's not worry about any of that and avoid race condition and inconsistent data.
+      console.info(
+        "alreadyFetching is on, skipping even triggering for fetchFileList.",
+      );
+      return this.wrapped.fetchFileList();
     }
+    // Fetching mutex
+    this.operationInProgress = true;
     try {
-      this.alreadyFetching = true;
+      // Fetch the list
+      const newFileList = await this.wrapped.fetchFileList();
+
+      // Now we have the list, let's compare it to the snapshot and trigger events appropriately
       const deletedFiles = new Set<string>(Object.keys(this.spaceSnapshot));
       for (const meta of newFileList) {
         const oldHash = this.spaceSnapshot[meta.name];
@@ -80,7 +91,7 @@ export class EventedSpacePrimitives implements SpacePrimitives {
       this.initialFileListLoad = false;
       return newFileList;
     } finally {
-      this.alreadyFetching = false;
+      this.operationInProgress = false;
     }
   }
 
@@ -89,14 +100,17 @@ export class EventedSpacePrimitives implements SpacePrimitives {
   ): Promise<{ data: Uint8Array; meta: FileMeta }> {
     try {
       // Fetching mutex
-      this.alreadyFetching = true;
+      const wasFetching = this.operationInProgress;
+      this.operationInProgress = true;
 
       // Fetch file
       const data = await this.wrapped.readFile(name);
-      this.triggerEventsAndCache(name, data.meta.lastModified);
+      if (!wasFetching) {
+        this.triggerEventsAndCache(name, data.meta.lastModified);
+      }
       return data;
     } finally {
-      this.alreadyFetching = false;
+      this.operationInProgress = false;
     }
   }
 
@@ -107,7 +121,7 @@ export class EventedSpacePrimitives implements SpacePrimitives {
     meta?: FileMeta,
   ): Promise<FileMeta> {
     try {
-      this.alreadyFetching = true;
+      this.operationInProgress = true;
       const newMeta = await this.wrapped.writeFile(
         name,
         data,
@@ -137,10 +151,12 @@ export class EventedSpacePrimitives implements SpacePrimitives {
           name: pageName,
           text,
         });
+      } else if (!name.endsWith(plugPrefix)) {
+        await this.dispatchEvent("attachment:index", name, newMeta);
       }
       return newMeta;
     } finally {
-      this.alreadyFetching = false;
+      this.operationInProgress = false;
     }
   }
 
@@ -156,9 +172,12 @@ export class EventedSpacePrimitives implements SpacePrimitives {
 
   async getFileMeta(name: string): Promise<FileMeta> {
     try {
-      this.alreadyFetching = true;
+      const wasFetching = this.operationInProgress;
+      this.operationInProgress = true;
       const newMeta = await this.wrapped.getFileMeta(name);
-      this.triggerEventsAndCache(name, newMeta.lastModified);
+      if (!wasFetching) {
+        this.triggerEventsAndCache(name, newMeta.lastModified);
+      }
       return newMeta;
     } catch (e: any) {
       // console.log("Checking error", e, name);
@@ -171,13 +190,13 @@ export class EventedSpacePrimitives implements SpacePrimitives {
       }
       throw e;
     } finally {
-      this.alreadyFetching = false;
+      this.operationInProgress = false;
     }
   }
 
   async deleteFile(name: string): Promise<void> {
     try {
-      this.alreadyFetching = true;
+      this.operationInProgress = true;
       if (name.endsWith(".md")) {
         const pageName = name.substring(0, name.length - 3);
         await this.dispatchEvent("page:deleted", pageName);
@@ -187,7 +206,7 @@ export class EventedSpacePrimitives implements SpacePrimitives {
       delete this.spaceSnapshot[name];
       await this.dispatchEvent("file:deleted", name);
     } finally {
-      this.alreadyFetching = false;
+      this.operationInProgress = false;
     }
   }
 }

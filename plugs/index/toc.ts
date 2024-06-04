@@ -1,5 +1,5 @@
 import { editor, markdown, YAML } from "$sb/syscalls.ts";
-import { CodeWidgetContent } from "$sb/types.ts";
+import { CodeWidgetContent } from "../../plug-api/types.ts";
 import { renderToText, traverseTree } from "$sb/lib/tree.ts";
 
 type Header = {
@@ -41,6 +41,10 @@ export async function widget(
     return false;
   });
 
+  if (headers.length === 0) {
+    return null;
+  }
+
   if (config.minHeaders && headers.length < config.minHeaders) {
     // Not enough headers, not showing TOC
     return null;
@@ -69,6 +73,12 @@ export async function widget(
   return {
     markdown: renderedMd,
     buttons: [
+      {
+        description: "Bake result",
+        svg:
+          `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>`,
+        invokeFunction: "query.bakeButton",
+      },
       {
         description: "Edit",
         svg:

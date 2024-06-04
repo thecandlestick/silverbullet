@@ -3,7 +3,11 @@ import {
   findNodeOfType,
   ParseTree,
   renderToText,
-} from "$sb/lib/tree.ts";
+} from "./tree.ts";
+
+/**
+ * Feed parsing functionality (WIP)
+ */
 
 import { extractAttributes } from "$sb/lib/attribute.ts";
 
@@ -47,7 +51,7 @@ async function nodesToFeedItem(nodes: ParseTree[]): Promise<FeedItem> {
   const wrapperNode: ParseTree = {
     children: nodes,
   };
-  const attributes = await extractAttributes(wrapperNode, true);
+  const attributes = await extractAttributes(["feed"], wrapperNode, true);
   let id = attributes.id;
   delete attributes.id;
   if (!id) {

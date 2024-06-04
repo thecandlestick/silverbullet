@@ -1,4 +1,4 @@
-import { Tag } from "../deps.ts";
+import { Tag } from "@lezer/highlight";
 
 export const CommandLinkTag = Tag.define();
 export const CommandLinkNameTag = Tag.define();
@@ -17,6 +17,15 @@ export const AttributeTag = Tag.define();
 export const AttributeNameTag = Tag.define();
 export const AttributeValueTag = Tag.define();
 
+export const NamedAnchorTag = Tag.define();
+
 export const TaskTag = Tag.define();
 export const TaskMarkTag = Tag.define();
 export const TaskStateTag = Tag.define();
+export const TaskDeadlineTag = Tag.define();
+
+export const HashtagTag = Tag.define();
+export const NakedURLTag = Tag.define();
+
+export const DirectiveMarkTag = Tag.define();
+export const DirectiveTag = Tag.define();

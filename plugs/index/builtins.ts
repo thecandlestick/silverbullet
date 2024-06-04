@@ -1,7 +1,8 @@
-import { ObjectValue } from "$sb/types.ts";
+import { system } from "$sb/syscalls.ts";
 import { indexObjects } from "./api.ts";
-import { AttributeObject } from "./attributes.ts";
-import { TagObject } from "./tags.ts";
+import { ObjectValue, QueryProviderEvent } from "$sb/types.ts";
+import { applyQuery } from "$sb/lib/query.ts";
+import { builtinFunctions } from "$lib/builtin_query_functions.ts";
 
 export const builtinPseudoPage = ":builtin:";
 
@@ -18,6 +19,15 @@ export const builtins: Record<string, Record<string, string>> = {
     contentType: "!string",
     size: "!number",
     tags: "string[]",
+  },
+  attachment: {
+    ref: "!string",
+    name: "!string",
+    created: "!date",
+    lastModified: "!date",
+    perm: "!rw|ro",
+    contentType: "!string",
+    size: "!number",
   },
   task: {
     ref: "!string",
@@ -70,6 +80,13 @@ export const builtins: Record<string, Record<string, string>> = {
     alias: "!string",
     asTemplate: "!boolean",
   },
+  header: {
+    ref: "!string",
+    name: "!string",
+    page: "!string",
+    level: "!number",
+    pos: "!number",
+  },
   paragraph: {
     text: "!string",
     page: "!string",
@@ -80,15 +97,36 @@ export const builtins: Record<string, Record<string, string>> = {
     page: "!string",
     pageName: "string",
     pos: "!number",
-    type: "string",
-    trigger: "string",
-    where: "string",
-    priority: "number",
-    enabled: "boolean",
+    hooks: "hooksSpec",
+  },
+  table: {
+    ref: "!string",
+    page: "!string",
+    pos: "!number",
+  },
+
+  // System builtins
+  syscall: {
+    name: "!string",
+    requiredPermissions: "!string[]",
+    argCount: "!number",
+  },
+
+  command: {
+    name: "!string",
+    priority: "!number",
+    key: "!string",
+    mac: "!string",
+    hide: "!boolean",
+    requireMode: "!rw|ro",
   },
 };
 
 export async function loadBuiltinsIntoIndex() {
+  if (await system.getMode() === "ro") {
+    console.log("Running in read-only mode, not loading builtins");
+    return;
+  }
   console.log("Loading builtins attributes into index");
   const allObjects: ObjectValue<any>[] = [];
   for (const [tagName, attributes] of Object.entries(builtins)) {
@@ -114,4 +152,30 @@ export async function loadBuiltinsIntoIndex() {
     );
   }
   await indexObjects(builtinPseudoPage, allObjects);
+}
+
+export async function syscallSourceProvider({
+  query,
+  variables,
+}: QueryProviderEvent): Promise<any[]> {
+  const syscalls = await system.listSyscalls();
+  return applyQuery(
+    { ...query, distinct: true },
+    syscalls,
+    variables || {},
+    builtinFunctions,
+  );
+}
+
+export async function commandSourceProvider({
+  query,
+  variables,
+}: QueryProviderEvent): Promise<any[]> {
+  const commands = await system.listCommands();
+  return applyQuery(
+    { ...query, distinct: true },
+    Object.values(commands),
+    variables || {},
+    builtinFunctions,
+  );
 }

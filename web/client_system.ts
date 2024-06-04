@@ -1,65 +1,69 @@
-import { PlugNamespaceHook } from "../common/hooks/plug_namespace.ts";
-import { Manifest, SilverBulletHooks } from "../common/manifest.ts";
-import buildMarkdown from "../common/markdown_parser/parser.ts";
-import { CronHook } from "../plugos/hooks/cron.ts";
-import { EventHook } from "../plugos/hooks/event.ts";
-import { createSandbox } from "../plugos/sandboxes/web_worker_sandbox.ts";
+import { PlugNamespaceHook } from "$common/hooks/plug_namespace.ts";
+import { SilverBulletHooks } from "../lib/manifest.ts";
+import { CronHook } from "../lib/plugos/hooks/cron.ts";
+import { EventHook } from "../common/hooks/event.ts";
+import { createSandbox } from "../lib/plugos/sandboxes/web_worker_sandbox.ts";
 
-import assetSyscalls from "../plugos/syscalls/asset.ts";
-import { eventSyscalls } from "../plugos/syscalls/event.ts";
-import { System } from "../plugos/system.ts";
+import assetSyscalls from "../lib/plugos/syscalls/asset.ts";
+import { eventSyscalls } from "../lib/plugos/syscalls/event.ts";
+import { System } from "../lib/plugos/system.ts";
 import type { Client } from "./client.ts";
 import { CodeWidgetHook } from "./hooks/code_widget.ts";
-import { CommandHook } from "./hooks/command.ts";
+import { CommandHook } from "$common/hooks/command.ts";
 import { SlashCommandHook } from "./hooks/slash_command.ts";
 import { clientStoreSyscalls } from "./syscalls/clientStore.ts";
 import { debugSyscalls } from "./syscalls/debug.ts";
 import { editorSyscalls } from "./syscalls/editor.ts";
 import { sandboxFetchSyscalls } from "./syscalls/fetch.ts";
-import { markdownSyscalls } from "../common/syscalls/markdown.ts";
+import { markdownSyscalls } from "$common/syscalls/markdown.ts";
 import { shellSyscalls } from "./syscalls/shell.ts";
-import { spaceSyscalls } from "./syscalls/space.ts";
+import { spaceReadSyscalls, spaceWriteSyscalls } from "./syscalls/space.ts";
 import { syncSyscalls } from "./syscalls/sync.ts";
-import { systemSyscalls } from "./syscalls/system.ts";
-import { yamlSyscalls } from "../common/syscalls/yaml.ts";
-import { Space } from "./space.ts";
-import {
-  loadMarkdownExtensions,
-  MDExt,
-} from "../common/markdown_parser/markdown_ext.ts";
-import { MQHook } from "../plugos/hooks/mq.ts";
-import { mqSyscalls } from "../plugos/syscalls/mq.ts";
+import { systemSyscalls } from "$common/syscalls/system.ts";
+import { yamlSyscalls } from "$common/syscalls/yaml.ts";
+import { Space } from "../common/space.ts";
+import { MQHook } from "../lib/plugos/hooks/mq.ts";
+import { mqSyscalls } from "../lib/plugos/syscalls/mq.ts";
 import { mqProxySyscalls } from "./syscalls/mq.proxy.ts";
 import { dataStoreProxySyscalls } from "./syscalls/datastore.proxy.ts";
-import { dataStoreSyscalls } from "../plugos/syscalls/datastore.ts";
-import { DataStore } from "../plugos/lib/datastore.ts";
-import { MessageQueue } from "../plugos/lib/mq.ts";
-import { languageSyscalls } from "../common/syscalls/language.ts";
-import { handlebarsSyscalls } from "../common/syscalls/handlebars.ts";
+import {
+  dataStoreReadSyscalls,
+  dataStoreWriteSyscalls,
+} from "../lib/plugos/syscalls/datastore.ts";
+import { DataStore } from "$lib/data/datastore.ts";
+import { languageSyscalls } from "$common/syscalls/language.ts";
+import { templateSyscalls } from "$common/syscalls/template.ts";
 import { codeWidgetSyscalls } from "./syscalls/code_widget.ts";
 import { clientCodeWidgetSyscalls } from "./syscalls/client_code_widget.ts";
-import { KVPrimitivesManifestCache } from "../plugos/manifest_cache.ts";
-import { deepObjectMerge } from "$sb/lib/json.ts";
-import { Query } from "$sb/types.ts";
+import { KVPrimitivesManifestCache } from "$lib/plugos/manifest_cache.ts";
+import { deepObjectMerge } from "../plug-api/lib/json.ts";
+import { Query } from "../plug-api/types.ts";
 import { PanelWidgetHook } from "./hooks/panel_widget.ts";
+import { createKeyBindings } from "./editor_state.ts";
+import { CommonSystem } from "$common/common_system.ts";
+import { DataStoreMQ } from "$lib/data/mq.datastore.ts";
+import { plugPrefix } from "$common/spaces/constants.ts";
 
 const plugNameExtractRegex = /\/(.+)\.plug\.js$/;
 
-export class ClientSystem {
-  commandHook: CommandHook;
-  slashCommandHook: SlashCommandHook;
-  namespaceHook: PlugNamespaceHook;
-  codeWidgetHook: CodeWidgetHook;
-  mdExtensions: MDExt[] = [];
-  system: System<SilverBulletHooks>;
-  panelWidgetHook: PanelWidgetHook;
-
+/**
+ * Wrapper around a System, used by the client
+ */
+export class ClientSystem extends CommonSystem {
   constructor(
     private client: Client,
-    private mq: MessageQueue,
-    private ds: DataStore,
-    private eventHook: EventHook,
+    mq: DataStoreMQ,
+    ds: DataStore,
+    eventHook: EventHook,
+    readOnlyMode: boolean,
   ) {
+    super(
+      mq,
+      ds,
+      eventHook,
+      readOnlyMode,
+      window.silverBulletConfig.enableSpaceScript,
+    );
     // Only set environment to "client" when running in thin client mode, otherwise we run everything locally (hybrid)
     this.system = new System(
       client.syncMode ? undefined : "client",
@@ -96,12 +100,21 @@ export class ClientSystem {
     }
 
     // Command hook
-    this.commandHook = new CommandHook();
+    this.commandHook = new CommandHook(
+      this.readOnlyMode,
+      this.spaceScriptCommands,
+    );
     this.commandHook.on({
       commandsUpdated: (commandMap) => {
         this.client.ui?.viewDispatch({
           type: "update-commands",
           commands: commandMap,
+        });
+        // Replace the key mapping compartment (keybindings)
+        this.client.editorView.dispatch({
+          effects: this.client.keyHandlerCompartment?.reconfigure(
+            createKeyBindings(this.client),
+          ),
         });
       },
     });
@@ -128,26 +141,21 @@ export class ClientSystem {
     this.eventHook.addLocalListener(
       "file:changed",
       async (path: string, _selfUpdate, _oldHash, newHash) => {
-        if (path.startsWith("_plug/") && path.endsWith(".plug.js")) {
+        if (path.startsWith(plugPrefix) && path.endsWith(".plug.js")) {
           const plugName = plugNameExtractRegex.exec(path)![1];
           console.log("Plug updated, reloading", plugName, "from", path);
           this.system.unload(path);
-          const plug = await this.system.load(
+          await this.system.load(
             plugName,
             createSandbox(new URL(`/${path}`, location.href)),
             newHash,
           );
-          if ((plug.manifest! as Manifest).syntax) {
-            // If there are syntax extensions, rebuild the markdown parser immediately
-            this.updateMarkdownParser();
-          }
-          this.client.debouncedPlugsUpdatedEvent();
         }
       },
     );
   }
 
-  async init() {
+  init() {
     // Slash command hook
     this.slashCommandHook = new SlashCommandHook(this.client);
     this.system.addHook(this.slashCommandHook);
@@ -157,12 +165,12 @@ export class ClientSystem {
       [],
       eventSyscalls(this.eventHook),
       editorSyscalls(this.client),
-      spaceSyscalls(this.client),
-      systemSyscalls(this.system, this.client),
-      markdownSyscalls(buildMarkdown(this.mdExtensions)),
+      spaceReadSyscalls(this.client),
+      systemSyscalls(this.system, false, this, this.client),
+      markdownSyscalls(),
       assetSyscalls(this.system),
       yamlSyscalls(),
-      handlebarsSyscalls(),
+      templateSyscalls(this.ds),
       codeWidgetSyscalls(this.codeWidgetHook),
       clientCodeWidgetSyscalls(),
       languageSyscalls(),
@@ -171,24 +179,31 @@ export class ClientSystem {
         ? mqSyscalls(this.mq)
         // In non-sync mode proxy to server
         : mqProxySyscalls(this.client),
-      this.client.syncMode
-        ? dataStoreSyscalls(this.ds)
-        : dataStoreProxySyscalls(this.client),
-      debugSyscalls(),
+      ...this.client.syncMode
+        ? [dataStoreReadSyscalls(this.ds), dataStoreWriteSyscalls(this.ds)]
+        : [dataStoreProxySyscalls(this.client)],
+      debugSyscalls(this.client),
       syncSyscalls(this.client),
       clientStoreSyscalls(this.ds),
     );
 
-    // Syscalls that require some additional permissions
-    this.system.registerSyscalls(
-      ["fetch"],
-      sandboxFetchSyscalls(this.client),
-    );
+    if (!this.readOnlyMode) {
+      // Write syscalls
+      this.system.registerSyscalls(
+        [],
+        spaceWriteSyscalls(this.client),
+      );
+      // Syscalls that require some additional permissions
+      this.system.registerSyscalls(
+        ["fetch"],
+        sandboxFetchSyscalls(this.client),
+      );
 
-    this.system.registerSyscalls(
-      ["shell"],
-      shellSyscalls(this.client),
-    );
+      this.system.registerSyscalls(
+        ["shell"],
+        shellSyscalls(this.client),
+      );
+    }
   }
 
   async reloadPlugsFromSpace(space: Space) {
@@ -213,16 +228,6 @@ export class ClientSystem {
         );
       }
     }));
-  }
-
-  updateMarkdownParser() {
-    // Load all syntax extensions
-    this.mdExtensions = loadMarkdownExtensions(this.system);
-    // And reload the syscalls to use the new syntax extensions
-    this.system.registerSyscalls(
-      [],
-      markdownSyscalls(buildMarkdown(this.mdExtensions)),
-    );
   }
 
   localSyscall(name: string, args: any[]) {

@@ -1,76 +1,66 @@
-import { PlugNamespaceHook } from "../common/hooks/plug_namespace.ts";
-import { SilverBulletHooks } from "../common/manifest.ts";
-import { loadMarkdownExtensions } from "../common/markdown_parser/markdown_ext.ts";
-import buildMarkdown from "../common/markdown_parser/parser.ts";
-import { EventedSpacePrimitives } from "../common/spaces/evented_space_primitives.ts";
-import { PlugSpacePrimitives } from "../common/spaces/plug_space_primitives.ts";
-import { createSandbox } from "../plugos/sandboxes/web_worker_sandbox.ts";
-import { CronHook } from "../plugos/hooks/cron.ts";
-import { EventHook } from "../plugos/hooks/event.ts";
-import { MQHook } from "../plugos/hooks/mq.ts";
-import assetSyscalls from "../plugos/syscalls/asset.ts";
-import { eventSyscalls } from "../plugos/syscalls/event.ts";
-import { mqSyscalls } from "../plugos/syscalls/mq.ts";
-import { System } from "../plugos/system.ts";
-import { Space } from "../web/space.ts";
-import { debugSyscalls } from "../web/syscalls/debug.ts";
-import { markdownSyscalls } from "../common/syscalls/markdown.ts";
-import { spaceSyscalls } from "./syscalls/space.ts";
-import { systemSyscalls } from "../web/syscalls/system.ts";
-import { yamlSyscalls } from "../common/syscalls/yaml.ts";
-import { sandboxFetchSyscalls } from "../plugos/syscalls/fetch.ts";
+import { PlugNamespaceHook } from "$common/hooks/plug_namespace.ts";
+import { SilverBulletHooks } from "../lib/manifest.ts";
+import { EventedSpacePrimitives } from "$common/spaces/evented_space_primitives.ts";
+import { PlugSpacePrimitives } from "$common/spaces/plug_space_primitives.ts";
+import { createSandbox } from "../lib/plugos/sandboxes/web_worker_sandbox.ts";
+import { CronHook } from "../lib/plugos/hooks/cron.ts";
+import { EventHook } from "../common/hooks/event.ts";
+import { MQHook } from "../lib/plugos/hooks/mq.ts";
+import assetSyscalls from "../lib/plugos/syscalls/asset.ts";
+import { eventSyscalls } from "../lib/plugos/syscalls/event.ts";
+import { mqSyscalls } from "../lib/plugos/syscalls/mq.ts";
+import { System } from "../lib/plugos/system.ts";
+import { Space } from "../common/space.ts";
+import { markdownSyscalls } from "$common/syscalls/markdown.ts";
+import { spaceReadSyscalls, spaceWriteSyscalls } from "./syscalls/space.ts";
+import { systemSyscalls } from "$common/syscalls/system.ts";
+import { yamlSyscalls } from "$common/syscalls/yaml.ts";
+import { sandboxFetchSyscalls } from "../lib/plugos/syscalls/fetch.ts";
 import { shellSyscalls } from "./syscalls/shell.ts";
-import { SpacePrimitives } from "../common/spaces/space_primitives.ts";
-import { base64EncodedDataUrl } from "../plugos/asset_bundle/base64.ts";
-import { Plug } from "../plugos/plug.ts";
-import { DataStore } from "../plugos/lib/datastore.ts";
-import { dataStoreSyscalls } from "../plugos/syscalls/datastore.ts";
-import { DataStoreMQ } from "../plugos/lib/mq.datastore.ts";
-import { languageSyscalls } from "../common/syscalls/language.ts";
-import { handlebarsSyscalls } from "../common/syscalls/handlebars.ts";
+import { SpacePrimitives } from "$common/spaces/space_primitives.ts";
+import { Plug } from "../lib/plugos/plug.ts";
+import { DataStore } from "$lib/data/datastore.ts";
+import {
+  dataStoreReadSyscalls,
+  dataStoreWriteSyscalls,
+} from "../lib/plugos/syscalls/datastore.ts";
+import { languageSyscalls } from "$common/syscalls/language.ts";
+import { templateSyscalls } from "$common/syscalls/template.ts";
 import { codeWidgetSyscalls } from "../web/syscalls/code_widget.ts";
 import { CodeWidgetHook } from "../web/hooks/code_widget.ts";
-import { KVPrimitivesManifestCache } from "../plugos/manifest_cache.ts";
-import { KvPrimitives } from "../plugos/lib/kv_primitives.ts";
+import { KVPrimitivesManifestCache } from "$lib/plugos/manifest_cache.ts";
+import { KvPrimitives } from "$lib/data/kv_primitives.ts";
 import { ShellBackend } from "./shell_backend.ts";
-import { ensureSpaceIndex } from "../common/space_index.ts";
-
-// // Important: load this before the actual plugs
-// import {
-//   createSandbox as noSandboxFactory,
-//   runWithSystemLock,
-// } from "../plugos/sandboxes/no_sandbox.ts";
-
-// // Load list of builtin plugs
-// import { plug as plugIndex } from "../dist_plug_bundle/_plug/index.plug.js";
-// import { plug as plugFederation } from "../dist_plug_bundle/_plug/federation.plug.js";
-// import { plug as plugQuery } from "../dist_plug_bundle/_plug/query.plug.js";
-// import { plug as plugSearch } from "../dist_plug_bundle/_plug/search.plug.js";
-// import { plug as plugTasks } from "../dist_plug_bundle/_plug/tasks.plug.js";
-// import { plug as plugTemplate } from "../dist_plug_bundle/_plug/template.plug.js";
+import { ensureSpaceIndex } from "$common/space_index.ts";
+import { FileMeta } from "../plug-api/types.ts";
+import { CommandHook } from "$common/hooks/command.ts";
+import { CommonSystem } from "$common/common_system.ts";
+import { DataStoreMQ } from "$lib/data/mq.datastore.ts";
+import { plugPrefix } from "$common/spaces/constants.ts";
+import { base64EncodedDataUrl } from "$lib/crypto.ts";
 
 const fileListInterval = 30 * 1000; // 30s
 
 const plugNameExtractRegex = /([^/]+)\.plug\.js$/;
 
-export class ServerSystem {
-  system!: System<SilverBulletHooks>;
-  public spacePrimitives!: SpacePrimitives;
-  // denoKv!: Deno.Kv;
+export class ServerSystem extends CommonSystem {
   listInterval?: number;
-  ds!: DataStore;
 
   constructor(
-    private baseSpacePrimitives: SpacePrimitives,
-    readonly kvPrimitives: KvPrimitives,
+    public spacePrimitives: SpacePrimitives,
+    private kvPrimitives: KvPrimitives,
     private shellBackend: ShellBackend,
+    mq: DataStoreMQ,
+    ds: DataStore,
+    eventHook: EventHook,
+    readOnlyMode: boolean,
+    enableSpaceScript: boolean,
   ) {
+    super(mq, ds, eventHook, readOnlyMode, enableSpaceScript);
   }
 
   // Always needs to be invoked right after construction
   async init(awaitIndex = false) {
-    this.ds = new DataStore(this.kvPrimitives);
-
     this.system = new System(
       "server",
       {
@@ -82,25 +72,26 @@ export class ServerSystem {
       },
     );
 
+    this.ds = new DataStore(this.kvPrimitives);
+
     // Event hook
-    const eventHook = new EventHook();
-    this.system.addHook(eventHook);
+    this.system.addHook(this.eventHook);
+
+    // Command hook, just for introspection
+    this.commandHook = new CommandHook(
+      this.readOnlyMode,
+      this.spaceScriptCommands,
+    );
+    this.system.addHook(this.commandHook);
 
     // Cron hook
     const cronHook = new CronHook(this.system);
     this.system.addHook(cronHook);
 
-    const mq = new DataStoreMQ(this.ds);
-
-    setInterval(() => {
-      // Timeout after 5s, retries 3 times, otherwise drops the message (no DLQ)
-      mq.requeueTimeouts(5000, 3, true).catch(console.error);
-    }, 20000); // Look to requeue every 20s
-
     const plugNamespaceHook = new PlugNamespaceHook();
     this.system.addHook(plugNamespaceHook);
 
-    this.system.addHook(new MQHook(this.system, mq));
+    this.system.addHook(new MQHook(this.system, this.mq));
 
     const codeWidgetHook = new CodeWidgetHook();
 
@@ -108,74 +99,95 @@ export class ServerSystem {
 
     this.spacePrimitives = new EventedSpacePrimitives(
       new PlugSpacePrimitives(
-        this.baseSpacePrimitives,
+        this.spacePrimitives,
         plugNamespaceHook,
       ),
-      eventHook,
+      this.eventHook,
     );
-    const space = new Space(this.spacePrimitives, eventHook);
+    const space = new Space(this.spacePrimitives, this.eventHook);
 
     // Add syscalls
     this.system.registerSyscalls(
       [],
-      eventSyscalls(eventHook),
-      spaceSyscalls(space),
+      eventSyscalls(this.eventHook),
+      spaceReadSyscalls(space),
       assetSyscalls(this.system),
       yamlSyscalls(),
-      systemSyscalls(this.system),
-      mqSyscalls(mq),
+      systemSyscalls(this.system, this.readOnlyMode, this),
+      mqSyscalls(this.mq),
       languageSyscalls(),
-      handlebarsSyscalls(),
-      dataStoreSyscalls(this.ds),
-      debugSyscalls(),
+      templateSyscalls(this.ds),
+      dataStoreReadSyscalls(this.ds),
       codeWidgetSyscalls(codeWidgetHook),
-      markdownSyscalls(buildMarkdown([])), // Will later be replaced with markdown extensions
+      markdownSyscalls(),
     );
 
-    // Syscalls that require some additional permissions
-    this.system.registerSyscalls(
-      ["fetch"],
-      sandboxFetchSyscalls(),
-    );
+    if (!this.readOnlyMode) {
+      // Write mode only
+      this.system.registerSyscalls(
+        [],
+        spaceWriteSyscalls(space),
+        dataStoreWriteSyscalls(this.ds),
+      );
 
-    this.system.registerSyscalls(
-      ["shell"],
-      shellSyscalls(this.shellBackend),
-    );
+      // Syscalls that require some additional permissions
+      this.system.registerSyscalls(
+        ["fetch"],
+        sandboxFetchSyscalls(),
+      );
+
+      this.system.registerSyscalls(
+        ["shell"],
+        shellSyscalls(this.shellBackend),
+      );
+    }
 
     await this.loadPlugs();
 
-    // Load markdown syscalls based on all new syntax (if any)
-    this.system.registerSyscalls(
-      [],
-      markdownSyscalls(buildMarkdown(loadMarkdownExtensions(this.system))),
-    );
+    await this.loadSpaceScripts();
 
     this.listInterval = setInterval(() => {
-      // runWithSystemLock(this.system, async () => {
-      //   await space.updatePageList();
-      // });
       space.updatePageList().catch(console.error);
     }, fileListInterval);
 
-    eventHook.addLocalListener("file:changed", async (path, localChange) => {
-      if (!localChange && path.endsWith(".md")) {
-        const pageName = path.slice(0, -3);
-        const data = await this.spacePrimitives.readFile(path);
-        console.log("Outside page change: reindexing", pageName);
-        // Change made outside of editor, trigger reindex
-        await eventHook.dispatchEvent("page:index_text", {
-          name: pageName,
-          text: new TextDecoder().decode(data.data),
-        });
-      }
+    this.eventHook.addLocalListener(
+      "file:changed",
+      async (path, localChange) => {
+        if (!localChange) {
+          console.log("Outside file change: reindexing", path);
+          // Change made outside of editor, trigger reindex
+          if (path.endsWith(".md")) {
+            const pageName = path.slice(0, -3);
+            const data = await this.spacePrimitives.readFile(path);
+            await this.eventHook.dispatchEvent("page:index_text", {
+              name: pageName,
+              text: new TextDecoder().decode(data.data),
+            });
+          } else if (!path.startsWith(plugPrefix)) {
+            await this.eventHook.dispatchEvent("attachment:index", path);
+          }
+        }
 
-      if (path.startsWith("_plug/") && path.endsWith(".plug.js")) {
-        console.log("Plug updated, reloading:", path);
-        this.system.unload(path);
-        await this.loadPlugFromSpace(path);
-      }
-    });
+        if (path.startsWith(plugPrefix) && path.endsWith(".plug.js")) {
+          console.log("Plug updated, reloading:", path);
+          this.system.unload(path);
+          await this.loadPlugFromSpace(path);
+        }
+      },
+    );
+
+    this.eventHook.addLocalListener(
+      "file:listed",
+      (allFiles: FileMeta[]) => {
+        // Update list of known pages and attachments
+        this.allKnownFiles.clear();
+        allFiles.forEach((f) => {
+          if (!f.name.startsWith(plugPrefix)) {
+            this.allKnownFiles.add(f.name);
+          }
+        });
+      },
+    );
 
     // Ensure a valid index
     const indexPromise = ensureSpaceIndex(this.ds, this.system);
@@ -183,19 +195,10 @@ export class ServerSystem {
       await indexPromise;
     }
 
-    // await runWithSystemLock(this.system, async () => {
-    await eventHook.dispatchEvent("system:ready");
-    // });
+    await this.eventHook.dispatchEvent("system:ready");
   }
 
   async loadPlugs() {
-    // await this.system.load("index", noSandboxFactory(plugIndex));
-    // await this.system.load("federation", noSandboxFactory(plugFederation));
-    // await this.system.load("query", noSandboxFactory(plugQuery));
-    // await this.system.load("search", noSandboxFactory(plugSearch));
-    // await this.system.load("tasks", noSandboxFactory(plugTasks));
-    // await this.system.load("template", noSandboxFactory(plugTemplate));
-
     for (const { name } of await this.spacePrimitives.fetchFileList()) {
       if (plugNameExtractRegex.test(name)) {
         await this.loadPlugFromSpace(name);

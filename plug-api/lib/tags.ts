@@ -1,5 +1,5 @@
-import { FrontMatter } from "$sb/lib/frontmatter.ts";
-import { ObjectValue } from "$sb/types.ts";
+import { FrontMatter } from "./frontmatter.ts";
+import { ObjectValue } from "../types.ts";
 
 export function updateITags<T>(obj: ObjectValue<T>, frontmatter: FrontMatter) {
   const itags = [obj.tag, ...frontmatter.tags || []];

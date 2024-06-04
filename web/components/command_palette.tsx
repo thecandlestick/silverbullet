@@ -1,9 +1,10 @@
-import { isMacLike } from "../../common/util.ts";
 import { FilterList } from "./filter.tsx";
-import { CompletionContext, CompletionResult, TerminalIcon } from "../deps.ts";
-import { AppCommand } from "../hooks/command.ts";
-import { BuiltinSettings, FilterOption } from "../types.ts";
-import { commandLinkRegex } from "../../common/markdown_parser/parser.ts";
+import { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
+import { Terminal } from "preact-feather";
+import { AppCommand } from "../../lib/command.ts";
+import { FilterOption } from "$lib/web.ts";
+import { BuiltinSettings } from "../../type/web.ts";
+import { parseCommand } from "$common/command.ts";
 
 export function CommandPalette({
   commands,
@@ -25,6 +26,9 @@ export function CommandPalette({
   const options: FilterOption[] = [];
   const isMac = isMacLike();
   for (const [name, def] of commands.entries()) {
+    if (def.command.hide) {
+      continue;
+    }
     let shortcut: { key?: string; mac?: string; priority?: number } =
       def.command;
     // Let's see if there's a shortcut override
@@ -32,15 +36,13 @@ export function CommandPalette({
       const commandOverride = settings.shortcuts.find((
         shortcut,
       ) => {
-        const commandMatch = commandLinkRegex.exec(shortcut.command);
+        const parsedCommand = parseCommand(shortcut.command);
         // If this is a command link, we want to match the command name but also make sure no arguments were set
-        return commandMatch && commandMatch[1] === name && !commandMatch[5] ||
-          // or if it's not a command link, let's match exactly
-          shortcut.command === name;
+        return parsedCommand.name === name && parsedCommand.args.length === 0;
       });
       if (commandOverride) {
         shortcut = commandOverride;
-        console.log(`Shortcut override for ${name}:`, shortcut);
+        // console.log(`Shortcut override for ${name}:`, shortcut);
       }
     }
     options.push({
@@ -58,7 +60,7 @@ export function CommandPalette({
       placeholder="Command"
       options={options}
       allowNew={false}
-      icon={TerminalIcon}
+      icon={Terminal}
       completer={completer}
       vimMode={vimMode}
       darkMode={darkMode}
@@ -72,4 +74,12 @@ export function CommandPalette({
       }}
     />
   );
+}
+
+/**
+ * Checks if the current platform is Mac-like (Mac, iPhone, iPod, iPad).
+ * @returns A boolean indicating if the platform is Mac-like.
+ */
+function isMacLike() {
+  return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
 }

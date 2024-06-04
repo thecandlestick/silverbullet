@@ -1,10 +1,6 @@
 name: editor
-syntax:
-  NakedURL:
-    firstCharacters:
-      - "h"
-    regex: "https?:\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{1,256}([-a-zA-Z0-9()@:%_\\+.~#?&=\\/]*)"
-    className: sb-naked-url
+requiredPermissions:
+  - fetch
 functions:
   setEditorMode:
     path: "./editor.ts:setEditorMode"
@@ -15,15 +11,38 @@ functions:
     command:
       name: "Editor: Toggle Dark Mode"
 
+  openCommandPalette:
+    path: editor.ts:openCommandPalette
+    command:
+      name: "Open Command Palette"
+      key: "Ctrl-/"
+      mac: "Cmd-/"
+
+  openPageNavigator:
+    path: editor.ts:openPageNavigator
+    command:
+      name: "Navigate: Page Picker"
+      key: "Ctrl-k"
+      mac: "Cmd-k"
+
+  openTemplateNavigator:
+    path: editor.ts:openTemplateNavigator
+    command:
+      name: "Navigate: Template Picker"
+      key: "Ctrl-Shift-t"
+      mac: "Cmd-Shift-t"
+
   # Page operations
   deletePage:
     path: "./page.ts:deletePage"
     command:
       name: "Page: Delete"
+      requireMode: rw
   copyPage:
     path: "./page.ts:copyPage"
     command:
       name: "Page: Copy"
+      requireMode: rw
 
   # Completion
   pageComplete:
@@ -35,11 +54,17 @@ functions:
     events:
       - editor:complete
 
+  reloadSystem:
+    path: editor.ts:reloadSystem
+    command:
+      name: "System: Reload"
+      key: Ctrl-Alt-r
+
   # Navigation
   linkNavigate:
     path: "./navigate.ts:linkNavigate"
     command:
-      name: Navigate To page
+      name: "Navigate: To This Page"
       key: Ctrl-Enter
       mac: Cmd-Enter
   clickNavigate:
@@ -56,6 +81,24 @@ functions:
     path: "./editor.ts:moveToPosCommand"
     command:
       name: "Navigate: Move Cursor to Position"
+  navigateToPage:
+    path: "./navigate.ts:navigateToPage"
+    command:
+      name: "Navigate: To Page"
+      hide: true
+  navigateToURL:
+    path: "./navigate.ts:navigateToURL"
+    command:
+      name: "Navigate: To URL"
+      hide: true
+  navigateBack:
+    path: "./navigate.ts:navigateBack"
+    command:
+      name: "Navigate: Back in History"
+  navigateForward:
+    path: "./navigate.ts:navigateForward"
+    command:
+      name: "Navigate: Forward in History"
 
   # Text editing commands
   quoteSelectionCommand:
@@ -64,22 +107,26 @@ functions:
       name: "Text: Quote Selection"
       key: "Ctrl-Shift-."
       mac: "Cmd-Shift-."
+      requireMode: rw
   listifySelection:
     path: ./text.ts:listifySelection
     command:
       name: "Text: Listify Selection"
       key: "Ctrl-Shift-8"
       mac: "Cmd-Shift-8"
+      requireMode: rw
   numberListifySelection:
     path: ./text.ts:numberListifySelection
     command:
       name: "Text: Number Listify Selection"
+      requireMode: rw
   linkSelection:
     path: ./text.ts:linkSelection
     command:
       name: "Text: Link Selection"
       key: "Ctrl-Shift-k"
       mac: "Cmd-Shift-k"
+      requireMode: rw
   bold:
     path: ./text.ts:wrapSelection
     command:
@@ -87,6 +134,7 @@ functions:
       key: "Ctrl-b"
       mac: "Cmd-b"
       wrapper: "**"
+      requireMode: rw
   italic:
     path: ./text.ts:wrapSelection
     command:
@@ -94,23 +142,33 @@ functions:
       key: "Ctrl-i"
       mac: "Cmd-i"
       wrapper: "_"
+      requireMode: rw
   strikethrough:
     path: ./text.ts:wrapSelection
     command:
       name: "Text: Strikethrough"
       key: "Ctrl-Shift-s"
       wrapper: "~~"
+      requireMode: rw
   marker:
     path: ./text.ts:wrapSelection
     command:
       name: "Text: Marker"
       key: "Alt-m"
       wrapper: "=="
+      requireMode: rw
   centerCursor:
     path: "./editor.ts:centerCursorCommand"
     command:
       name: "Navigate: Center Cursor"
       key: "Ctrl-Alt-l"
+      requireMode: rw
+  deleteLine:
+    path: "./editor.ts:deleteLineCommand"
+    command:
+      name: "Delete Line"
+      key: "Ctrl-d"
+      requireMode: rw
 
   # Debug commands
   parseCommand:
@@ -125,23 +183,35 @@ functions:
       name: "Link: Unfurl"
       key: "Ctrl-Shift-u"
       mac: "Cmd-Shift-u"
-      contexts:
-        - NakedURL
+      requireMode: rw
 
   # Title-based link unfurl
   titleUnfurlOptions:
     path: ./link.ts:titleUnfurlOptions
     events:
       - unfurl:options
+
   titleUnfurl:
     path: ./link.ts:titleUnfurl
     events:
       - unfurl:title-unfurl
 
+
+  # Title-based link unfurl
+  youtubeUnfurlOptions:
+    path: ./link.ts:youtubeUnfurlOptions
+    events:
+      - unfurl:options
+
+  youtubeUnfurl:
+    path: ./link.ts:youtubeUnfurl
+    events:
+      - unfurl:youtube-unfurl
+
+
   embedWidget:
     path: ./embed.ts:embedWidget
     codeWidget: embed
-
 
   # Vim
   toggleVimMode:
@@ -154,11 +224,6 @@ functions:
       name: "Editor: Vim: Load VIMRC"
     events:
       - editor:modeswitch
-
-  brokenLinksCommand:
-    path: ./broken_links.ts:brokenLinksCommand
-    command:
-      name: "Broken Links: Show"
 
   # Random stuff
   statsCommand:
@@ -185,14 +250,15 @@ functions:
       name: "Help: Getting Started"
 
   accountLogoutCommand:
-    path: ./account.ts:accountLogoutCommand
+    path: clean.ts:cleanCommand
     command:
-      name: "Account: Logout"
+      name: "Clear Local Storage & Logout"
 
   uploadFileCommand:
     path: ./upload.ts:uploadFile
     command:
       name: "Upload: File"
+      requireMode: rw
 
   # Outline commands
   outlineMoveUp:
@@ -200,24 +266,28 @@ functions:
     command:
       name: "Outline: Move Up"
       key: "Alt-ArrowUp"
+      requireMode: rw
 
   outlineMoveDown:
     path: ./outline.ts:moveItemDown
     command:
       name: "Outline: Move Down"
       key: "Alt-ArrowDown"
+      requireMode: rw
 
   outlineIndent:
     path: ./outline.ts:indentItem
     command:
       name: "Outline: Move Right"
       key: "Alt->"
+      requireMode: rw
 
   outlineOutdent:
     path: ./outline.ts:outdentItem
     command:
       name: "Outline: Move Left"
       key: "Alt-<"
+      requireMode: rw
 
   # Outline folding commands
   foldCommand:
@@ -245,11 +315,34 @@ functions:
     command:
       name: "Outline: Unfold All"
       key: "Ctrl-Alt-Shift-]"
+  findInPageCommand:
+    path: editor.ts:findInPageCommand
+    command:
+      name: "Editor: Find in Page"
+      key: "Ctrl-f"
+      mac: "Cmd-f"
+
+  # Undo/redo
+  undoCommand:
+    path: ./editor.ts:undoCommand
+    command:
+      name: "Editor: Undo"
+      key: "Ctrl-z"
+      mac: "Cmd-z"
+      requireMode: rw
+  redoCommand:
+    path: ./editor.ts:redoCommand
+    command:
+      name: "Editor: Redo"
+      key: "Ctrl-y"
+      mac: "Cmd-Shift-z"
+      requireMode: rw
 
   # Demo
   customFlashMessage:
     path: editor.ts:customFlashMessage
     command:
       name: "Flash: Custom Message"
+      hide: true
       contexts:
-      - internal
+        - internal

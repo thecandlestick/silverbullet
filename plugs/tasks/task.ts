@@ -1,10 +1,11 @@
-import type { ClickEvent, IndexTreeEvent } from "$sb/app_event.ts";
+import type { ClickEvent, IndexTreeEvent } from "../../plug-api/types.ts";
 
-import { editor, markdown, space, sync } from "$sb/syscalls.ts";
+import { editor, events, markdown, space, sync } from "$sb/syscalls.ts";
 
 import {
   addParentPointers,
   collectNodesMatching,
+  findNodeMatching,
   findNodeOfType,
   findParentMatching,
   nodeAtPos,
@@ -12,14 +13,15 @@ import {
   renderToText,
   replaceNodesMatching,
   traverseTreeAsync,
-} from "$sb/lib/tree.ts";
-import { niceDate } from "$sb/lib/dates.ts";
+} from "../../plug-api/lib/tree.ts";
+import { niceDate } from "$lib/dates.ts";
 import { extractAttributes } from "$sb/lib/attribute.ts";
 import { rewritePageRefs } from "$sb/lib/resolve.ts";
-import { ObjectValue } from "$sb/types.ts";
+import { ObjectValue } from "../../plug-api/types.ts";
 import { indexObjects, queryObjects } from "../index/plug_api.ts";
 import { updateITags } from "$sb/lib/tags.ts";
 import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
+import { parsePageRef } from "$sb/lib/page_ref.ts";
 
 export type TaskObject = ObjectValue<
   {
@@ -89,16 +91,22 @@ export async function indexTasks({ name, tree }: IndexTreeEvent) {
           task.tags = [];
         }
         task.tags.push(tagName);
+        tree.children = [];
       }
     });
 
     // Extract attributes and remove from tree
-    const extractedAttributes = await extractAttributes(n, true);
+    task.name = n.children!.slice(1).map(renderToText).join("").trim();
+    const extractedAttributes = await extractAttributes(
+      ["task", ...task.tags || []],
+      n,
+      true,
+    );
+    task.name = n.children!.slice(1).map(renderToText).join("").trim();
+
     for (const [key, value] of Object.entries(extractedAttributes)) {
       task[key] = value;
     }
-
-    task.name = n.children!.slice(1).map(renderToText).join("").trim();
 
     updateITags(task, frontmatter);
 
@@ -183,6 +191,13 @@ async function cycleTaskState(
       await updateTaskState(ref, stateText, changeTo);
     }
   }
+
+  await events.dispatchEvent("task:stateChange", {
+    from: node.parent!.from,
+    to: node.parent!.to,
+    newState: changeTo,
+    text: renderToText(node.parent),
+  });
 }
 
 export async function updateTaskState(
@@ -191,8 +206,11 @@ export async function updateTaskState(
   newState: string,
 ) {
   const currentPage = await editor.getCurrentPage();
-  const [page, posS] = ref.split("@");
-  const pos = +posS;
+  const { page, pos } = parsePageRef(ref);
+  if (pos === undefined) {
+    console.error("No position found in page ref, skipping", ref);
+    return;
+  }
   if (page === currentPage) {
     // In current page, just update the task marker with dispatch
     const editorText = await editor.getText();
@@ -332,4 +350,35 @@ export async function postponeCommand() {
       anchor: pos,
     },
   });
+}
+
+export async function removeCompletedTasksCommand() {
+  const tree = await markdown.parseMarkdown(await editor.getText());
+  addParentPointers(tree);
+
+  // Taking this ugly approach because the tree is modified in place
+  // Just finding and removing one task at a time and then repeating until nothing changes
+  while (true) {
+    const completedTaskNode = findNodeMatching(tree, (node) => {
+      return node.type === "Task" &&
+        ["x", "X"].includes(node.children![0].children![1].text!);
+    });
+    if (completedTaskNode) {
+      // Ok got one, let's remove it
+      const listItemNode = completedTaskNode.parent!;
+      const bulletListNode = listItemNode.parent!;
+      // Remove the list item
+      const listItemIdx = bulletListNode.children!.indexOf(listItemNode);
+      let removeItems = 1;
+      if (bulletListNode.children![listItemIdx + 1]?.text === "\n") {
+        removeItems++;
+      }
+      bulletListNode.children!.splice(listItemIdx, removeItems);
+    } else {
+      // No completed tasks left, we're done
+      break;
+    }
+  }
+
+  await editor.setText(renderToText(tree));
 }

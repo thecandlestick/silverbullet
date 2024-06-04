@@ -1,4 +1,4 @@
-import { WidgetContent } from "$sb/app_event.ts";
+import { WidgetContent } from "../../plug-api/types.ts";
 import { Client } from "../client.ts";
 import { panelHtml } from "./panel_html.ts";
 
@@ -123,7 +123,7 @@ export function mountIFrame(
           case "syscall": {
             const { id, name, args } = data;
             try {
-              const result = await client.system.localSyscall(name, args);
+              const result = await client.clientSystem.localSyscall(name, args);
               if (!iframe.contentWindow) {
                 // iFrame already went away
                 return;

@@ -1,4 +1,6 @@
-import { Decoration, EditorState, syntaxTree } from "../deps.ts";
+import { EditorState } from "@codemirror/state";
+import { syntaxTree } from "@codemirror/language";
+import { Decoration } from "@codemirror/view";
 import type { Client } from "../client.ts";
 import {
   decoratorStateField,
@@ -8,7 +10,7 @@ import {
 } from "./util.ts";
 import { MarkdownWidget } from "./markdown_widget.ts";
 import { IFrameWidget } from "./iframe_widget.ts";
-import { isTemplate } from "$sb/lib/cheap_yaml.ts";
+import { isTemplate } from "../../lib/cheap_yaml.ts";
 
 export function fencedCodePlugin(editor: Client) {
   return decoratorStateField((state: EditorState) => {
@@ -21,13 +23,14 @@ export function fencedCodePlugin(editor: Client) {
             return;
           }
           const text = state.sliceDoc(from, to);
-          const [_, lang] = text.match(/^```(\w+)?/)!;
-          const codeWidgetCallback = editor.system.codeWidgetHook
+          const [_, lang] = text.match(/^(?:```+|~~~+)(\w+)?/)!;
+          const codeWidgetCallback = editor.clientSystem.codeWidgetHook
             .codeWidgetCallbacks
             .get(lang);
-          const renderMode = editor.system.codeWidgetHook.codeWidgetModes.get(
-            lang,
-          );
+          const renderMode = editor.clientSystem.codeWidgetHook.codeWidgetModes
+            .get(
+              lang,
+            );
           // Only custom render when we have a custom renderer, and the current page is not a template
           if (codeWidgetCallback && !isTemplate(state.sliceDoc(0, from))) {
             // We got a custom renderer!

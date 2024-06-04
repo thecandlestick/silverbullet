@@ -1,0 +1,1 @@
+![linked list](img/LL-diagram.png)

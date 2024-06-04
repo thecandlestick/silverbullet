@@ -5,11 +5,13 @@ import clientAssetBundle from "../dist/client_asset_bundle.json" assert {
 import plugAssetBundle from "../dist/plug_asset_bundle.json" assert {
   type: "json",
 };
-import { AssetBundle, AssetJson } from "../plugos/asset_bundle/bundle.ts";
-import { sleep } from "$sb/lib/async.ts";
+import { AssetBundle, AssetJson } from "../lib/asset_bundle/bundle.ts";
 
 import { determineDatabaseBackend } from "../server/db_backend.ts";
 import { SpaceServerConfig } from "../server/instance.ts";
+import { runPlug } from "../cmd/plug_run.ts";
+import { PrefixedKvPrimitives } from "$lib/data/prefixed_kv_primitives.ts";
+import { sleep } from "$lib/async.ts";
 
 export async function serveCommand(
   options: {
@@ -40,6 +42,8 @@ export async function serveCommand(
   }
 
   const syncOnly = options.syncOnly || !!Deno.env.get("SB_SYNC_ONLY");
+
+  const readOnly = !!Deno.env.get("SB_READ_ONLY");
 
   if (syncOnly) {
     console.log("Running in sync-only mode (no backend processing)");
@@ -75,6 +79,10 @@ export async function serveCommand(
     const [user, pass] = userAuth.split(":");
     userCredentials = { user, pass };
   }
+
+  const backendConfig = Deno.env.get("SB_SHELL_BACKEND") || "local";
+  const enableSpaceScript = Deno.env.get("SB_SPACE_SCRIPT") !== "off";
+
   const configs = new Map<string, SpaceServerConfig>();
   configs.set("*", {
     hostname,
@@ -82,15 +90,55 @@ export async function serveCommand(
     auth: userCredentials,
     authToken: Deno.env.get("SB_AUTH_TOKEN"),
     syncOnly,
+    readOnly,
+    shellBackend: backendConfig,
     clientEncryption,
+    enableSpaceScript,
     pagesPath: folder,
   });
 
+  const plugAssets = new AssetBundle(plugAssetBundle as AssetJson);
+
+  if (readOnly) {
+    console.log("Performing initial space indexing...");
+    await runPlug(
+      folder,
+      "index.reindexSpace",
+      [],
+      plugAssets,
+      new PrefixedKvPrimitives(baseKvPrimitives, ["*"]),
+    );
+    console.log(
+      "Now indexing again to make sure any additional space script indexers are run...",
+    );
+    await runPlug(
+      folder,
+      "index.reindexSpace",
+      [true], // noClear
+      plugAssets,
+      new PrefixedKvPrimitives(baseKvPrimitives, ["*"]),
+    );
+  }
+
+  const clientAssets = new AssetBundle(clientAssetBundle as AssetJson);
+  const manifestName = Deno.env.get("SB_NAME");
+  const manifestDescription = Deno.env.get("SB_DESCRIPTION");
+
+  if (manifestName || manifestDescription) {
+    const manifestData = JSON.parse(clientAssets.readTextFileSync('.client/manifest.json'));
+    if (manifestName) {
+      manifestData.name = manifestData.short_name = manifestName;
+    }
+    if (manifestDescription) {
+      manifestData.description = manifestDescription;
+    }
+    clientAssets.writeTextFileSync('.client/manifest.json', 'application/json', JSON.stringify(manifestData));
+  }
   const httpServer = new HttpServer({
     hostname,
     port,
-    clientAssetBundle: new AssetBundle(clientAssetBundle as AssetJson),
-    plugAssetBundle: new AssetBundle(plugAssetBundle as AssetJson),
+    clientAssetBundle: clientAssets,
+    plugAssetBundle: plugAssets,
     baseKvPrimitives,
     keyFile: options.key,
     certFile: options.cert,

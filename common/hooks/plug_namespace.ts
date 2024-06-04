@@ -1,22 +1,8 @@
-import { Plug } from "../../plugos/plug.ts";
-import { System } from "../../plugos/system.ts";
-import { Hook, Manifest } from "../../plugos/types.ts";
-
-export type NamespaceOperation =
-  | "readFile"
-  | "writeFile"
-  | "listFiles"
-  | "getFileMeta"
-  | "deleteFile";
-
-export type PlugNamespaceDef = {
-  pattern: string;
-  operation: NamespaceOperation;
-};
-
-export type PlugNamespaceHookT = {
-  pageNamespace?: PlugNamespaceDef;
-};
+import { NamespaceOperation } from "$lib/plugos/namespace.ts";
+import { PlugNamespaceHookT } from "$lib/manifest.ts";
+import { Plug } from "../../lib/plugos/plug.ts";
+import { System } from "../../lib/plugos/system.ts";
+import { Hook, Manifest } from "../../lib/plugos/types.ts";
 
 type SpaceFunction = {
   operation: NamespaceOperation;

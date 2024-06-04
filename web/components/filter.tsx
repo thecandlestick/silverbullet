@@ -1,16 +1,12 @@
-import {
-  CompletionContext,
-  CompletionResult,
-  useEffect,
-  useRef,
-  useState,
-} from "../deps.ts";
-import { FilterOption } from "../types.ts";
-import { FunctionalComponent } from "https://esm.sh/v99/preact@10.11.3/src/index";
-import { FeatherProps } from "https://esm.sh/v99/preact-feather@4.2.1/dist/types";
+import { FeatherProps } from "preact-feather/types";
+import { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
+import { FunctionalComponent } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
+import { FilterOption } from "$lib/web.ts";
 import { MiniEditor } from "./mini_editor.tsx";
-import { fuzzySearchAndSort } from "./fuse_search.ts";
-import { deepEqual } from "$sb/lib/json.ts";
+import { fuzzySearchAndSort } from "../fuse_search.ts";
+import { deepEqual } from "../../plug-api/lib/json.ts";
+import { AlwaysShownModal } from "./basic_modals.tsx";
 
 export function FilterList({
   placeholder,
@@ -47,7 +43,10 @@ export function FilterList({
 }) {
   const [text, setText] = useState("");
   const [matchingOptions, setMatchingOptions] = useState(
-    fuzzySearchAndSort(options, ""),
+    fuzzySearchAndSort(
+      preFilter ? preFilter(options, "") : options,
+      "",
+    ),
   );
   const [selectedOption, setSelectionOption] = useState(0);
 
@@ -95,7 +94,11 @@ export function FilterList({
   }, []);
 
   const returnEl = (
-    <div className="sb-modal-box">
+    <AlwaysShownModal
+      onCancel={() => {
+        onSelect(undefined);
+      }}
+    >
       <div
         className="sb-header"
         onClick={(e) => {
@@ -145,7 +148,9 @@ export function FilterList({
                 setSelectionOption(Math.max(0, selectedOption - 5));
                 return true;
               case "PageDown":
-                setSelectionOption(Math.max(0, selectedOption + 5));
+                setSelectionOption(
+                  Math.min(matchingOptions.length - 1, selectedOption + 5),
+                );
                 return true;
               case "Home":
                 setSelectionOption(0);
@@ -172,7 +177,7 @@ export function FilterList({
         dangerouslySetInnerHTML={{ __html: helpText }}
       >
       </div>
-      <div className="sb-result-list">
+      <div className="sb-result-list" tabIndex={-1}>
         {matchingOptions && matchingOptions.length > 0
           ? matchingOptions.map((option, idx) => (
             <div
@@ -205,7 +210,7 @@ export function FilterList({
           ))
           : null}
       </div>
-    </div>
+    </AlwaysShownModal>
   );
 
   useEffect(() => {

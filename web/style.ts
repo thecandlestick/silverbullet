@@ -1,9 +1,8 @@
-import { HighlightStyle } from "../common/deps.ts";
-import { tagHighlighter, tags as t } from "./deps.ts";
-import * as ct from "../common/markdown_parser/customtags.ts";
-import { MDExt } from "../common/markdown_parser/markdown_ext.ts";
+import { HighlightStyle } from "@codemirror/language";
+import { tagHighlighter, tags as t } from "@lezer/highlight";
+import * as ct from "$common/markdown_parser/customtags.ts";
 
-export default function highlightStyles(mdExtension: MDExt[]) {
+export default function highlightStyles() {
   tagHighlighter;
   return HighlightStyle.define([
     { tag: t.heading1, class: "sb-h1" },
@@ -37,7 +36,8 @@ export default function highlightStyles(mdExtension: MDExt[]) {
     { tag: t.literal, class: "sb-literal" },
     { tag: t.keyword, class: "sb-keyword" },
     { tag: t.list, class: "sb-list" },
-    // { tag: t.def, class: "sb-li" },
+    { tag: t.operator, class: "sb-operator" },
+    { tag: t.regexp, class: "sb-string" },
     { tag: t.string, class: "sb-string" },
     { tag: t.number, class: "sb-number" },
     { tag: [t.regexp, t.escape, t.special(t.string)], class: "sb-string2" },
@@ -49,8 +49,12 @@ export default function highlightStyles(mdExtension: MDExt[]) {
     { tag: t.processingInstruction, class: "sb-meta" },
     { tag: t.punctuation, class: "sb-punctuation" },
     { tag: ct.HorizontalRuleTag, class: "sb-hr" },
-    ...mdExtension.map((mdExt) => {
-      return { tag: mdExt.tag, ...mdExt.styles, class: mdExt.className };
-    }),
+    { tag: ct.HashtagTag, class: "sb-hashtag" },
+    { tag: ct.NakedURLTag, class: "sb-naked-url" },
+    { tag: ct.TaskDeadlineTag, class: "sb-task-deadline" },
+    { tag: ct.NamedAnchorTag, class: "sb-named-anchor" },
+
+    { tag: ct.DirectiveMarkTag, class: "sb-directive-mark" },
+    { tag: ct.DirectiveTag, class: "sb-directive" },
   ]);
 }

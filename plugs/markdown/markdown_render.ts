@@ -7,7 +7,9 @@ import {
   renderToText,
   traverseTree,
 } from "$sb/lib/tree.ts";
+import { encodePageRef, parsePageRef } from "$sb/lib/page_ref.ts";
 import { Fragment, renderHtml, Tag } from "./html_render.ts";
+import { isLocalPath } from "$sb/lib/resolve.ts";
 
 export type MarkdownRenderOptions = {
   failOnUnknown?: true;
@@ -32,13 +34,16 @@ function cleanTags(values: (Tag | null)[], cleanWhitespace = false): Tag[] {
   return result;
 }
 
-function preprocess(t: ParseTree, options: MarkdownRenderOptions = {}) {
+function preprocess(t: ParseTree) {
   addParentPointers(t);
   traverseTree(t, (node) => {
     if (!node.type) {
       if (node.text?.startsWith("\n")) {
         const prevNodeIdx = node.parent!.children!.indexOf(node) - 1;
-        if (node.parent!.children![prevNodeIdx]?.type !== "Paragraph") {
+        const prevNodeType = node.parent!.children![prevNodeIdx]?.type;
+        if (
+          prevNodeType?.includes("Heading") || prevNodeType?.includes("Table")
+        ) {
           node.text = node.text.slice(1);
         }
       }
@@ -199,38 +204,72 @@ function render(
         body: "",
       };
     case "Link": {
-      const linkText = t.children![1].text!;
+      const linkTextChildren = t.children!.slice(1, -4);
       const urlNode = findNodeOfType(t, "URL");
       if (!urlNode) {
         return renderToText(t);
       }
       let url = urlNode.children![0].text!;
-      if (url.indexOf("://") === -1) {
-        url = `${options.attachmentUrlPrefix || ""}${url}`;
+      if (isLocalPath(url)) {
+        if (
+          options.attachmentUrlPrefix &&
+          !url.startsWith(options.attachmentUrlPrefix)
+        ) {
+          url = `${options.attachmentUrlPrefix}${url}`;
+        }
       }
       return {
         name: "a",
         attrs: {
           href: url,
         },
-        body: linkText,
+        body: cleanTags(mapRender(linkTextChildren)),
       };
     }
     case "Image": {
-      const altText = t.children![1].text!;
-      const urlNode = findNodeOfType(t, "URL");
+      const altTextNode = findNodeOfType(t, "WikiLinkAlias") ||
+        t.children![1];
+      let altText = altTextNode && altTextNode.type !== "LinkMark"
+        ? renderToText(altTextNode)
+        : "";
+      const dimReg = /\d*[^\|\s]*?[xX]\d*[^\|\s]*/.exec(altText);
+      let style = "";
+      if (dimReg) {
+        const [, width, widthUnit = "px", height, heightUnit = "px"] =
+          dimReg[0].match(/(\d*)(\S*?x?)??[xX](\d*)(.*)?/) ?? [];
+        if (width) {
+          style += `width: ${width}${widthUnit};`;
+        }
+        if (height) {
+          style += `height: ${height}${heightUnit};`;
+        }
+        altText = altText.replace(dimReg[0], "").replace("|", "");
+      }
+
+      const urlNode = findNodeOfType(t, "WikiLinkPage") ||
+        findNodeOfType(t, "URL");
       if (!urlNode) {
         return renderToText(t);
       }
-      let url = urlNode!.children![0].text!;
-      if (url.indexOf("://") === -1) {
-        url = `${options.attachmentUrlPrefix || ""}${url}`;
+      let url = renderToText(urlNode);
+      if (urlNode.type === "WikiLinkPage") {
+        url = "/" + url;
       }
+
+      if (
+        isLocalPath(url) &&
+        options.attachmentUrlPrefix &&
+        !url.startsWith(options.attachmentUrlPrefix)
+      ) {
+        url = `${options.attachmentUrlPrefix}${url}`;
+      }
+
       return {
         name: "img",
         attrs: {
           src: url,
           alt: altText,
+          style: style,
         },
         body: "",
       };
@@ -238,18 +277,17 @@ function render(
 
     // Custom stuff
     case "WikiLink": {
-      // console.log("WikiLink", JSON.stringify(t, null, 2));
       const ref = findNodeOfType(t, "WikiLinkPage")!.children![0].text!;
       let linkText = ref.split("/").pop()!;
       const aliasNode = findNodeOfType(t, "WikiLinkAlias");
       if (aliasNode) {
         linkText = aliasNode.children![0].text!;
       }
-      const [pageName] = ref.split(/[@$]/);
+      const pageRef = parsePageRef(ref);
       return {
         name: "a",
         attrs: {
-          href: `/${pageName}`,
+          href: `/${encodePageRef(pageRef)}`,
           class: "wiki-link",
           "data-ref": ref,
         },
@@ -278,9 +316,9 @@ function render(
     case "Task": {
       let externalTaskRef = "";
       collectNodesOfType(t, "WikiLinkPage").forEach((wikilink) => {
-        const ref = wikilink.children![0].text!;
-        if (!externalTaskRef && (ref.includes("@") || ref.includes("$"))) {
-          externalTaskRef = ref;
+        const pageRef = parsePageRef(wikilink.children![0].text!);
+        if (!externalTaskRef && (pageRef.pos !== undefined || pageRef.anchor)) {
+          externalTaskRef = wikilink.children![0].text!;
         }
       });
 
@@ -330,6 +368,13 @@ function render(
       const command = t.children![1].children![0].text!;
       let commandText = command;
       const aliasNode = findNodeOfType(t, "CommandLinkAlias");
+      const argsNode = findNodeOfType(t, "CommandLinkArgs");
+      let args: any = [];
+
+      if (argsNode) {
+        args = JSON.parse(`[${argsNode.children![0].text!}]`);
+      }
+
       if (aliasNode) {
         commandText = aliasNode.children![0].text!;
       }
@@ -337,7 +382,7 @@ function render(
       return {
         name: "button",
         attrs: {
-          "data-onclick": JSON.stringify(["command", command]),
+          "data-onclick": JSON.stringify(["command", command, args]),
         },
         body: commandText,
       };
@@ -473,7 +518,7 @@ export function renderMarkdownToHtml(
   t: ParseTree,
   options: MarkdownRenderOptions = {},
 ) {
-  preprocess(t, options);
+  preprocess(t);
   const htmlTree = posPreservingRender(t, options);
   if (htmlTree && options.translateUrls) {
     traverseTag(htmlTree, (t) => {
@@ -486,6 +531,9 @@ export function renderMarkdownToHtml(
 
       if (t.name === "a" && t.attrs!.href) {
         t.attrs!.href = options.translateUrls!(t.attrs!.href, "link");
+        if (t.body.length === 0) {
+          t.body = [t.attrs!.href];
+        }
       }
     });
   }

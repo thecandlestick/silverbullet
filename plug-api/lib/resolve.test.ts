@@ -1,37 +1,58 @@
 import {
   cleanPageRef,
   federatedPathToUrl,
-  resolveAttachmentPath,
   resolvePath,
   rewritePageRefs,
 } from "$sb/lib/resolve.ts";
-import { assertEquals } from "../../test_deps.ts";
-import { parseMarkdown } from "$sb/lib/test_utils.ts";
-import { renderToText } from "$sb/lib/tree.ts";
+import { assertEquals } from "$std/testing/asserts.ts";
+import { ParseTree, renderToText } from "./tree.ts";
+import { parse } from "$common/markdown_parser/parse_tree.ts";
+import { extendedMarkdownLanguage } from "$common/markdown_parser/parser.ts";
 
 Deno.test("Test URL resolver", () => {
-  assertEquals(resolvePath("test", "some page"), "some page");
+  // Absolute paths
+  assertEquals("some page", resolvePath("test", "/some page"));
+  assertEquals("some page", resolvePath("/folder/test", "/some page"));
+  assertEquals("bla@123", resolvePath("somewhere", "/bla@123"));
+  assertEquals("test.jpg", resolvePath("folder/test", "/test.jpg"));
+  assertEquals(
+    resolvePath("!silverbullet.md", "/some page"),
+    "!silverbullet.md/some page",
+  );
+  assertEquals(
+    resolvePath("!silverbullet.md/some/deep/path", "/some page"),
+    "!silverbullet.md/some page",
+  );
+  assertEquals(
+    "!silverbullet.md/test.jpg",
+    resolvePath("!silverbullet.md/something/bla", "/test.jpg"),
+  );
+  assertEquals(
+    resolvePath("!silverbullet.md", "/test/image.png", true),
+    "https://silverbullet.md/test/image.png",
+  );
+
+  // Relative paths
+  assertEquals("test.jpg", resolvePath("test", "test.jpg"));
+  assertEquals("folder/test.jpg", resolvePath("folder/test", "test.jpg"));
   assertEquals(
     resolvePath("!silverbullet.md", "some page"),
     "!silverbullet.md/some page",
   );
   assertEquals(
-    resolvePath("!silverbullet.md/some/deep/path", "some page"),
-    "!silverbullet.md/some page",
+    "!silverbullet.md/something/test.jpg",
+    resolvePath("!silverbullet.md/something/bla", "test.jpg"),
   );
-  assertEquals(resolvePath("!bla/bla", "!bla/bla2"), "!bla/bla2");
-
-  assertEquals(
-    resolvePath("!silverbullet.md", "test/image.png", true),
-    "https://silverbullet.md/test/image.png",
-  );
-
   assertEquals(
     resolvePath("!silverbullet.md", "bla@123"),
     "!silverbullet.md/bla@123",
   );
-  assertEquals(resolvePath("somewhere", "bla@123"), "bla@123");
-
+  assertEquals(
+    resolvePath("!silverbullet.md", "test/image.png", true),
+    "https://silverbullet.md/test/image.png",
+  );
+  // Federated pages
+  assertEquals(resolvePath("!bla/bla", "!bla/bla2"), "!bla/bla2");
   assertEquals(
     federatedPathToUrl("!silverbullet.md"),
     "https://silverbullet.md",
@@ -85,22 +106,8 @@ page: "[[!silverbullet.md/template/use-template]]"
     rewrittenText,
     `This is a [[local link]] and [[local link|with alias]].`,
   );
-
-  assertEquals("test.jpg", resolveAttachmentPath("test", "test.jpg"));
-  assertEquals(
-    "folder/test.jpg",
-    resolveAttachmentPath("folder/test", "test.jpg"),
-  );
-  assertEquals(
-    "test.jpg",
-    resolveAttachmentPath("folder/test", "/test.jpg"),
-  );
-  assertEquals(
-    "https://silverbullet.md/something/test.jpg",
-    resolveAttachmentPath("!silverbullet.md/something/bla", "test.jpg"),
-  );
-  assertEquals(
-    "https://silverbullet.md/test.jpg",
-    resolveAttachmentPath("!silverbullet.md/something/bla", "/test.jpg"),
-  );
 });
+
+function parseMarkdown(text: string): ParseTree {
+  return parse(extendedMarkdownLanguage, text);
+}

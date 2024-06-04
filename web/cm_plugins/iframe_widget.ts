@@ -1,8 +1,7 @@
-import { WidgetContent } from "../../plug-api/app_event.ts";
-import { WidgetType } from "../deps.ts";
+import { CodeWidgetCallback, WidgetContent } from "../../plug-api/types.ts";
+import { WidgetType } from "@codemirror/view";
 import type { Client } from "../client.ts";
 import { createWidgetSandboxIFrame } from "../components/widget_sandbox_iframe.ts";
-import type { CodeWidgetCallback } from "$sb/types.ts";
 
 export class IFrameWidget extends WidgetType {
   iframe?: HTMLIFrameElement;
@@ -22,7 +21,7 @@ export class IFrameWidget extends WidgetType {
     const iframe = createWidgetSandboxIFrame(
       this.client,
       this.bodyText,
-      this.codeWidgetCallback(this.bodyText, this.client.currentPage!),
+      this.codeWidgetCallback(this.bodyText, this.client.currentPage),
       (message) => {
         switch (message.type) {
           case "blur":
@@ -33,7 +32,7 @@ export class IFrameWidget extends WidgetType {
 
             break;
           case "reload":
-            this.codeWidgetCallback(this.bodyText, this.client.currentPage!)
+            this.codeWidgetCallback(this.bodyText, this.client.currentPage)
               .then(
                 (widgetContent: WidgetContent | null) => {
                   if (widgetContent === null) {

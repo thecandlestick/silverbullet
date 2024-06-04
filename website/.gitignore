@@ -1,7 +1,0 @@
-data.db
-_plug
-p/
-snippet/
-../deno_cache/
-dist_bundle/
-sandbox.md

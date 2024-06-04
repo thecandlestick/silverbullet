@@ -1,25 +1,20 @@
-import { isMacLike, safeRun } from "../common/util.ts";
 import { Confirm, Prompt } from "./components/basic_modals.tsx";
 import { CommandPalette } from "./components/command_palette.tsx";
 import { FilterList } from "./components/filter.tsx";
 import { PageNavigator } from "./components/page_navigator.tsx";
 import { TopBar } from "./components/top_bar.tsx";
 import reducer from "./reducer.ts";
-import { Action, AppViewState, initialViewState } from "./types.ts";
-import {
-  BookIcon,
-  HomeIcon,
-  preactRender,
-  RefreshCwIcon,
-  runScopeHandlers,
-  TerminalIcon,
-  useEffect,
-  useReducer,
-} from "./deps.ts";
+import { Action, AppViewState, initialViewState } from "../type/web.ts";
+import * as featherIcons from "preact-feather";
+import * as mdi from "./filtered_material_icons.ts"
+import { h, render as preactRender } from "preact";
+import { useEffect, useReducer } from "preact/hooks";
+import { closeSearchPanel } from "@codemirror/search";
+import { runScopeHandlers } from "@codemirror/view";
 import type { Client } from "./client.ts";
 import { Panel } from "./components/panel.tsx";
-import { h } from "./deps.ts";
-import { sleep } from "$sb/lib/async.ts";
+import { safeRun, sleep } from "../lib/async.ts";
+import { parseCommand } from "$common/command.ts";
 
 export class MainUI {
   viewState: AppViewState = initialViewState;
@@ -29,10 +24,19 @@ export class MainUI {
     // Make keyboard shortcuts work even when the editor is in read only mode or not focused
     globalThis.addEventListener("keydown", (ev) => {
       if (!client.editorView.hasFocus) {
-        if ((ev.target as any).closest(".cm-editor")) {
+        const target = ev.target as HTMLElement;
+        if (target.className === "cm-textfield" && ev.key === "Escape") {
+          // Search panel is open, let's close it
+          console.log("Closing search panel");
+          closeSearchPanel(client.editorView);
+          return;
+        } else if (
+          target.className === "cm-textfield" || target.closest(".cm-content")
+        ) {
           // In some cm element, let's back out
           return;
         }
+        console.log("Delegated keydown", ev, "to editor");
         if (runScopeHandlers(client.editorView, ev, "editor")) {
           ev.preventDefault();
         }
@@ -44,7 +48,7 @@ export class MainUI {
       if (ev.touches.length === 2) {
         ev.stopPropagation();
         ev.preventDefault();
-        client.startPageNavigate();
+        client.startPageNavigate("page");
       }
       // Launch the command palette using a three-finger tap
       if (ev.touches.length === 3) {
@@ -99,6 +103,7 @@ export class MainUI {
           <PageNavigator
             allPages={viewState.allPages}
             currentPage={client.currentPage}
+            mode={viewState.pageNavigatorMode}
             completer={client.miniEditorComplete.bind(client)}
             vimMode={viewState.uiOptions.vimMode}
             darkMode={viewState.uiOptions.darkMode}
@@ -109,7 +114,7 @@ export class MainUI {
               });
               if (page) {
                 safeRun(async () => {
-                  await client.navigate(page);
+                  await client.navigate({ page });
                 });
               }
             }}
@@ -119,9 +124,6 @@ export class MainUI {
           <CommandPalette
             onTrigger={(cmd) => {
               dispatch({ type: "hide-palette" });
-              setTimeout(() => {
-                client.focus();
-              });
               if (cmd) {
                 dispatch({ type: "command-run", command: cmd.command.name });
                 cmd
@@ -129,9 +131,11 @@ export class MainUI {
                   .catch((e: any) => {
                     console.error("Error running command", e.message);
                   })
-                  .then(() => {
+                  .then((returnValue: any) => {
                     // Always be focusing the editor after running a command
-                    client.focus();
+                    if (returnValue !== false) {
+                      client.focus();
+                    }
                   });
               }
             }}
@@ -184,6 +188,7 @@ export class MainUI {
           syncFailures={viewState.syncFailures}
           unsavedChanges={viewState.unsavedChanges}
           isLoading={viewState.isLoading}
+          isMobile={viewState.isMobile}
           vimMode={viewState.uiOptions.vimMode}
           darkMode={viewState.uiOptions.darkMode}
           progressPerc={viewState.progressPerc}
@@ -201,17 +206,18 @@ export class MainUI {
               return;
             }
             console.log("Now renaming page to...", newName);
-            await client.system.system.loadedPlugs.get("index")!.invoke(
-              "renamePageCommand",
+            await client.clientSystem.system.invokeFunction(
+              "index.renamePageCommand",
               [{ page: newName }],
             );
             client.focus();
           }}
           actionButtons={[
-            ...!window.silverBulletConfig.syncOnly
+            ...(!window.silverBulletConfig.syncOnly &&
+                !viewState.settings.hideSyncButton)
               // If we support syncOnly, don't show this toggle button
               ? [{
-                icon: RefreshCwIcon,
+                icon: featherIcons.RefreshCw,
                 description: this.client.syncMode
                   ? "Currently in Sync mode, click to switch to Online mode"
                   : "Currently in Online mode, click to switch to Sync mode",
@@ -239,31 +245,31 @@ export class MainUI {
                 },
               }]
               : [],
-            {
-              icon: HomeIcon,
-              description: `Go to the index page (Alt-h)`,
-              callback: () => {
-                client.navigate("", 0);
-              },
-              href: "",
-            },
-            {
-              icon: BookIcon,
-              description: `Open page (${isMacLike() ? "Cmd-k" : "Ctrl-k"})`,
-              callback: () => {
-                client.startPageNavigate();
-              },
-            },
-            {
-              icon: TerminalIcon,
-              description: `Run command (${isMacLike() ? "Cmd-/" : "Ctrl-/"})`,
-              callback: () => {
-                dispatch({
-                  type: "show-palette",
-                  context: client.getContext(),
-                });
-              },
-            },
+            ...viewState.settings.actionButtons
+              .filter((button) =>
+                (typeof button.mobile === "undefined") ||
+                (button.mobile === viewState.isMobile)
+              )
+              .map((button) => {
+                const parsedCommand = parseCommand(button.command);
+                const mdiIcon = (mdi as any)[kebabToCamel(button.icon)];
+                let featherIcon =
+                  (featherIcons as any)[kebabToCamel(button.icon)];
+                if (!featherIcon) {
+                  featherIcon = featherIcons.HelpCircle;
+                }
+                return {
+                  icon: mdiIcon ? mdiIcon : featherIcon,
+                  description: button.description || "",
+                  callback: () => {
+                    client.runCommandByName(
+                      parsedCommand.name,
+                      parsedCommand.args,
+                    );
+                  },
+                  href: "",
+                };
+              }),
           ]}
           rhs={!!viewState.panels.rhs.mode && (
             <div
@@ -306,6 +312,14 @@ export class MainUI {
 
   render(container: Element) {
     // const ViewComponent = this.ui.ViewComponent.bind(this.ui);
+    container.innerHTML = "";
     preactRender(h(this.ViewComponent.bind(this), {}), container);
   }
+}
+
+function kebabToCamel(str: string) {
+  return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase()).replace(
+    /^./,
+    (g) => g.toUpperCase(),
+  );
 }

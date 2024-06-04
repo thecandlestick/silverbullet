@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "../deps.ts";
+import { useEffect, useRef } from "https://esm.sh/preact@10.11.1/hooks";
 import { Client } from "../client.ts";
-import { PanelConfig } from "../types.ts";
+import { PanelConfig } from "../../type/web.ts";
 import { panelHtml } from "./panel_html.ts";
 
 export function Panel({
@@ -47,7 +47,7 @@ export function Panel({
           break;
         case "syscall": {
           const { id, name, args } = data;
-          editor.system.localSyscall(name, args).then(
+          editor.clientSystem.localSyscall(name, args).then(
             (result) => {
               if (!iFrameRef.current?.contentWindow) {
                 // iFrame already went away

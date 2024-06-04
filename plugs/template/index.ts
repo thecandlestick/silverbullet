@@ -1,4 +1,4 @@
-import type { IndexTreeEvent } from "$sb/app_event.ts";
+import type { IndexTreeEvent } from "../../plug-api/types.ts";
 import { system } from "$sb/syscalls.ts";
 
 export async function indexTemplate({ name, tree }: IndexTreeEvent) {

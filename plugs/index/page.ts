@@ -1,7 +1,7 @@
-import type { IndexTreeEvent } from "$sb/app_event.ts";
+import type { IndexTreeEvent } from "../../plug-api/types.ts";
 import { editor, markdown, space, YAML } from "$sb/syscalls.ts";
 
-import type { LintDiagnostic, PageMeta } from "$sb/types.ts";
+import type { LintDiagnostic, PageMeta } from "../../plug-api/types.ts";
 import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
 import { extractAttributes } from "$sb/lib/attribute.ts";
 import { indexObjects } from "./api.ts";
@@ -9,7 +9,7 @@ import {
   findNodeOfType,
   renderToText,
   traverseTreeAsync,
-} from "$sb/lib/tree.ts";
+} from "../../plug-api/lib/tree.ts";
 import { updateITags } from "$sb/lib/tags.ts";
 
 export async function indexPage({ name, tree }: IndexTreeEvent) {
@@ -19,7 +19,11 @@ export async function indexPage({ name, tree }: IndexTreeEvent) {
   }
   const pageMeta = await space.getPageMeta(name);
   const frontmatter = await extractFrontmatter(tree);
-  const toplevelAttributes = await extractAttributes(tree, false);
+  const toplevelAttributes = await extractAttributes(
+    ["page", ...frontmatter.tags || []],
+    tree,
+    false,
+  );
 
   // Push them all into the page object
   // Note the order here, making sure that the actual page meta data overrules
@@ -40,6 +44,15 @@ export async function indexPage({ name, tree }: IndexTreeEvent) {
   ];
 
   combinedPageMeta.tag = "page";
+
+  if (combinedPageMeta.aliases && !Array.isArray(combinedPageMeta.aliases)) {
+    console.warn(
+      "Aliases must be an array",
+      combinedPageMeta.aliases,
+      "falling back to empty array",
+    );
+    combinedPageMeta.aliases = [];
+  }
 
   updateITags(combinedPageMeta, frontmatter);
 

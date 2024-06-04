@@ -1,27 +1,25 @@
-import { Hook, Manifest } from "../../plugos/types.ts";
-import { System } from "../../plugos/system.ts";
-import { Completion, CompletionContext, CompletionResult } from "../deps.ts";
-import { safeRun } from "../../common/util.ts";
+import { Hook, Manifest } from "$lib/plugos/types.ts";
+import { System } from "$lib/plugos/system.ts";
+import {
+  Completion,
+  CompletionContext,
+  CompletionResult,
+} from "@codemirror/autocomplete";
 import { Client } from "../client.ts";
-import { syntaxTree } from "../deps.ts";
-import { SlashCompletion } from "$sb/app_event.ts";
-
-export type SlashCommandDef = {
-  name: string;
-  description?: string;
-  boost?: number;
-};
+import { syntaxTree } from "@codemirror/language";
+import {
+  SlashCompletionOption,
+  SlashCompletions,
+} from "../../plug-api/types.ts";
+import { safeRun } from "$lib/async.ts";
+import { SlashCommandDef, SlashCommandHookT } from "$lib/manifest.ts";
 
 export type AppSlashCommand = {
   slashCommand: SlashCommandDef;
   run: () => Promise<void>;
 };
 
-export type SlashCommandHookT = {
-  slashCommand?: SlashCommandDef;
-};
-
-const slashCommandRegexp = /([^\w:]|^)\/[\w\-]*/;
+const slashCommandRegexp = /([^\w:]|^)\/[\w#\-]*/;
 
 export class SlashCommandHook implements Hook<SlashCommandHookT> {
   slashCommands = new Map<string, AppSlashCommand>();
@@ -64,9 +62,12 @@ export class SlashCommandHook implements Hook<SlashCommandHookT> {
     const prefixText = prefix.text;
     const options: Completion[] = [];
 
-    // No slash commands in comment blocks (queries and such)
+    // No slash commands in comment blocks (queries and such) or links
     const currentNode = syntaxTree(ctx.state).resolveInner(ctx.pos);
-    if (currentNode.type.name === "CommentBlock") {
+    if (
+      currentNode.type.name === "CommentBlock" ||
+      currentNode.type.name === "Link"
+    ) {
       return null;
     }
 
@@ -93,17 +94,22 @@ export class SlashCommandHook implements Hook<SlashCommandHookT> {
       });
     }
 
-    const slashCompletions: SlashCompletion[] | null = await this.editor
-      .completeWithEvent(
-        ctx,
-        "slash:complete",
-      ) as any;
+    const slashCompletions: CompletionResult | SlashCompletions | null =
+      await this.editor
+        .completeWithEvent(
+          ctx,
+          "slash:complete",
+        );
 
     if (slashCompletions) {
-      for (const slashCompletion of slashCompletions) {
+      for (
+        const slashCompletion of slashCompletions
+          .options as SlashCompletionOption[]
+      ) {
         options.push({
           label: slashCompletion.label,
           detail: slashCompletion.detail,
+          boost: slashCompletion.order && -slashCompletion.order,
           apply: () => {
             // Delete slash command part
             this.editor.editorView.dispatch({
@@ -115,18 +121,10 @@ export class SlashCommandHook implements Hook<SlashCommandHookT> {
             });
             // Replace with whatever the completion is
             safeRun(async () => {
-              const [plugName, functionName] = slashCompletion.invoke.split(
-                ".",
+              await this.editor.clientSystem.system.invokeFunction(
+                slashCompletion.invoke,
+                [slashCompletion],
               );
-              const plug = this.editor.system.system.loadedPlugs.get(plugName);
-              if (!plug) {
-                this.editor.flashNotification(
-                  `Plug ${plugName} not found`,
-                  "error",
-                );
-                return;
-              }
-              await plug.invoke(functionName, [slashCompletion]);
               this.editor.focus();
             });
           },

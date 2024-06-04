@@ -1,0 +1,1 @@
+![ArrayList diagram](img/arrlist-diagram.png)

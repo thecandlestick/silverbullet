@@ -1,6 +1,7 @@
-import { resolveAttachmentPath } from "$sb/lib/resolve.ts";
+import { isLocalPath, resolvePath } from "$sb/lib/resolve.ts";
 import { Client } from "../client.ts";
-import { Decoration, syntaxTree } from "../deps.ts";
+import { syntaxTree } from "@codemirror/language";
+import { Decoration } from "@codemirror/view";
 import {
   decoratorStateField,
   invisibleDecoration,
@@ -35,9 +36,9 @@ export function linkPlugin(client: Client) {
         const cleanAnchor = anchorPart.substring(1); // cut off the initial [
         let cleanLink = linkPart.substring(0, linkPart.length - 1); // cut off the final )
 
-        if (!cleanLink.includes("://")) {
-          cleanLink = resolveAttachmentPath(
-            client.currentPage!,
+        if (isLocalPath(cleanLink)) {
+          cleanLink = resolvePath(
+            client.currentPage,
             decodeURI(cleanLink),
           );
         }

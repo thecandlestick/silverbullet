@@ -10,16 +10,14 @@ email: jackmanhardt@mst.edu
 
 ## Meeting Times
 
-* Section 103
-9:30am - 10:45am T/Th (CS 222)
+12:40 - 1:40pm MTWRF via Zoom
 
-* Section 102
-12:30pm - 1:45pm T/Th (CS 222)
+Zoom Link: https://umsystem.zoom.us/j/91807966939?pwd=kS2TcckPcSBFLJorLMMC0HbKXCRQzv.1
 
 ## Office Hours
 
-Open Office Hours: MWF 4-5pm, **CS213**
-Individual Meetings: by appointment, **CS317**
+Open office hours immediately after each lecture
+Individual meetings by email appointment
 
 ---
 
@@ -28,15 +26,23 @@ Individual Meetings: by appointment, **CS317**
 ## Assignments
 Homework will be primarily C++ coding-based, with the amount of assignments dependent on the speed of content covered. Your lowest homework score will be dropped.
 
-Instead of large quizzes or exams, in-class assignments will be spread out to short, daily knowledge-checks. You will need to bring some form of internet-capable device to the lectures for this purpose.
-
 There is _no_ midterm exam and _no_ final exam
 
 ## Scale
 
 The breakdown of your grade will be as follows:
-* 85% Programming assignments
-* 15% In-class assignments (Knowledge-checks)
+* 75% Programming assignments
+* 25% Canvas Quizzes
+
+## Extra Credit
+
+Daily opportunities for extra credit will be available simply by attending and participating in lectures. The following things can net you extra credit points:
+
+- Attempting to answer a question asked in class (Does not have to be correct)
+- Sharing your thoughts during a discussion
+- Catching mistakes in the material or assignments
+
+You can earn multiple extra credit points in a single lecture, up to a maximum per week.
 
 ## Autograder ([grade.sh](https://gitlab.com/classroomcode/grade-sh/grade-sh))
 Your assignments in this course will be graded by an open-source autograding tool developed right here at S&T. Some exciting features include the ability to receive ==immediate feedback== on your current progress and built-in tools to help you incrementally develop your code.

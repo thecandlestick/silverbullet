@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: dynamic-memory
+hooks.snippet.slashCommand: dynamic-memory
 ---
 
 # Dynamic Memory
@@ -12,7 +12,6 @@ Variables created during run time have no name by which to refer to them. Instea
 Standard variables exist in a part of memory known as the **stack**. Dynamic variables exist in a different part of memory known as the **heap.**
 
 [[snippet/ops/cpp-new-delete]]
-<!-- #include [[snippet/ops/cpp-new-delete]] -->
 ## _new_ Operator
 
 (Dynamically) Allocates a new variable or array of variables to the heap and returns a pointer to it
@@ -28,9 +27,9 @@ Unlike local variables that get removed when leaving their scope, dynamic variab
 ```delete <ptr>;```  used for dynamic variables
 
 ```delete [] <ptr>;```  used for dynamic arrays
-<!-- /include -->
 
-<!-- #include [[examples/ptr-new-delete]] -->
+
+[[examples/ptr-new-delete]]
 ```c++
 #include <iostream>
 using namespace std;
@@ -49,7 +48,7 @@ int main()
 
   return 0;
 }
-<!-- /include -->
+```
 
 ## Problems with Pointers
 
@@ -59,7 +58,7 @@ Calling _delete_ **DOES NOT** alter the pointer in any way. It **ONLY** de-alloc
 
 **Invalid Reads/Writes** occur when pointers are used to read or write to memory that doesn’t belong to your program. It is important to note that even if the pointer stores a valid memory address, it can still perform an invalid read/write!
 
-<!-- #include [[examples/ptr-dangling]] -->
+[[examples/ptr-dangling]]
 ```c++
 #include <iostream>
 using namespace std;
@@ -78,13 +77,13 @@ int main()
 
   return 0;
 }
-<!-- /include -->
+```
 
 **Memory Leaks** occur when dynamic memory becomes unreachable. Any dynamically-allocated variable on the heap must at all times remain _anchored_ to the stack in some way, either directly via a pointer or indirectly through some chain of pointers.
 
 Once that connection is lost, it becomes (nearly) impossible to access or de-allocate that memory until the program ends.
 
-<!-- #include [[examples/ptr-mem-leak]] -->
+[[examples/ptr-mem-leak]]
 ```c++
 #include <iostream>
 using namespace std;
@@ -99,7 +98,7 @@ int main()
   return 0;
 }
 ````
-<!-- /include -->
+
 
 These problems create very nasty bugs, because they often do not crash your program. They allow it to go on until something else breaks as a result!
 
@@ -139,7 +138,7 @@ Pointers can also be used to dynamically allocate multidimensional arrays. To cr
 
 De-allocating a multidimensional array must be done in the opposite order. The deepest pointers have to be de-allocated first, or else memory will be leaked.
 
-<!-- #include [[examples/ptr-2d-array]] -->
+[[examples/ptr-2d-array]]
 ```c++
 #include <iostream>
 using namespace std;
@@ -161,7 +160,7 @@ int main()
 
   return 0;
 }
-<!-- /include -->
+```
 
 ---
 
@@ -179,7 +178,7 @@ _myClassObj_ is known as the _calling object_. It’s memory address will be sto
 
 Whenever a user-defined class is created, C++ automatically generates three special functions: a Destructor, an Operator= (assignment operator), and a copy-constructor.
 
-<!-- #include [[examples/ptr-def-mem-func]] -->
+[[examples/ptr-def-mem-func]]
 ```c++
 
 // For a class “Foo” with members “x” “y” “z”
@@ -204,17 +203,17 @@ const Foo& operator=( const Foo &rhs )
 
 Foo( const Foo &rhs ) : x (rhs.x), y (rhs.y), z (rhs.z)
 {
-  // Same as above  
+  // Same behavior as the operator= above  
 }
 ```
-<!-- /include -->
+
 
 
 ## Destructor
 
 The destructor is the “clean-up” function that is called whenever an object reaches the end of it’s scope. It’s job is to safely de-allocate any dynamic member variables that may be tied to that object.
 
-<!-- #include [[examples/ptr-destructor]] -->
+[[examples/ptr-destructor]]
 ```c++
 class IntBox  // example class with dynamic member variable
 {
@@ -239,14 +238,13 @@ IntBox::~IntBox()  // "proper" destructor
   delete item;
 }
 ```
-<!-- /include -->
 
 
 ## Operator=
 
 The assignment operator is used to make one (existing) object into a copy of another.
 
-<!-- #include [[examples/ptr-assign-op]] -->
+[[examples/ptr-assign-op]]
 ```c++
 #include <iostream>
 using namespace std;
@@ -285,7 +283,7 @@ const IntBox& IntBox::operator=( const IntBox &rhs )
   }
 }
 ```
-<!-- /include -->
+
 
 
 ## Copy Constructor
@@ -296,7 +294,7 @@ The copy constructor serves a very similar purpose to the operator=, it ==create
 * Pass-by-value functions   ```int& Foo( int byValue )```
 * Return-by-value functions   ```int Bar( int &byReference )```
 
-<!-- #include [[examples/ptr-copy-constructor]] -->
+[[examples/ptr-copy-constructor]]
 ```c++
 class IntBox  // example class with dynamic member variable
 {
@@ -325,6 +323,5 @@ IntBox::IntBox( const IntBox &rhs )
   // *item = *rhs.item (would also work)
 }
 ```
-<!-- /include -->
 
 As a general rule, if your class contains a pointer to a dynamically allocated object, you must overwrite **all three** of the default member functions. For classes without pointers, this is generally not necessary.

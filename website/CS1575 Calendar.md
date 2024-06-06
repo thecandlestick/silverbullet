@@ -7,7 +7,7 @@
 
 # Upcoming Units
 
-* [ ] cpp-review
+* [x] cpp-review
 * [ ] pointers
 * [ ] oop
 * [ ] inheritance

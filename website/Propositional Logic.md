@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: "propositional-logic"
+hooks.snippet.slashCommand: "propositional-logic"
 ---
 
 # Propositional Logic

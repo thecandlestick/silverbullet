@@ -1,7 +1,7 @@
 
 # Schedule of Topics
 
-* [ ] propositional-logic
+* [x] propositional-logic
 * [ ] predicate-logic
 * [ ] argument-validity
 * [ ] proofs

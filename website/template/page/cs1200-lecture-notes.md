@@ -1,7 +1,7 @@
 ---
-pageName: "notes-1200/"
 tags: template
-type: page
+hooks.newPage:
+  suggestedName: "notes-cs1200/{{today}}"
 ---
 #cs1200LN
 |  |  |  |  |

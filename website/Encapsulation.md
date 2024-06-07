@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: encapsulation
+hooks.snippet.slashCommand: encapsulation
 ---
 
 Encapsulation refers to the ability for an object to hide or restrict access to its data. Its purpose is to help ensure that the data belonging to an object remains in a _valid state_ for functions operating on that object and to enforce a layer of abstraction between the class structure and the end-programmer.

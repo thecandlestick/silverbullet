@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: polymorphism
+hooks.snippet.slashCommand: polymorphism
 ---
 
 # Polymorphism in C++

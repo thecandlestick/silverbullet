@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: inheritance
+hooks.snippet.slashCommand: inheritance
 ---
 
 # Inheritance in C++

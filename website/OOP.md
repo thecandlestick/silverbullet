@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: oop
+hooks.snippet.slashCommand: oop
 ---
 
 # Object Oriented Programming

@@ -20,6 +20,8 @@ Copy the entire key and add it to your git-classes account
 
 In-depth tutorial for this step [here](https://git-classes.mst.edu/help/user/ssh.md)
 
+**NOTE:** This step needs to be performed inside the Dev Environment from which you will be working on your assignments. If using mill-classes, the clipboard may not work. I recommend going to **Files -> Home Directory -> Change directory** from the mill-classes dashboard and entering **/home/(your campus username)/.ssh/**. Then you can copy the key from **id_rsa.pub** and paste it in git-classes
+
 ## How to start your assignment
 
 Once you have your SSH key added, the next step is to clone the repository. Navigate to the assignment at git-classes and copy the link found via **Clone -> Clone with SSH**

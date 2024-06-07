@@ -72,3 +72,23 @@ Any changes made to files in the **your_code/** directory (in the docker contain
 
 The suggested workflow is to use your own device to edit and submit code, but use the docker container to run the autograder and check progress.
 
+# Option 4: Mill-Classes
+
+This option will allow you to work on your assignments from any browser by accessing the _Mill_ (a section of S&T’s high-performance computing cluster). This option will require an active mill account which depends on you being currently enrolled in a course that needs it.
+
+Start by navigating to https://mill-classes.mst.edu
+* If you receive an error, contact your instructor to make sure you have been added to the appropriate net-group for the course
+* If this is your first time using the Mill, request an account and wait to be approved by the IT department
+
+Once there, select the **Mill Desktop** option and start a session.
+* If the session expires, you will be kicked off and have to start a new session. If this happens, any _saved_ files will still be there when you return but you **may lose any unsaved code**
+* _VS-Code_ power-users are welcome to create a VS-Code session instead, but this option is not officially supported and you are responsible for making the standard assignment instructions work with this method
+
+This desktop environment is under the supervision of the IT RSS team, and may not have all of the software packages needed for our assignments. We therefore need to use a _container_ to get access to the required software without installing it locally.
+
+Open a terminal and run the following commands:
+
+* echo "alias cs1575=\"apptainer shell /mnt/stor/ceph/cs_class/cs1575/fedora_container.sif\"“
+* source ~/.bashrc
+
+Now type the command ```cs1575```. If successful, you should see the word ```Apptainer>``` at the prompt of your terminal. Run this command whenever you need to use the course auto-grader and it will work until the terminal is closed.

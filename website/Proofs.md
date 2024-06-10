@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: proofs
+hooks.snippet.slashCommand: proofs
 ---
 
 A **proof**, put simply, is a carefully reasoned mathematical argument intended to convince the reader of the truth of an assertion.

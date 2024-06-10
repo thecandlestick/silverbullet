@@ -8,7 +8,7 @@
 # Upcoming Units
 
 * [x] cpp-review
-* [ ] pointers
+* [x] pointers
 * [ ] oop
 * [ ] inheritance
 * [ ] polymorphism

@@ -2,7 +2,7 @@
 # Schedule of Topics
 
 * [x] propositional-logic
-* [ ] predicate-logic
+* [x] predicate-logic
 * [ ] argument-validity
 * [ ] proofs
 **Exam 1**

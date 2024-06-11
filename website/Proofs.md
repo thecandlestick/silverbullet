@@ -80,18 +80,13 @@ _equivalent statements:_
 
 #KnowledgeCheck True or False: _3 divides (3k+1)(3k+2)(3k+3)_
 
-#Definition An integer **n** is **prime** if and only if **n > 1** and for all positive integers **r** and **s**, **n = rs** implies **r** or **s** equals **n**
+#Definition An integer **n** is **prime** if and only if **n > 1** and for all positive integers **r** <= **n**, **r | n** if and only if **r = 1** or **r = n**
 ```latex
 \text{n is prime}\\
-\Leftrightarrow (n > 1) \land \forall r,s \in \Z^+, n=rs \rightarrow (r = n \lor s = n)
+\Leftrightarrow (n > 1) \land \forall r \leq n \in \Z^+, r | n \leftrightarrow (r = 1 \lor r = n)
 ```
 
-#Definition An integer is **composite** if and only if **n > 1** and **n = rs** for some integers **r** and **s** where **1 < r < n** and **1 < s < n**
-```latex
-\text{m is composite}\\
-\Leftrightarrow (m > 1) \land \exists r,s \in \Z^+ \text{ such that } m = rs\\
-\text{where }(1 < r < m) \land (1 < s < m)
-```
+#Definition An integer is **composite** if and only if **n > 1** and **n** is not _prime_
 
 ## Constructive Proofs
 

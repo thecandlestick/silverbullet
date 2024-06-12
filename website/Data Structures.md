@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: data-structures
+hooks.snippet.slashCommand: data-structures
 ---
 
 What is it that computer scientists do?

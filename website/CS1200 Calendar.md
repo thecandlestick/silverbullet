@@ -3,7 +3,7 @@
 
 * [x] propositional-logic
 * [x] predicate-logic
-* [ ] argument-validity
+* [x] argument-validity
 * [ ] proofs
 **Exam 1**
 

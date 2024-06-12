@@ -9,9 +9,9 @@
 
 * [x] cpp-review
 * [x] pointers
-* [ ] oop
-* [ ] inheritance
-* [ ] polymorphism
+* [x] oop
+* [x] inheritance
+* [x] polymorphism
 * [ ] exception-handling
 * [ ] data-structures
 * [ ] lists

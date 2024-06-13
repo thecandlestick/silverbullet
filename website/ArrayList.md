@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: arraylist
+hooks.snippet.slashCommand: arraylist
 ---
 
 

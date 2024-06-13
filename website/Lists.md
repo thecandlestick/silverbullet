@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: list
+hooks.snippet.slashCommand: list
 ---
 
 # The List Abstract Data Type
@@ -33,7 +33,7 @@ We shall define the following operations for the List A.D.T.:
 * **Find(L, x)**       -> _true_ if x is in L, _false_ otherwise
 
 
-_KC: What will be the result of each operation below_
+_#KnowledgeCheck: What will be the result of each operation below_
 * Size(L1) -> ?
 * Get(L1, 2) -> ?
 * Set(L1, 1, y) -> ?

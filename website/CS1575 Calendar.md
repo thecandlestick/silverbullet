@@ -12,7 +12,7 @@
 * [x] oop
 * [x] inheritance
 * [x] polymorphism
-* [ ] exception-handling
+* [x] exception-handling
 * [ ] data-structures
 * [ ] lists
 * [ ] arraylist

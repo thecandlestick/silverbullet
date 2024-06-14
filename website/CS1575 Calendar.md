@@ -13,7 +13,7 @@
 * [x] inheritance
 * [x] polymorphism
 * [x] exception-handling
-* [ ] data-structures
+* [x] data-structures
 * [ ] lists
 * [ ] arraylist
 * [ ] linkedlist

@@ -8,8 +8,7 @@
 ## CS1575
 
 ```query
-page
-name =~ /notes-1575/
+cs1575LN
 order by lastModified
 render [[template/basic]]
 ```
@@ -17,8 +16,7 @@ render [[template/basic]]
 ## CS1200
 
 ```query
-page
-name =~ /notes-1200/
+cs1200LN
 order by lastModified
 render [[template/basic]]
 ```

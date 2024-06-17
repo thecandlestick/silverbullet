@@ -4,7 +4,7 @@
 * [x] propositional-logic
 * [x] predicate-logic
 * [x] argument-validity
-* [ ] proofs
+* [x] proofs
 **Exam 1**
 
 * [ ] sequences

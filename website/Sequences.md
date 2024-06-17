@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: sequences
+hooks.snippet.slashCommand: sequences
 ---
 
 # Sequences

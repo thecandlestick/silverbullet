@@ -7,7 +7,7 @@
 * [x] proofs
 **Exam 1**
 
-* [ ] sequences
+* [x] sequences
 * [ ] induction
 * [ ] set-theory
 * [ ] functions

@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: linkedlist
+hooks.snippet.slashCommand: linkedlist
 ---
 
 # LinkedList Class & Diagram

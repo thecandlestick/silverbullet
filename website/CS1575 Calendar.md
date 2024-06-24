@@ -15,7 +15,7 @@
 * [x] exception-handling
 * [x] data-structures
 * [x] lists
-* [ ] arraylist
+* [x] arraylist
 * [ ] linkedlist
 * [ ] algorithm-complexity
 * [ ] stacks-and-queues

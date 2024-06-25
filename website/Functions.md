@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: functions
+hooks.snippet.slashCommand: functions
 ---
 
 # Functions

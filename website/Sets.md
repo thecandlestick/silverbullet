@@ -1,6 +1,5 @@
 ---
 tags: template
-trigger: sets
 ---
 
 # Set Theory

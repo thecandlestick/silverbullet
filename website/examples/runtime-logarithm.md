@@ -25,4 +25,4 @@ How many times will the while loop iterate in terms of n?
 
 let n be length of array
 
-RTF: 3 + (11)lg(n)
+RTF: 

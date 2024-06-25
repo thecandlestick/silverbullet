@@ -14,7 +14,7 @@ bool ArrayList<T>::find( const T &value )
 let n be num_elements
 
 RTF : Init + Σ(Body + Test + Advance) = ?
-RTF : 1 + num_elements(2 + 1 + 1) = 4n + 1
+
 
 
 ```c++
@@ -24,9 +24,9 @@ ListNode<T>* LinkedList<T>::find( const T& value )
   ListNode<T> *p = head; // 1 op
   while( p -> next != nullptr )  // Test
   {  // Loop Body
-    if (value == p -> data ) //2
+    if (value == p -> data ) 
       return p;
-    p = p -> next; //2
+    p = p -> next; 
   }
   return nullptr;
 }
@@ -34,7 +34,7 @@ ListNode<T>* LinkedList<T>::find( const T& value )
 
 let n = num_elements
 
-RTF : 1 + Σ(4 + 2) = 6n + 1
+RTF : 1 + Σ(Body + Test) 
 
 
 
@@ -51,7 +51,7 @@ int sum_sqrm(int a**, int n)  // return sum of n-by-n matrix
 }
 ```
 
-Cost of Inner : 1 + n(1 + 1 + 3) = 5n + 1
-Cost of Outer : 1 + n(1 + 1 + (5n + 1)) = 5n^2 + 3n + 1
+Cost of Inner : 
+Cost of Outer : 
 
-RTF :==5n^2 + 3n + 2==
+RTF : 

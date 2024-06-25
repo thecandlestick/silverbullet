@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: complexity
+hooks.snippet.slashCommand: complexity
 ---
 
 # Intro to Algorithm Complexity

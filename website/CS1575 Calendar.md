@@ -16,7 +16,7 @@
 * [x] data-structures
 * [x] lists
 * [x] arraylist
-* [ ] linkedlist
+* [x] linkedlist
 * [ ] algorithm-complexity
 * [ ] stacks-and-queues
 * [ ] recursion

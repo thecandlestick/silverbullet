@@ -8,7 +8,7 @@
 **Exam 1**
 
 * [x] sequences
-* [ ] induction
+* [x] induction
 * [ ] set-theory
 * [ ] functions
 * [ ] relations

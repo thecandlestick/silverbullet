@@ -25,4 +25,8 @@ How many times will the while loop iterate in terms of n?
 
 let n be length of array
 
-RTF: 
+n = 16 -> 8 -> 4 -> 2 -> 1 -> Done
+
+2^4 -> 2^3 -> 2^2 -> 2^1 -> 2^0
+
+RTF: 3 + (11)lg(n)

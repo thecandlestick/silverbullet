@@ -8,12 +8,13 @@ Let C = 1, n0 = 1
 
 * n^2 <= C*(3n^2 + n)   _for n > n0_
 * n^2 <= 3n^2 + n      _for n > 1_
+* 0 <= 2n^2 + n 
 
 _but now..._
 
 **Claim:**
 ```latex
-3n^2 \text{ is } O(n^2)
+3n^2 + n \text{ is } O(n^2)
 ```
 **Proof:**
 

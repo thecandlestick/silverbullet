@@ -5,13 +5,13 @@ template <typename T>
 class ArrayStack
 {
   private:
-    int m_size;       // # of elements currently stored
-    int m_capacity;   // length of storage array
-    T *m_data;        // pointer to storage array
-    void resize(int new_capacity);
+    int num_elems;       // # of elements currently stored
+    int max_elems;   // length of storage array
+    T *data;        // pointer to storage array
+    void resize(int new_max_elems);
   public:
-    ArrayStack() : m_size (0), m_capacity (MIN_CAPACITY) 
-                { m_data = new T[m_capacity]; } // default constructor
+    ArrayStack() : num_elems (0), max_elems (MIN_CAPACITY) 
+                { data = new T[max_elems]; } // default constructor
 
     //OPERATIONS
     T& top();

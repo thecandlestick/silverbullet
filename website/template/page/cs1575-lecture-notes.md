@@ -14,6 +14,7 @@ hooks.newPage:
 ```query
 cs1575task
 where done = false
+render [[template/topic]]
 ```
 
 ## Objectives

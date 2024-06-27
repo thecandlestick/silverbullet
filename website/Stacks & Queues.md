@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: stack-queue
+hooks.snippet.slashCommand: stack-queue
 ---
 
 In this section we’ll see how some limited, minimal data structures can still be a powerful tool. We’ll also see how having fewer operations can lead to enhanced performance through clever engineering

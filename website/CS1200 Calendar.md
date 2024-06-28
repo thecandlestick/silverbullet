@@ -9,7 +9,7 @@
 
 * [x] sequences
 * [x] induction
-* [ ] set-theory
+* [x] set-theory
 * [ ] functions
 * [ ] relations
 * [ ] partial-order

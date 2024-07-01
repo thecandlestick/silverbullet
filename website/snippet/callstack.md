@@ -6,4 +6,4 @@ Each function call receives its own stack frame, and it contains information suc
   * Variables local to the scope of the function
   * A return address to where execution should resume afterwards
 
-![the call stack](img/call-stack.png)
+![the call stack](../img/call-stack.png)

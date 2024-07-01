@@ -1,7 +1,3 @@
----
-tags: template
-trigger: relations
----
 
 # Relations
 

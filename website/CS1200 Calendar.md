@@ -10,7 +10,7 @@
 * [x] sequences
 * [x] induction
 * [x] set-theory
-* [ ] functions
+* [x] functions
 * [ ] relations
 * [ ] partial-order
 **Exam 2**

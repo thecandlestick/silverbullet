@@ -11,7 +11,7 @@ void ArrayQueue<T>::enqueue(const T& value)
   if (m_front == m_back && m_size != 0)
     resize(2*m_capacity);
   m_data[m_back] = value;
-  m_back = (m_back+1) % m_capacity; //wrap around if necessary
+  m_back = (m_back+1) % max_elems; //wrap around if necessary
   size++;
 }
 

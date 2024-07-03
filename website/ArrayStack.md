@@ -29,7 +29,7 @@ Consider the following stack:
 
 Can [[ArrayList]] operations efficiently implement _top_, _push_, and _pop_? 
 
-![ArrayList diagram](../img/arrlist-diagram.png)
+![ArrayList diagram](/img/arrlist-diagram.png)
 TOP: **O(1)**
 
 return data[num_elems -1]

@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: recursion
+hooks.snippet.slashCommand: recursion
 ---
 
 # What is Recursion

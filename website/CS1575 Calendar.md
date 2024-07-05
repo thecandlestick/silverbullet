@@ -18,7 +18,7 @@
 * [x] arraylist
 * [x] linkedlist
 * [x] algorithm-complexity
-* [ ] stacks-and-queues
+* [x] stacks-and-queues
 * [ ] recursion
 * [ ] trees
 * [ ] BST

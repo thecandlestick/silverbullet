@@ -141,7 +141,7 @@ Some data structures are purposefully designed with recursion in mind, or just s
 
 There is a particularly deep body of data structures that use [[Trees]] to represent data, which are inherently recursive objects and thus lend themselves well to operations implemented by recursive algorithms.
 
-We have already seen an example of a recursive data structure; however, when we noted that the _ListNode_ class alone is sufficient to implement the _List_ abstract data type. To think of these operations recursively, simply note that _m_next_ in this implementation points to either:
+We have already seen an example of a recursive data structure; however, when we noted that the _ListNode_ class alone is sufficient to implement the _List_ abstract data type. To think of these operations recursively, simply note that the _next_ pointer for each node in this implementation points to either:
   * nullptr (**Base Case**)
   * a smaller (size n-1) list (**Recursive Case**)
 
@@ -193,13 +193,7 @@ This wasteful re-calculation very quickly gets out of hand, and it’s why a _bo
 
 Note that there is a technique in the field of _Dynamic Programming_ for tackling this problem of redundant sub-problems known as _memoization_, but it is beyond the scope of this course.
 
-## The hidden cost of a function
 
-Even if a recursive and iterative version of an algorithm have the same _analytical_ time-complexity, you may often find that the iterative version outperforms _empirically._ This is because of another consideration for recursive algorithms which is the cost of maintaining the _call stack_.
-
-Remember that every time we make a function call, a _stack frame_ is generated with information about the current state of the program before the new function takes control. This takes a non-trivial amount of time to do, but we disregard it during analytical testing as it is technically environment-dependent and does not have an effect on rate-of-growth.
-
-What this tells us is that while recursive algorithms are good enough for most purposes and can offer significantly increased readability/maintainability, if speed is your primary concern you may look for an iterative equivalent.
 
 ## Recursion is looping, looping is Recursion
 

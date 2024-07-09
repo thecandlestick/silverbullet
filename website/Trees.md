@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: trees
+hooks.snippet.slashCommand: trees
 ---
 
 Trees are a very special mathematical object that have inspired many data structures and algorithms. Trees appear all throughout the field of computer science in the most unexpected of places.

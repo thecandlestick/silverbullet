@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: heaps
+hooks.snippet.slashCommand: heaps
 ---
 
 # Properties of Heaps

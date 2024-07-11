@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: map
+hooks.snippet.slashCommand: map
 ---
 
 # The Map Abstract Data Type

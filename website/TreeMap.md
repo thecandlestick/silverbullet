@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: treemap
+hooks.snippet.slashCommand: treemap
 ---
 
 # TreeMap Class & Diagram

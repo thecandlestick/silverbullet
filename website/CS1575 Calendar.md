@@ -20,7 +20,7 @@
 * [x] algorithm-complexity
 * [x] stacks-and-queues
 * [x] recursion
-* [ ] trees
+* [x] trees
 * [ ] BST
 * [ ] maps
 * [ ] treemap

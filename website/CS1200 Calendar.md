@@ -11,8 +11,8 @@
 * [x] induction
 * [x] set-theory
 * [x] functions
-* [ ] relations
-* [ ] partial-order
+* [x] relations
+* [x] partial-order
 **Exam 2**
 
 * [ ] counting-and-probability

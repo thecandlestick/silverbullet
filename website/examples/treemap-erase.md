@@ -6,30 +6,30 @@ void TreeMap<K,V>::erase_helper(MapNode<K,V> *&root, const K &erase_key)
   if (root == nullptr)
     return;
 
-  if (erase_key < root->m_key)
-    erase_helper(root->m_left, erase_key)
-  else if (erase_key > root->m_key)
-    erase_helper(root->m_right, erase_key)
+  if (erase_key < root->key)
+    erase_helper(root->left_st, erase_key)
+  else if (erase_key > root->key)
+    erase_helper(root->right_st, erase_key)
   else
   {
   /// Node found, begin erasure ///
   
     /// Degree 0 ///
-    if (root->m_left == nullptr && root->m_right == nullptr)
+    if (root->left_st == nullptr && root->right_st == nullptr)
     {
       delete root;
       root = nullptr;
     }
     /// Degree 1 ///
-    else if (root->m_left == nullptr)
+    else if (root->left_st == nullptr)
     {
-      MapNode<K,V> *child = root->m_right;
+      MapNode<K,V> *child = root->right_st;
       delete root;
       root = child;
     }
-    else if (root->m_right == nullptr)
+    else if (root->right_st == nullptr)
     {
-      MapNode<K,V> *child = root->m_left;
+      MapNode<K,V> *child = root->left_st;
       delete root;
       root = child;
     }
@@ -37,14 +37,14 @@ void TreeMap<K,V>::erase_helper(MapNode<K,V> *&root, const K &erase_key)
     /// Degree 2 ///
     else
     {
-      MapNode<K,V> *successor = getMax(root->m_left);
-      //TreeMap<K,V> *successor = getMin(root->m_right);
-      root->m_key = successor->m_key;
-      root->m_value = successor->m_value;
+      MapNode<K,V> *successor = getMax(root->left_st);
+      //TreeMap<K,V> *successor = getMin(root->right_st);
+      root->key = successor->key;
+      root->value = successor->value;
       
       // Eject the imposter
-      erase_helper(root->m_left, successor->m_key); 
-      //erase_helper(root->m_right, successor->m_key);
+      erase_helper(root->left_st, successor->key); 
+      //erase_helper(root->right_st, successor->key);
     }
 
   }

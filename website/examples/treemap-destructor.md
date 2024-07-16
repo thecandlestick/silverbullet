@@ -4,8 +4,8 @@ void TreeMap<K,V>::clear(MapNode<K,V> *&root)
 {
   if (root == nullptr) return;
 
-  clear(root->m_right); // de-allocate right subtree
-  clear(root->m_left);  // de-allocate left subtree
+  clear(root->right_st); // de-allocate right subtree
+  clear(root->left_st);  // de-allocate left subtree
   delete root;          // de-allocate root
   root = nullptr;
 }
@@ -13,5 +13,5 @@ void TreeMap<K,V>::clear(MapNode<K,V> *&root)
 template <typename K, typename V>
 TreeMap<K,V>::~TreeMap()
 {
-  clear(m_root);
+  clear(global_root);
 }

@@ -5,8 +5,8 @@ MapNode<K,V>* TreeMap<K,V>::clone(const MapNode<K,V>* root)
   if (root == nullptr)
     return nullptr;
   else
-    return new MapNode<K,V>(root->m_key, root->m_value,
-                    clone(root->m_left), clone(root->m_right));
+    return new MapNode<K,V>(root->key, root->value,
+                    clone(root->left_st), clone(root->right_st));
 
   // Copy key/val from root then clone right/left subtrees
 }
@@ -14,8 +14,8 @@ MapNode<K,V>* TreeMap<K,V>::clone(const MapNode<K,V>* root)
 template <typename K, typename V>
 TreeMap<K,V>& TreeMap<K,V>::operator=(const TreeMap<K,V> &rhs)
 {
-  clear(m_root);
-  m_root = clone(rhs.m_root);
+  clear(global_root);
+  global_root = clone(rhs.global_root);
   return *this;
 }
 ```

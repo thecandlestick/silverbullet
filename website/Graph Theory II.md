@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: graph-theory-2
+hooks.snippet.slashCommand: graph-theory-2
 ---
 
 ## Euler Circuits & Trails

@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: graph-theory
+hooks.snippet.slashCommand: graph-theory
 ---
 
 # Graphs

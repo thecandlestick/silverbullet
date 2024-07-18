@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: binary-heap
+hooks.snippet.slashCommand: binary-heap
 ---
 
 # Class & Diagram

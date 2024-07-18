@@ -22,8 +22,8 @@
 * [x] recursion
 * [x] trees
 * [x] BST
-* [ ] maps
-* [ ] treemap
+* [x] maps
+* [x] treemap
 * [ ] priority-queue
 * [ ] heaps
 

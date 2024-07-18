@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: priority-queue
+hooks.snippet.slashCommand: priority-queue
 ---
 
 # The Priority Queue Abstract Data Type

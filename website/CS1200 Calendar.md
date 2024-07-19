@@ -15,7 +15,7 @@
 * [x] partial-order
 **Exam 2**
 
-* [ ] counting-and-probability
+* [x] counting-and-probability
 * [ ] graph-theory
 * Bonus Topics
 **Exam 3**

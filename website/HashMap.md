@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: hashmap
+hooks.snippet.slashCommand: hashmap
 ---
 
 We’ve seen how to implement a map that runs in logarithmic-time as a [[TreeMap]]. This already scales extremely well, but can we do even better?

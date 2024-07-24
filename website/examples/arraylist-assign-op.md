@@ -2,7 +2,7 @@
 template <typename T>
 const ArrayList& ArrayList<T>::operator=(const ArrayList& rhs)
 {
-  if (this != &rhs)
+  if (this != &rhs) // A = A;
   {
     T *tmp = new T[rhs.max_elems];  // allocate enough space
 

@@ -10,6 +10,10 @@
 
 * How can we measure and assess _long-term_ retention between courses? Are K-12 institutions more of a “united front” than university departments?
 
+  * Major field test. Is the data _actually_ used?
+  * Capstone courses
+  * Subsequent courses
+
 * <your impressions here>
 
 
@@ -33,9 +37,9 @@ how to define ==desirable difficulties==?
 _Examples:_
 * Students learning to toss beanbags from 2/4 feet have to learn to judge distance and develop fine motor control. Students tossing from 3 feet only learn to rely on muscle memory
   
-* Students engaging in interleaved practice learn to identify problem types whereas students engaging in blocked practice suffer more from “discrimination errors”
+* Students engaging in interleaved practice learn to identify problem types whereas students engaging in blocked practice suffer more from “discrimination errors”. Better engagement
 
-* <your examples here>
+* Material on exams / crib sheet
 
 ---
 
@@ -56,6 +60,9 @@ A brief delay between question and correct answer fosters curiosity in students.
 
 #DiscussionQuestion How to create opportunities for retrieval without eating a ton of class time? Can students be expected to abstain from using notes/etc in quizzes outside of the classroom?
 
+* group work
+* canvas question banks
+* pre-made canvas resources
 
 ### Classroom Tips
 

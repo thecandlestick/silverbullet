@@ -24,8 +24,8 @@
 * [x] BST
 * [x] maps
 * [x] treemap
-* [ ] priority-queue
-* [ ] heaps
+* [x] priority-queue
+* [x] heaps
 
 ---
 # Schedule of Topics

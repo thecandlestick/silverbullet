@@ -1,6 +1,6 @@
 ---
 tags: template
-trigger: graph-adt
+hooks.snippet.slashCommand: graph-adt
 ---
 
 A Graph is a collection of **vertices** (or _nodes_), and **edges** between them. The previously introduced [[Trees]] are a special case of graphs with restrictions placed on the edges to enforce a _hierarchical_ relationship between nodes. Graphs generalize this concept by having no such restrictions, allowing us to represent any arbitrary relationship for the nodes. 
@@ -48,7 +48,7 @@ In an _undirected graph_
 The **degree** of a graph is the highest degree among all vertices.
 
 A **path** is a sequence of vertices { v0, v1, ..., vn } such that <vi,vi+1> is in E for all i in {0, 1, ..., n-1}
-  * _n_ (the number of edges) is the **length** of the path
+  * _n-1_ (the number of edges) is the **length** of the path
   * A path can be empty
   * A path with no _loops_ is known as a **simple path**
 
@@ -62,13 +62,6 @@ There are three definitions of _connected_ used for digraphs:
   * A digraph is **unilaterally connected** if for every pair of vertices _x, y_, there is either a path from _x_ to _y_ OR there is a path from _y_ to _x_
   * A digraph is **strongly connected** if for every pair of vertices _x, y_, there is a path from _x_ to _y_ AND there is a path from _y_ to _x_ 
 
-_KC: Is the following graph:_
-* **weakly connected, but not unilaterally connected**
-* **unilaterally connected, but not strongly connected**
-* **strongly connected**
-* **none of the above**
-
-![](img/connectivity-graph.png)
 
 ## Search/Traversals
 

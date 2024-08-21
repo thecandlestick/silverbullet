@@ -20,7 +20,7 @@ CS 1585 requires setup and makes heavy use of a linux VM. If you are taking or h
 Assuming you have set up a Debian VM, you can run the following commands to install all 1575-specific packages:
 
 ```bash
-$ sudo apt-get install cmake python3-levenshtein clang-format valgrind pipx
+$ sudo apt install cmake python3-levenshtein clang-format valgrind pipx
 
 $ python3 -m pipx ensurepath
 $ pipx install valgreen
@@ -78,7 +78,7 @@ This option will allow you to work on your assignments from any browser by acces
 
 Start by navigating to https://mill-classes.mst.edu
 * If you receive an error, contact your instructor to make sure you have been added to the appropriate net-group for the course
-* If this is your first time using the Mill, request an account and wait to be approved by the IT department
+* If this is your first time using the Mill, [request an account](https://docs.itrss.umsystem.edu/pub/hpc/mill) and wait to be approved by the IT department
 
 Once there, select the **Mill Desktop** option and start a session.
 * If the session expires, you will be kicked off and have to start a new session. If this happens, any _saved_ files will still be there when you return but you **may lose any unsaved code**

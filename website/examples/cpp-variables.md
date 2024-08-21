@@ -1,3 +1,7 @@
+---
+tags: template, cs1575-lecture-slides
+sequence-number: 1
+---
 
 ```c++
 #include <iostream>

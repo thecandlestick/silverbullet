@@ -61,10 +61,10 @@ Your assignments in this course will be graded by an open-source autograding too
 
 ## Textbooks
 
-[Efficient Data Structures](https://www.cnsr.dev/index_files/Classes/DataStructures/Content/eds-cpp.pdf) by Patrick Taylor
+[Efficient Data Structures](https://cs-mst.gitlab.io/index/Classes/DataStructures/Book.html) by Patrick Taylor
 (Adapted from [Open Data Structures](https://opendatastructures.org/))
 
-[Data Structures and Algorithm Analysis](https://www.cnsr.dev/index_files/Classes/DataStructures/Content/DSA_Shaffer2013.pdf) by Clifford A. Shaffer
+[Data Structures and Algorithm Analysis](https://cs-mst.gitlab.io/index/Classes/DataStructures/Content/DSA_Shaffer2013.pdf) by Clifford A. Shaffer
 
 ## Helpful Stuff
 

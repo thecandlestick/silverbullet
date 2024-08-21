@@ -7,25 +7,25 @@
 
 # Upcoming Units
 
-* [x] cpp-review
-* [x] pointers
-* [x] oop
-* [x] inheritance
-* [x] polymorphism
-* [x] exception-handling
-* [x] data-structures
-* [x] lists
-* [x] arraylist
-* [x] linkedlist
-* [x] algorithm-complexity
-* [x] stacks-and-queues
-* [x] recursion
-* [x] trees
-* [x] BST
-* [x] maps
-* [x] treemap
-* [x] priority-queue
-* [x] heaps
+* [ ] cpp-review
+* [ ] pointers
+* [ ] oop
+* [ ] inheritance
+* [ ] polymorphism
+* [ ] exception-handling
+* [ ] data-structures
+* [ ] lists
+* [ ] arraylist
+* [ ] linkedlist
+* [ ] algorithm-complexity
+* [ ] stacks-and-queues
+* [ ] recursion
+* [ ] trees
+* [ ] BST
+* [ ] maps
+* [ ] treemap
+* [ ] priority-queue
+* [ ] heaps
 
 ---
 # Schedule of Topics

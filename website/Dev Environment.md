@@ -88,7 +88,7 @@ This desktop environment is under the supervision of the IT RSS team, and may no
 
 Open a terminal and run the following commands:
 
-* echo "alias cs1575=\"apptainer shell /mnt/stor/ceph/cs_class/cs1575/fedora_container.sif\"“ >> ~/.bashrc
+* echo “alias cs1575=\“apptainer shell /mnt/stor/ceph/cs_class/cs1575/fedora_container.sif\““ >> ~/.bashrc
 * source ~/.bashrc
 
 Now type the command ```cs1575```. If successful, you should see the word ```Apptainer>``` at the prompt of your terminal. Run this command whenever you need to use the course auto-grader and it will work until the terminal is closed.

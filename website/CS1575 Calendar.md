@@ -5,6 +5,11 @@
 
 ---
 
+# Assignment Dates
+
+* [ ] [[PA00]]  📅2024-08-30 #cs1575task
+
+
 # Upcoming Units
 
 * [ ] cpp-review

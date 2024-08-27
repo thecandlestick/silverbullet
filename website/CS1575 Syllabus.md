@@ -18,7 +18,9 @@ email: jackmanhardt@mst.edu
 
 ## Office Hours
 
-TBA
+Monday/Friday 10-10:50am
+Wednesday 2-2:50pm
+CS 2nd floor lounge (CS213)
 Individual meetings by email appointment
 
 ---

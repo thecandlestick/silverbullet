@@ -51,7 +51,7 @@ _Note: CS 1585 students are required to set-up their own VM. If you have not com
 
 [Docker](https://www.docker.com/) is a tool that allows you to deploy a customized OS environment with no installation required. Provided inside the assignment repository is a _Dockerfile_ which will allow you to deploy and interact with the exact environment that your code will be graded in. This can be helpful if you do not wish to or cannot install the required packages.
 
-Experienced MacOS or WSL users may use this Dockerfile to complete the assignments if they wish, but this process is still experimental and not officially supported yet. It is highly recommended that you set up a Linux VM even if you intend to try using Docker.
+Experienced MacOS or WSL users may use this Dockerfile to complete the assignments if they wish, but this process is still experimental and not officially supported yet. It is highly recommended that you set up another Dev Environment option as a backup even if you intend to try using Docker.
 
 ### For MacOS users:
 
@@ -86,9 +86,12 @@ Once there, select the **Mill Desktop** option and start a session.
 
 This desktop environment is under the supervision of the IT RSS team, and may not have all of the software packages needed for our assignments. We therefore need to use a _container_ to get access to the required software without installing it locally.
 
-Open a terminal and run the following commands:
+Open a web browser from inside mill-classes, navigate to this page, copy the command below, and paste it in the terminal:
 
-* echo “alias cs1575=\“apptainer shell /mnt/stor/ceph/cs_class/cs1575/fedora_container.sif\““ >> ~/.bashrc
-* source ~/.bashrc
+```bash
+echo "alias cs1575=\"apptainer shell /mnt/stor/ceph/cs_class/cs1575/fedora_container.sif\"" >> ~/.bashrc && source ~/.bashrc
+```
+
+_note: If you try to type out the command yourself, please triple check that you have it exactly correct. A single character being off can change the entire meaning of a terminal command_
 
 Now type the command ```cs1575```. If successful, you should see the word ```Apptainer>``` at the prompt of your terminal. Run this command whenever you need to use the course auto-grader and it will work until the terminal is closed.

@@ -1,5 +1,8 @@
 ```query
-cs1575LN where size > 500
+cs1575LNsgdhdf where size > 500
 render [[Library/Personal/Notes Summary]]
 ```
 
+```bash
+echo alias cs1575="apptainer shell "
+```

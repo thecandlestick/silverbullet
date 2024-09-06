@@ -5,15 +5,14 @@
 
 ---
 
-# Assignment Dates
 
-* [ ] [[PA00]]  📅2024-08-30 #cs1575task
+* [x] [[PA00]]  📅2024-08-30 #cs1575task
 
 
 # Upcoming Units
 
-* [ ] cpp-review
-* [ ] pointers
+* [x] cpp-review
+* [x] pointers
 * [ ] oop
 * [ ] inheritance
 * [ ] polymorphism

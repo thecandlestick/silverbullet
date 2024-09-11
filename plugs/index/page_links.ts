@@ -1,12 +1,29 @@
-import { findNodeOfType, renderToText, traverseTree } from "$sb/lib/tree.ts";
-import { IndexTreeEvent, ObjectValue } from "$sb/types.ts";
-import { isLocalPath, resolvePath } from "$sb/lib/resolve.ts";
+import {
+  findNodeOfType,
+  renderToText,
+  traverseTree,
+} from "@silverbulletmd/silverbullet/lib/tree";
+import type {
+  IndexTreeEvent,
+  ObjectValue,
+} from "@silverbulletmd/silverbullet/types";
+import {
+  isLocalPath,
+  resolvePath,
+} from "@silverbulletmd/silverbullet/lib/resolve";
 import { indexObjects, queryObjects } from "./api.ts";
-import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
-import { updateITags } from "$sb/lib/tags.ts";
-import { parsePageRef } from "$sb/lib/page_ref.ts";
+import { extractFrontmatter } from "@silverbulletmd/silverbullet/lib/frontmatter";
+import { updateITags } from "@silverbulletmd/silverbullet/lib/tags";
+import {
+  looksLikePathWithExtension,
+  parsePageRef,
+} from "@silverbulletmd/silverbullet/lib/page_ref";
 import { extractSnippetAroundIndex } from "./snippet_extractor.ts";
-import { mdLinkRegex, wikiLinkRegex } from "$common/markdown_parser/parser.ts";
+import {
+  mdLinkRegex,
+  wikiLinkRegex,
+} from "$common/markdown_parser/constants.ts";
+import { space } from "@silverbulletmd/silverbullet/syscalls";
 
 export type LinkObject = ObjectValue<
   {
@@ -34,6 +51,19 @@ export type LinkObject = ObjectValue<
   }
 >;
 
+/**
+ * Represents a page that does not yet exist, but is being linked to. A page "aspiring" to be created.
+ */
+export type AspiringPageObject = ObjectValue<{
+  // ref: page@pos
+  // The page the link appears on
+  page: string;
+  // And the position
+  pos: number;
+  // The page the link points to
+  name: string;
+}>;
+
 export async function indexLinks({ name, tree }: IndexTreeEvent) {
   const links: ObjectValue<LinkObject>[] = [];
   const frontmatter = await extractFrontmatter(tree);
@@ -57,7 +87,7 @@ export async function indexLinks({ name, tree }: IndexTreeEvent) {
       };
       // Assume link is to an attachment if it has
       // an extension, to a page otherwise
-      if (/\.[a-zA-Z0-9]+$/.test(url)) {
+      if (looksLikePathWithExtension(url)) {
         link.toFile = url;
       } else {
         link.toPage = parsePageRef(url).page;
@@ -100,7 +130,7 @@ export async function indexLinks({ name, tree }: IndexTreeEvent) {
       };
       // Assume link is to an attachment if it has
       // an extension, to a page otherwise
-      if (/\.[a-zA-Z0-9]+$/.test(url)) {
+      if (looksLikePathWithExtension(url)) {
         link.toFile = url;
       } else {
         link.toPage = parsePageRef(url).page;
@@ -140,7 +170,7 @@ export async function indexLinks({ name, tree }: IndexTreeEvent) {
           };
           // Assume link is to an attachment if it has
           // an extension, to a page otherwise
-          if (/\.[a-zA-Z0-9]+$/.test(url)) {
+          if (looksLikePathWithExtension(url)) {
             link.toFile = resolvePath(name, "/" + url);
           } else {
             link.toPage = resolvePath(name, "/" + parsePageRef(url).page);
@@ -163,7 +193,7 @@ export async function indexLinks({ name, tree }: IndexTreeEvent) {
             pos: pos,
             asTemplate: true,
           };
-          if (/\.[a-zA-Z0-9]+$/.test(url)) {
+          if (looksLikePathWithExtension(url)) {
             link.toFile = resolvePath(name, url);
           } else {
             link.toPage = resolvePath(name, parsePageRef(url).page);
@@ -178,8 +208,35 @@ export async function indexLinks({ name, tree }: IndexTreeEvent) {
     }
     return false;
   });
+
   // console.log("Found", links, "page link(s)");
-  await indexObjects(name, links);
+  if (links.length > 0) {
+    await indexObjects(name, links);
+  }
+
+  // Now let's check which are aspiring pages
+  const aspiringPages: ObjectValue<AspiringPageObject>[] = [];
+  for (const link of links) {
+    if (link.toPage) {
+      // No federated links, nothing with template directives
+      if (link.toPage.startsWith("!") || link.toPage.includes("{{")) {
+        continue;
+      }
+      if (!await space.fileExists(`${link.toPage}.md`)) {
+        aspiringPages.push({
+          ref: `${name}@${link.pos}`,
+          tag: "aspiring-page",
+          page: name,
+          pos: link.pos,
+          name: link.toPage,
+        } as AspiringPageObject);
+      }
+    }
+  }
+
+  if (aspiringPages.length > 0) {
+    await indexObjects(name, aspiringPages);
+  }
 }
 
 export async function getBackLinks(

@@ -1,9 +1,9 @@
-import { Hook, Manifest } from "../types.ts";
-import { System } from "../system.ts";
-import { MQMessage } from "../../../plug-api/types.ts";
-import { MessageQueue } from "../../data/mq.ts";
+import type { Hook, Manifest } from "../types.ts";
+import type { System } from "../system.ts";
+import type { MQMessage } from "../../../plug-api/types.ts";
+import type { MessageQueue } from "../../data/mq.ts";
 import { throttle } from "../../async.ts";
-import { MQHookT } from "$lib/manifest.ts";
+import type { MQHookT } from "$lib/manifest.ts";
 
 export class MQHook implements Hook<MQHookT> {
   subscriptions: (() => void)[] = [];
@@ -52,12 +52,13 @@ export class MQHook implements Hook<MQHookT> {
         const subscriptions = functionDef.mqSubscriptions;
         for (const subscriptionDef of subscriptions) {
           const queue = subscriptionDef.queue;
-          // console.log("Subscribing to queue", queue);
+          // console.log("Subscribing to queue", queue, subscriptionDef);
           this.subscriptions.push(
             this.mq.subscribe(
               queue,
               {
                 batchSize: subscriptionDef.batchSize,
+                pollInterval: subscriptionDef.pollInterval,
               },
               async (messages: MQMessage[]) => {
                 try {

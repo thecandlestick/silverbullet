@@ -1,7 +1,7 @@
 import { syntaxTree } from "@codemirror/language";
-import { EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
-import { Client } from "../client.ts";
-import { UploadFile } from "$sb/types.ts";
+import { EditorView, ViewPlugin, type ViewUpdate } from "@codemirror/view";
+import type { Client } from "../client.ts";
+import type { UploadFile } from "@silverbulletmd/silverbullet/types";
 
 // We use turndown to convert HTML to Markdown
 import TurndownService from "turndown";
@@ -13,10 +13,11 @@ import {
   addParentPointers,
   findParentMatching,
   nodeAtPos,
-} from "$sb/lib/tree.ts";
+} from "@silverbulletmd/silverbullet/lib/tree";
 import { defaultLinkStyle, maximumAttachmentSize } from "../constants.ts";
 import { safeRun } from "$lib/async.ts";
-import { resolvePath } from "$sb/lib/resolve.ts";
+import { resolvePath } from "@silverbulletmd/silverbullet/lib/resolve";
+import { localDateString } from "$lib/dates.ts";
 
 const turndownService = new TurndownService({
   hr: "---",
@@ -187,8 +188,7 @@ export function attachmentExtension(editor: Client) {
     }
     const fileType = file.type;
     const ext = fileType.split("/")[1];
-    const fileName = new Date()
-      .toISOString()
+    const fileName = localDateString(new Date())
       .split(".")[0]
       .replace("T", "_")
       .replaceAll(":", "-");
@@ -205,7 +205,7 @@ export function attachmentExtension(editor: Client) {
   }
 
   async function saveFile(file: UploadFile) {
-    const maxSize = editor.settings.maximumAttachmentSize ||
+    const maxSize = editor.config.maximumAttachmentSize ||
       maximumAttachmentSize;
     if (file.content.length > maxSize * 1024 * 1024) {
       editor.flashNotification(
@@ -224,7 +224,7 @@ export function attachmentExtension(editor: Client) {
     }
     const attachmentPath = resolvePath(editor.currentPage, finalFileName);
     await editor.space.writeAttachment(attachmentPath, file.content);
-    const linkStyle = editor.settings.defaultLinkStyle ||
+    const linkStyle = editor.config.defaultLinkStyle ||
       defaultLinkStyle.toLowerCase();
     let attachmentMarkdown = "";
     if (linkStyle === "wikilink") {

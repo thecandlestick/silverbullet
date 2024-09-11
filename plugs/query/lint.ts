@@ -1,15 +1,22 @@
-import { LintEvent } from "../../plug-api/types.ts";
-import { parseQuery } from "$sb/lib/parse-query.ts";
-import { cleanPageRef, resolvePath } from "$sb/lib/resolve.ts";
-import { findNodeOfType, traverseTreeAsync } from "$sb/lib/tree.ts";
-import { events, space } from "$sb/syscalls.ts";
-import { LintDiagnostic } from "../../plug-api/types.ts";
+import type { LintEvent } from "../../plug-api/types.ts";
+import { parseQuery } from "../../plug-api/lib/parse_query.ts";
+import {
+  cleanPageRef,
+  resolvePath,
+} from "@silverbulletmd/silverbullet/lib/resolve";
+import {
+  findNodeOfType,
+  traverseTreeAsync,
+} from "@silverbulletmd/silverbullet/lib/tree";
+import { events, space, system } from "@silverbulletmd/silverbullet/syscalls";
+import type { LintDiagnostic } from "../../plug-api/types.ts";
 import { loadPageObject, replaceTemplateVars } from "../template/page.ts";
 
 export async function lintQuery(
   { name, tree }: LintEvent,
 ): Promise<LintDiagnostic[]> {
   const diagnostics: LintDiagnostic[] = [];
+  const config = await system.getSpaceConfig();
   await traverseTreeAsync(tree, async (node) => {
     if (node.type === "FencedCode") {
       const codeInfo = findNodeOfType(node, "CodeInfo")!;
@@ -30,7 +37,7 @@ export async function lintQuery(
       try {
         const pageObject = await loadPageObject(name);
         const parsedQuery = await parseQuery(
-          await replaceTemplateVars(bodyText, pageObject),
+          await replaceTemplateVars(bodyText, pageObject, config),
         );
         const allSources = await allQuerySources();
         if (

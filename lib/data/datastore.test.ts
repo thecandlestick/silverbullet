@@ -1,11 +1,11 @@
 import "fake-indexeddb/auto";
 import { IndexedDBKvPrimitives } from "../data/indexeddb_kv_primitives.ts";
-import { DataStore } from "../data/datastore.ts";
 import { DenoKvPrimitives } from "../data/deno_kv_primitives.ts";
-import { KvPrimitives } from "../data/kv_primitives.ts";
-import { assertEquals } from "$std/testing/asserts.ts";
+import type { KvPrimitives } from "../data/kv_primitives.ts";
+import { assertEquals, assertThrows } from "@std/assert";
 import { PrefixedKvPrimitives } from "../data/prefixed_kv_primitives.ts";
-import { Query } from "../../plug-api/types.ts";
+import type { Query } from "../../plug-api/types.ts";
+import { DataStore } from "$lib/data/datastore.ts";
 
 async function test(db: KvPrimitives) {
   const datastore = new DataStore(new PrefixedKvPrimitives(db, ["ds"]), {
@@ -103,6 +103,160 @@ async function test(db: KvPrimitives) {
     }),
     [{ key: ["kv", "complicated"], value: { random: [] } }],
   );
+
+  // Test object enrichment
+  datastore.objectDecorators = [{
+    where: ["boolean", true],
+    attributes: {
+      pageDecoration: {
+        prefix: ["string", "🧑 "],
+      },
+      list: ["array", [["number", 2]]],
+    },
+  }];
+
+  const simplePage = {
+    name: "My Page",
+    pageDecoration: {
+      hide: true,
+    },
+    list: [1],
+  };
+  const enrichedPage = datastore.enrichObject(simplePage);
+  assertEquals(enrichedPage.name, "My Page");
+  assertEquals(enrichedPage.pageDecoration.hide, true);
+  assertEquals(enrichedPage.pageDecoration.prefix, "🧑 ");
+  assertEquals(enrichedPage.list, [1, 2]);
+  // console.log("Enriched page", enrichedPage);
+
+  // More complicated case
+  datastore.objectDecorators = [
+    { // fullName
+      where: ["=", ["attr", "tags"], ["string", "person"]],
+      attributes: {
+        fullName: ["+", ["+", ["attr", "firstName"], ["string", " "]], [
+          "attr",
+          "lastName",
+        ]],
+      },
+    },
+    {
+      where: ["=", ["attr", "tags"], ["string", "person"]],
+      attributes: {
+        pageDecoration: {
+          prefix: {
+            bla: {
+              doh: ["+", ["string", "🧑 "], ["attr", "fullName"]],
+            },
+          },
+        },
+      },
+    },
+    // Test extending existing array attributes
+    {
+      where: ["boolean", true],
+      attributes: {
+        listAttribute: ["array", [["string", "newValue1"]]],
+        nested: {
+          listAttribute1: ["array", [["string", "newValue 1"]]],
+        },
+      },
+    },
+    {
+      where: ["boolean", true],
+      attributes: {
+        listAttribute: ["array", [["string", "newValue2"]]],
+        nested: {
+          listAttribute1: ["array", [["string", "newValue 2"]]],
+        },
+      },
+    },
+    {
+      where: ["boolean", true],
+      attributes: {
+        nested: {
+          listAttribute1: ["array", [["string", "newValue 3"]]],
+        },
+      },
+    },
+    {
+      where: ["boolean", true],
+      attributes: {
+        nested: {
+          deeper: {
+            listAttribute2: ["array", [["string", "newValue 1"]]],
+          },
+        },
+      },
+    },
+    {
+      where: ["boolean", true],
+      attributes: {
+        nested: {
+          deeper: {
+            listAttribute2: ["array", [["string", "newValue 2"]]],
+          },
+        },
+      },
+    },
+    // Test not being able to override existing attributes
+    {
+      where: ["boolean", true],
+      attributes: {
+        lastName: ["string", "Shouldn't be set"],
+      },
+    },
+    {
+      where: ["=", ["attr", "tags"], ["string", "person"]],
+      attributes: {
+        existingObjAttribute: {
+          another: ["string", "value"],
+        },
+      },
+    },
+  ];
+
+  let obj: Record<string, any> = {
+    firstName: "Pete",
+    lastName: "Smith",
+    pageDecoration: {},
+    existingObjAttribute: {
+      something: true,
+    },
+    tags: ["person"],
+  };
+  const pristineCopy = JSON.parse(JSON.stringify(obj));
+
+  obj = datastore.enrichObject(obj);
+  // console.log("Enrhiched", obj);
+  assertEquals(obj.fullName, "Pete Smith");
+  assertEquals(obj.lastName, "Smith");
+  assertEquals(obj.pageDecoration.prefix.bla.doh, "🧑 Pete Smith");
+  assertEquals(obj.existingObjAttribute.something, true);
+  assertEquals(obj.existingObjAttribute.another, "value");
+  assertEquals(obj.listAttribute, ["newValue1", "newValue2"]);
+  assertEquals(obj.nested.listAttribute1, [
+    "newValue 1",
+    "newValue 2",
+    "newValue 3",
+  ]);
+
+  // And now let's clean it again
+  datastore.cleanEnrichedObject(obj);
+
+  assertEquals(obj, pristineCopy);
+
+  // Validate no async functions are called in the object enrichment
+  datastore.objectDecorators = [
+    {
+      where: ["call", "$query", []],
+      attributes: {},
+    },
+  ];
+
+  assertThrows(() => {
+    datastore.enrichObject({});
+  });
 }
 
 Deno.test("Test Deno KV DataStore", async () => {

@@ -1,4 +1,4 @@
-import { assertEquals } from "$std/testing/asserts.ts";
+import { assertEquals } from "@std/assert";
 import { parseTemplate } from "./template_parser.ts";
 
 Deno.test("Test template", () => {
@@ -18,7 +18,7 @@ Deno.test("Test template", () => {
     ]], "}"]],
   ]]]);
 
-  assertEquals(parseTemplate(`{{escapeRegexp @page.name}}`), ["Template", [
+  assertEquals(parseTemplate(`{{escapeRegexp(@page.name)}}`), ["Template", [
     "TemplateElement",
     ["ExpressionDirective", ["Expression", [
       "Call",

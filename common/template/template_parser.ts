@@ -4,7 +4,7 @@ import { parse } from "../markdown_parser/parse_tree.ts";
 import { parser as templateParser } from "./parse-template.js";
 import { parser as expressionParser } from "../markdown_parser/parse-expression.js";
 import { parser as queryParser } from "../markdown_parser/parse-query.js";
-import { AST, parseTreeToAST } from "../../plug-api/lib/tree.ts";
+import { type AST, parseTreeToAST } from "../../plug-api/lib/tree.ts";
 import { deepEqual } from "../../plug-api/lib/json.ts";
 
 export const templateLanguage = LRLanguage.define({
@@ -41,17 +41,8 @@ function processTree(tree: AST): AST {
     case "TemplateElement":
       return ["TemplateElement", ...(tree.slice(1) as AST[]).map(processTree)];
     case "ExpressionDirective": {
-      let exprString = tree[2][1] as string;
-      const legacyCallSyntax = /^([A-Za-z]+)\s+([^(]+$)/.exec(exprString);
-      if (legacyCallSyntax) {
-        // Translates "escapeRegex @page.name" -> "escapeRegex(@page.name)"
-        const [_, fn, args] = legacyCallSyntax;
-        exprString = `${fn}(${args})`;
-        console.warn(
-          "Translated legacy function call to new syntax",
-          exprString,
-        );
-      }
+      const exprString = tree[2][1] as string;
+
       const expressionTree = parseTreeToAST(parse(
         expressionLanguage,
         exprString,

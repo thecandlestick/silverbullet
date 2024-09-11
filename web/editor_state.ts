@@ -1,9 +1,8 @@
-import { readonlyMode } from "./cm_plugins/readonly.ts";
 import customMarkdownStyle from "./style.ts";
 import {
   history,
-  historyKeymap,
   indentWithTab,
+  isolateHistory,
   standardKeymap,
 } from "@codemirror/commands";
 import {
@@ -25,28 +24,28 @@ import {
   dropCursor,
   EditorView,
   highlightSpecialChars,
-  KeyBinding,
+  type KeyBinding,
   keymap,
   ViewPlugin,
-  ViewUpdate,
+  type ViewUpdate,
 } from "@codemirror/view";
 import { vim } from "@replit/codemirror-vim";
 import { markdown } from "@codemirror/lang-markdown";
-import { Client } from "./client.ts";
-import { inlineImagesPlugin } from "./cm_plugins/inline_image.ts";
+import type { Client } from "./client.ts";
+import { inlineContentPlugin } from "./cm_plugins/inline_content.ts";
 import { cleanModePlugins } from "./cm_plugins/clean.ts";
 import { lineWrapper } from "./cm_plugins/line_wrapper.ts";
-import { smartQuoteKeymap } from "./cm_plugins/smart_quotes.ts";
-import { ClickEvent } from "../plug-api/types.ts";
+import { createSmartQuoteKeyBindings } from "./cm_plugins/smart_quotes.ts";
+import type { ClickEvent } from "../plug-api/types.ts";
 import {
   attachmentExtension,
   pasteLinkExtension,
 } from "./cm_plugins/editor_paste.ts";
-import { TextChange } from "./change.ts";
+import type { TextChange } from "./change.ts";
 import { postScriptPrefacePlugin } from "./cm_plugins/top_bottom_panels.ts";
 import { languageFor } from "$common/languages.ts";
 import { plugLinter } from "./cm_plugins/lint.ts";
-import { Compartment, Extension } from "@codemirror/state";
+import { Compartment, type Extension } from "@codemirror/state";
 import { extendedMarkdownLanguage } from "$common/markdown_parser/parser.ts";
 import { parseCommand } from "$common/command.ts";
 import { safeRun } from "$lib/async.ts";
@@ -73,13 +72,14 @@ export function createEditorState(
       EditorView.theme({}, {
         dark: client.ui.viewState.uiOptions.darkMode,
       }),
+
       // Enable vim mode, or not
       [
         ...client.ui.viewState.uiOptions.vimMode ? [vim({ status: true })] : [],
       ],
       [
         ...readOnly || client.ui.viewState.uiOptions.forcedROMode
-          ? [readonlyMode()]
+          ? [EditorView.editable.of(false)]
           : [],
       ],
 
@@ -110,12 +110,18 @@ export function createEditorState(
             client.clientSystem.slashCommandHook,
           ),
         ],
+        optionClass(completion: any) {
+          if (completion.cssClass) {
+            return "sb-decorated-object " + completion.cssClass;
+          } else {
+            return "";
+          }
+        },
       }),
-      inlineImagesPlugin(client),
+      inlineContentPlugin(client),
       codeCopyPlugin(client),
       highlightSpecialChars(),
       history(),
-      drawSelection(),
       dropCursor(),
       codeFolding({
         placeholderText: "…",
@@ -124,8 +130,7 @@ export function createEditorState(
       ...cleanModePlugins(client),
       EditorView.lineWrapping,
       plugLinter(client),
-      // lintGutter(),
-      //       gutters(),
+      drawSelection(),
       postScriptPrefacePlugin(client),
       lineWrapper([
         { selector: "ATXHeading1", class: "sb-line-h1" },
@@ -200,7 +205,7 @@ export function createEditorState(
           touchCount = 0;
         },
 
-        mousedown: (event: MouseEvent, view: EditorView) => {
+        click: (event: MouseEvent, view: EditorView) => {
           const pos = view.posAtCoords(event);
           if (event.button !== 0) {
             return;
@@ -247,6 +252,12 @@ export function createEditorState(
         class {
           update(update: ViewUpdate): void {
             if (update.docChanged) {
+              // Find if there's a history isolate in the transaction, if so it came from a local reload and we don't do anything
+              if (
+                update.transactions.some((t) => t.annotation(isolateHistory))
+              ) {
+                return;
+              }
               const changes: TextChange[] = [];
               update.changes.iterChanges((fromA, toA, fromB, toB, inserted) =>
                 changes.push({
@@ -276,8 +287,8 @@ export function createCommandKeyBindings(client: Client): KeyBinding[] {
   // Track which keyboard shortcuts for which commands we've overridden, so we can skip them later
   const overriddenCommands = new Set<string>();
   // Keyboard shortcuts from SETTINGS take precedense
-  if (client.settings?.shortcuts) {
-    for (const shortcut of client.settings.shortcuts) {
+  if (client.config?.shortcuts) {
+    for (const shortcut of client.config.shortcuts) {
       // Figure out if we're using the command link syntax here, if so: parse it out
       const parsedCommand = parseCommand(shortcut.command);
       if (parsedCommand.args.length === 0) {
@@ -352,7 +363,7 @@ export function createCommandKeyBindings(client: Client): KeyBinding[] {
 export function createKeyBindings(client: Client): Extension {
   return keymap.of([
     ...createCommandKeyBindings(client),
-    ...smartQuoteKeymap,
+    ...createSmartQuoteKeyBindings(client),
     ...closeBracketsKeymap,
     ...standardKeymap,
     ...completionKeymap,

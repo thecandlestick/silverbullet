@@ -1,4 +1,4 @@
-import { FunctionMap, QueryExpression } from "../types.ts";
+import type { FunctionMap, QueryExpression } from "../types.ts";
 
 export function evalQueryExpression(
   val: QueryExpression,
@@ -25,7 +25,7 @@ export function evalQueryExpression(
       } else if (op1Val) {
         return evalQueryExpression(val[2], obj, variables, functionMap);
       } else {
-        return false;
+        return op1Val;
       }
     }
     case "or": {
@@ -41,7 +41,7 @@ export function evalQueryExpression(
           evalQueryExpression(val[2], obj, variables, functionMap)
         );
       } else if (op1Val) {
-        return true;
+        return op1Val;
       } else {
         return evalQueryExpression(val[2], obj, variables, functionMap);
       }
@@ -249,6 +249,9 @@ function evalSimpleExpression(type: string, val1: any, val2: any, val3: any) {
       return val1 != val2;
     }
     case "=~": {
+      if (typeof val2 === "string") {
+        val2 = [val2, "i"];
+      }
       if (!Array.isArray(val2)) {
         throw new Error(`Invalid regexp: ${val2}`);
       }
@@ -256,6 +259,9 @@ function evalSimpleExpression(type: string, val1: any, val2: any, val3: any) {
       return r.test(val1);
     }
     case "!=~": {
+      if (typeof val2 === "string") {
+        val2 = [val2, "i"];
+      }
       if (!Array.isArray(val2)) {
         throw new Error(`Invalid regexp: ${val2}`);
       }
@@ -274,6 +280,8 @@ function evalSimpleExpression(type: string, val1: any, val2: any, val3: any) {
       return val2.includes(val1);
     case "?":
       return val1 ? val2 : val3;
+    case "??":
+      return val1 ?? val2;
     default:
       throw new Error(`Unupported operator: ${type}`);
   }

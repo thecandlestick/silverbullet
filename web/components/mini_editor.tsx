@@ -3,9 +3,9 @@ import { history, historyKeymap, standardKeymap } from "@codemirror/commands";
 import {
   autocompletion,
   closeBracketsKeymap,
-  CompletionContext,
+  type CompletionContext,
   completionKeymap,
-  CompletionResult,
+  type CompletionResult,
 } from "@codemirror/autocomplete";
 import { EditorState } from "@codemirror/state";
 import {
@@ -14,7 +14,7 @@ import {
   keymap,
   placeholder,
   ViewPlugin,
-  ViewUpdate,
+  type ViewUpdate,
 } from "@codemirror/view";
 import { getCM as vimGetCm, Vim, vim } from "@replit/codemirror-vim";
 import { createCommandKeyBindings } from "../editor_state.ts";
@@ -190,7 +190,7 @@ export function MiniEditor(
           ...standardKeymap,
           ...historyKeymap,
           ...completionKeymap,
-          ...createCommandKeyBindings(window.client),
+          ...createCommandKeyBindings(globalThis.client),
         ]),
         EditorView.domEventHandlers({
           click: (e) => {
@@ -253,7 +253,7 @@ export function MiniEditor(
       onBlurred = true;
       if (callbacksRef.current!.onBlur) {
         Promise.resolve(callbacksRef.current!.onBlur(view.state.sliceDoc()))
-          .catch((e) => {
+          .catch(() => {
             // Reset the state
             view.setState(buildEditorState());
           });

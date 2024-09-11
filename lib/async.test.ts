@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "$std/testing/asserts.ts";
+import { assert, assertEquals } from "@std/assert";
 import { batchRequests, PromiseQueue, sleep } from "./async.ts";
 
 Deno.test("PromiseQueue test", async () => {
@@ -35,8 +35,8 @@ Deno.test("Batch test", async () => {
     return batch.map((e) => e * 2);
   }, 9);
   assertEquals(multiplied, elements.map((e) => e * 2));
-  const multiplied2 = await batchRequests(elements, async (batch) => {
-    return batch.map((e) => e * 2);
+  const multiplied2 = await batchRequests(elements, (batch) => {
+    return Promise.resolve(batch.map((e) => e * 2));
   }, 10000);
   assertEquals(multiplied2, elements.map((e) => e * 2));
 });

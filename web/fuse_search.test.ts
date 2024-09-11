@@ -1,5 +1,5 @@
-import { FilterOption } from "$lib/web.ts";
-import { assertEquals } from "$std/testing/asserts.ts";
+import type { FilterOption } from "@silverbulletmd/silverbullet/type/client";
+import { assertEquals } from "@std/assert";
 import { fuzzySearchAndSort } from "./fuse_search.ts";
 
 Deno.test("testFuzzyFilter", () => {

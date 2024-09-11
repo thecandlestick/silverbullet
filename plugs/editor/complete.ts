@@ -1,12 +1,24 @@
-import {
+import type {
   AttachmentMeta,
   CompleteEvent,
   FileMeta,
   PageMeta,
-} from "$sb/types.ts";
-import { cacheFileListing } from "../federation/federation.ts";
+  QueryExpression,
+} from "@silverbulletmd/silverbullet/types";
+import { listFilesCached } from "../federation/federation.ts";
 import { queryObjects } from "../index/plug_api.ts";
-import { folderName } from "$sb/lib/resolve.ts";
+import { folderName } from "@silverbulletmd/silverbullet/lib/resolve";
+import type { AspiringPageObject } from "../index/page_links.ts";
+import { localDateString } from "$lib/dates.ts";
+
+// A meta page is a page tagged with either #template or #meta
+const isMetaPageFilter: QueryExpression = ["or", ["=", ["attr", "tags"], [
+  "string",
+  "template",
+]], ["=", [
+  "attr",
+  "tags",
+], ["string", "meta"]]];
 
 // Completion
 export async function pageComplete(completeEvent: CompleteEvent) {
@@ -22,16 +34,29 @@ export async function pageComplete(completeEvent: CompleteEvent) {
     return null;
   }
 
+  const prefix = match[1];
+
   let allPages: (PageMeta | AttachmentMeta)[] = [];
 
-  if (
+  if (prefix.startsWith("^")) {
+    // A carrot prefix means we're looking for a meta page
+    allPages = await queryObjects<PageMeta>("page", {
+      filter: isMetaPageFilter,
+    }, 5);
+    // Let's prefix the names with a caret to make them match
+    allPages = allPages.map((page) => ({
+      ...page,
+      name: "^" + page.name,
+    }));
+  } // Let's try to be smart about the types of completions we're offering based on the context
+  else if (
     completeEvent.parentNodes.find((node) => node.startsWith("FencedCode")) &&
     // either a render [[bla]] clause
     /(render\s+|template\()\[\[/.test(
       completeEvent.linePrefix,
     )
   ) {
-    // We're in a template context, let's only complete templates
+    // We're quite certainly in a template context, let's only complete templates
     allPages = await queryObjects<PageMeta>("template", {}, 5);
   } else if (
     completeEvent.parentNodes.find((node) =>
@@ -39,77 +64,113 @@ export async function pageComplete(completeEvent: CompleteEvent) {
       node.startsWith("FencedCode:template")
     )
   ) {
-    // Include both pages and templates in page completion in ```include and ```template blocks
+    // Include both pages and meta in page completion in ```include and ```template blocks
     allPages = await queryObjects<PageMeta>("page", {}, 5);
   } else {
-    // Otherwise, just complete non-template pages
-    allPages = await queryObjects<PageMeta>("page", {
-      filter: ["!=", ["attr", "tags"], ["string", "template"]],
-    }, 5);
-    // and attachments
-    allPages = allPages.concat(
-      await queryObjects<AttachmentMeta>("attachment", {}, 5),
-    );
+    // This is the most common case, we're combining three types of completions here:
+    allPages = (await Promise.all([
+      // All non-meta pages
+      queryObjects<PageMeta>("page", {
+        filter: ["not", isMetaPageFilter],
+      }, 5),
+      // All attachments
+      queryObjects<AttachmentMeta>("attachment", {
+        // All attachment that do not start with a _ (internal attachments)
+        filter: ["!=~", ["attr", "name"], ["regexp", "^_", ""]],
+      }, 5),
+      // And all links to non-existing pages (to augment the existing ones)
+      queryObjects<AspiringPageObject>("aspiring-page", {
+        distinct: true,
+        select: [{ name: "name" }],
+      }, 5).then((aspiringPages) =>
+        // Rewrite them to PageMeta shaped objects
+        aspiringPages.map((aspiringPage): PageMeta => ({
+          ref: aspiringPage.name,
+          tag: "page",
+          tags: ["non-existing"], // Picked up later in completion
+          name: aspiringPage.name,
+          created: "",
+          lastModified: "",
+          perm: "rw",
+        }))
+      ),
+    ])).flat();
   }
 
-  const prefix = match[1];
+  // Don't complete hidden pages
+  allPages = allPages.filter((page) => !(page.pageDecoration?.hide === true));
+
   if (prefix.startsWith("!")) {
-    // Federation prefix, let's first see if we're matching anything from federation that is locally synced
-    const prefixMatches = allPages.filter((pageMeta) =>
-      pageMeta.name.startsWith(prefix)
-    );
-    if (prefixMatches.length === 0) {
-      // Ok, nothing synced in via federation, let's see if this URI is complete enough to try to fetch index.json
-      if (prefix.includes("/")) {
-        // Yep
-        const domain = prefix.split("/")[0];
-        // Cached listing
-        const federationPages = (await cacheFileListing(domain)).filter((fm) =>
-          fm.name.endsWith(".md")
-        ).map(fileMetaToPageMeta);
-        if (federationPages.length > 0) {
-          allPages = allPages.concat(federationPages);
-        }
+    // Federation!
+    // Let's see if this URI is complete enough to try to fetch index.json
+    if (prefix.includes("/")) {
+      // Yep
+      const domain = prefix.split("/")[0];
+      // Cached listing
+      const federationPages = (await listFilesCached(domain)).filter((fm) =>
+        fm.name.endsWith(".md")
+      ).map(fileMetaToPageMeta);
+      if (federationPages.length > 0) {
+        allPages = allPages.concat(federationPages);
       }
     }
   }
 
   const folder = folderName(completeEvent.pageName);
+
   return {
-    from: completeEvent.pos - match[1].length,
+    from: completeEvent.pos - prefix.length,
     options: allPages.map((pageMeta) => {
       const completions: any[] = [];
+      const namePrefix = (pageMeta as PageMeta).pageDecoration?.prefix || "";
+      const cssClass = ((pageMeta as PageMeta).pageDecoration?.cssClasses || [])
+        .join(" ").replaceAll(/[^a-zA-Z0-9-_ ]/g, "");
+
       if (isWikilink) {
+        // A [[wikilink]]
         if (pageMeta.displayName) {
+          const decoratedName = namePrefix + pageMeta.displayName;
           completions.push({
-            label: `${pageMeta.displayName}`,
+            label: pageMeta.displayName,
+            displayLabel: decoratedName,
             boost: new Date(pageMeta.lastModified).getTime(),
             apply: pageMeta.tag === "template"
               ? pageMeta.name
               : `${pageMeta.name}|${pageMeta.displayName}`,
             detail: `displayName for: ${pageMeta.name}`,
             type: "page",
+            cssClass,
           });
         }
         if (Array.isArray(pageMeta.aliases)) {
           for (const alias of pageMeta.aliases) {
+            const decoratedName = namePrefix + alias;
             completions.push({
-              label: `${alias}`,
+              label: alias,
+              displayLabel: decoratedName,
               boost: new Date(pageMeta.lastModified).getTime(),
               apply: pageMeta.tag === "template"
                 ? pageMeta.name
                 : `${pageMeta.name}|${alias}`,
               detail: `alias to: ${pageMeta.name}`,
               type: "page",
+              cssClass,
             });
           }
         }
+        const decoratedName = namePrefix + pageMeta.name;
         completions.push({
-          label: `${pageMeta.name}`,
+          label: pageMeta.name,
+          displayLabel: decoratedName,
           boost: new Date(pageMeta.lastModified).getTime(),
+          detail: pageMeta.tags?.includes("non-existing")
+            ? "Linked but not created"
+            : undefined,
           type: "page",
+          cssClass,
         });
       } else {
+        // A markdown link []()
         let labelText = pageMeta.name;
         let boost = new Date(pageMeta.lastModified).getTime();
         // Relative path if in the same folder or a subfolder
@@ -122,9 +183,11 @@ export async function pageComplete(completeEvent: CompleteEvent) {
         }
         completions.push({
           label: labelText,
+          displayLabel: namePrefix + labelText,
           boost: boost,
           apply: labelText.includes(" ") ? "<" + labelText + ">" : labelText,
           type: "page",
+          cssClass,
         });
       }
       return completions;
@@ -139,7 +202,7 @@ function fileMetaToPageMeta(fileMeta: FileMeta): PageMeta {
     ref: fileMeta.name,
     tag: "page",
     name,
-    created: new Date(fileMeta.created).toISOString(),
-    lastModified: new Date(fileMeta.lastModified).toISOString(),
+    created: localDateString(new Date(fileMeta.created)),
+    lastModified: localDateString(new Date(fileMeta.lastModified)),
   } as PageMeta;
 }

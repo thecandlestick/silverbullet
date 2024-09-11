@@ -1,4 +1,5 @@
-import { Action, AppViewState } from "../type/web.ts";
+import type { PageMeta } from "../plug-api/types.ts";
+import type { Action, AppViewState } from "./type.ts";
 
 export default function reducer(
   state: AppViewState,
@@ -19,7 +20,7 @@ export default function reducer(
         },
       };
     case "page-loaded": {
-      const mouseDetected = window.matchMedia("(any-pointer:fine)").matches;
+      const mouseDetected = globalThis.matchMedia("(pointer:fine)").matches;
       return {
         ...state,
         isLoading: false,
@@ -38,36 +39,51 @@ export default function reducer(
         ...state,
         unsavedChanges: true,
       };
-    case "page-saved":
+    case "page-saved": {
       return {
         ...state,
         unsavedChanges: false,
       };
+    }
+    case "update-current-page-meta": {
+      // Update in the allPages list as well
+      state.allPages = state.allPages.map((pageMeta) =>
+        pageMeta.name === action.meta.name ? action.meta : pageMeta
+      );
+      return {
+        ...state,
+        currentPageMeta: action.meta,
+      };
+    }
     case "sync-change":
       return {
         ...state,
         syncFailures: action.syncSuccess ? 0 : state.syncFailures + 1,
       };
-    case "settings-loaded":
+    case "config-loaded":
       return {
         ...state,
-        settings: action.settings,
+        config: action.config,
       };
     case "update-page-list": {
       // Let's move over any "lastOpened" times to the "allPages" list
       const oldPageMeta = new Map(
         [...state.allPages].map((pm) => [pm.name, pm]),
       );
+      let currPageMeta: PageMeta | undefined;
       for (const pageMeta of action.allPages) {
         const oldPageMetaItem = oldPageMeta.get(pageMeta.name);
         if (oldPageMetaItem && oldPageMetaItem.lastOpened) {
           pageMeta.lastOpened = oldPageMetaItem.lastOpened;
         }
+        if (pageMeta.name === state.currentPage) {
+          currPageMeta = pageMeta;
+        }
       }
-
       return {
         ...state,
         allPages: action.allPages,
+        currentPageMeta: currPageMeta,
       };
     }
     case "start-navigate": {
@@ -202,5 +218,4 @@ export default function reducer(
         progressPerc: action.progressPerc,
       };
   }
-  return state;
 }

@@ -1,11 +1,11 @@
-import { copy } from "$std/fs/copy.ts";
+import { copy } from "@std/fs";
 
 import sass from "denosass";
 import { bundleFolder } from "./lib/asset_bundle/builder.ts";
 
-import { parse } from "$std/flags/mod.ts";
+import { parseArgs } from "@std/cli/parse-args";
 import { patchDenoLibJS } from "./cmd/compile.ts";
-import { denoPlugins } from "esbuild_deno_loader";
+import { denoPlugins } from "@luca/esbuild-deno-loader";
 import * as esbuild from "esbuild";
 
 export async function bundleAll(
@@ -103,10 +103,9 @@ async function buildCopyBundleAssets() {
     // metafile: true,
     jsx: "automatic",
     jsxFragment: "Fragment",
-    jsxImportSource: "https://esm.sh/preact@10.11.1",
+    jsxImportSource: "https://esm.sh/preact@10.23.1",
     plugins: denoPlugins({
-      importMapURL: new URL("./import_map.json", import.meta.url)
-        .toString(),
+      configPath: new URL("./deno.json", import.meta.url).pathname,
     }),
   });
 
@@ -127,7 +126,7 @@ async function buildCopyBundleAssets() {
 }
 
 if (import.meta.main) {
-  const args = parse(Deno.args, {
+  const args = parseArgs(Deno.args, {
     boolean: ["watch"],
     alias: { w: "watch" },
     default: {

@@ -1,4 +1,4 @@
-import { clientStore, editor } from "$sb/syscalls.ts";
+import { clientStore, editor } from "@silverbulletmd/silverbullet/syscalls";
 
 // Run on "editor:init"
 export async function setEditorMode() {
@@ -18,8 +18,12 @@ export async function openPageNavigator() {
   await editor.openPageNavigator("page");
 }
 
-export async function openTemplateNavigator() {
-  await editor.openPageNavigator("template");
+export async function openMetaNavigator() {
+  await editor.openPageNavigator("meta");
+}
+
+export async function openAllNavigator() {
+  await editor.openPageNavigator("all");
 }
 
 export async function toggleDarkMode() {
@@ -40,7 +44,32 @@ export async function moveToPosCommand() {
     return;
   }
   const pos = +posString;
-  await editor.moveCursor(pos);
+  await editor.moveCursor(pos, true); // showing the movement for better UX
+}
+
+export async function moveToLineCommand() {
+  const lineString = await editor.prompt(
+    "Move to line (and optionally column):",
+  );
+  if (!lineString) {
+    return;
+  }
+  // Match sequence of digits at the start, optionally another sequence
+  const numberRegex = /^(\d+)(?:[^\d]+(\d+))?/;
+  const match = lineString.match(numberRegex);
+  if (!match) {
+    await editor.flashNotification(
+      "Could not parse line number in prompt",
+      "error",
+    );
+    return;
+  }
+  let column = 1;
+  const line = parseInt(match[1]);
+  if (match[2]) {
+    column = parseInt(match[2]);
+  }
+  await editor.moveCursorToLine(line, column, true); // showing the movement for better UX
 }
 
 export async function customFlashMessage(_def: any, message: string) {
@@ -48,7 +77,7 @@ export async function customFlashMessage(_def: any, message: string) {
 }
 
 export async function reloadSystem() {
-  await editor.reloadSettingsAndCommands();
+  await editor.reloadConfigAndCommands();
   await editor.flashNotification("Reloaded system");
 }
 
@@ -67,4 +96,8 @@ export function redoCommand() {
 
 export function deleteLineCommand() {
   return editor.deleteLine();
+}
+
+export function newWindowCommand() {
+  return editor.newWindow();
 }

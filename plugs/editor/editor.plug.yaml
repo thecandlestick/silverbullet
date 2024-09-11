@@ -1,6 +1,68 @@
 name: editor
 requiredPermissions:
   - fetch
+config:
+  schema.config.properties:
+    shortcuts:
+      type: array
+      items:
+        type: object
+        properties:
+          command:
+            type: string
+          key:
+            type: string
+            nullable: true
+          mac:
+            type: string
+            nullable: true
+          slashCommand:
+            type: string
+            nullable: true
+          priority:
+            type: number
+            nullable: true
+        required:
+          - command
+      nullable: true
+    useSmartQuotes:
+      type: boolean
+      nullable: true
+    pwaOpenLastPage:
+      type: boolean
+      nullable: true
+    hideEditButton:
+      type: boolean
+      nullable: true
+    hideSyncButton:
+      type: boolean
+      nullable: true
+    actionButtons:
+      type: array
+      items:
+        type: object
+        properties:
+          icon:
+            type: string
+          description:
+            type: string
+            nullable: true
+          command:
+            type: string
+          args:
+            type: array
+            items:
+              type: object
+            nullable: true
+          mobile:
+            type: boolean
+            nullable: true
+        required:
+          - icon
+          - command
+    defaultLinkStyle:
+      type: string
+      nullable: true
 functions:
   setEditorMode:
     path: "./editor.ts:setEditorMode"
@@ -10,6 +72,12 @@ functions:
     path: "./editor.ts:toggleDarkMode"
     command:
       name: "Editor: Toggle Dark Mode"
+  newWindow:
+    path: editor.ts:newWindowCommand
+    command:
+      name: "Editor: New Window"
+      key: "Ctrl-n"
+      mac: "Cmd-n"
 
   openCommandPalette:
     path: editor.ts:openCommandPalette
@@ -25,12 +93,17 @@ functions:
       key: "Ctrl-k"
       mac: "Cmd-k"
 
-  openTemplateNavigator:
-    path: editor.ts:openTemplateNavigator
+  openMetaNavigator:
+    path: editor.ts:openMetaNavigator
     command:
-      name: "Navigate: Template Picker"
-      key: "Ctrl-Shift-t"
-      mac: "Cmd-Shift-t"
+      name: "Navigate: Meta Picker"
+      key: "Ctrl-Shift-k"
+      mac: "Cmd-Shift-k"
+
+  openAllNavigator:
+    path: editor.ts:openAllNavigator
+    command:
+      name: "Navigate: All Pages Picker"
 
   # Page operations
   deletePage:
@@ -77,10 +150,21 @@ functions:
       name: "Navigate: Home"
       key: "Alt-h"
       page: ""
+  navigateToSettings:
+    path: "./navigate.ts:navigateCommand"
+    command:
+      name: "Navigate: Open SETTINGS"
+      key: "Ctrl-,"
+      mac: "Cmd-,"
+      page: "SETTINGS"
   moveToPos:
     path: "./editor.ts:moveToPosCommand"
     command:
-      name: "Navigate: Move Cursor to Position"
+      name: "Navigate: To Position"
+  moveToLine:
+    path: "./editor.ts:moveToLineCommand"
+    command:
+      name: "Navigate: To Line"
   navigateToPage:
     path: "./navigate.ts:navigateToPage"
     command:
@@ -124,8 +208,6 @@ functions:
     path: ./text.ts:linkSelection
     command:
       name: "Text: Link Selection"
-      key: "Ctrl-Shift-k"
-      mac: "Cmd-Shift-k"
       requireMode: rw
   bold:
     path: ./text.ts:wrapSelection
@@ -196,7 +278,6 @@ functions:
     events:
       - unfurl:title-unfurl
 
-
   # Title-based link unfurl
   youtubeUnfurlOptions:
     path: ./link.ts:youtubeUnfurlOptions
@@ -207,7 +288,6 @@ functions:
     path: ./link.ts:youtubeUnfurl
     events:
       - unfurl:youtube-unfurl
-
 
   embedWidget:
     path: ./embed.ts:embedWidget
@@ -321,6 +401,12 @@ functions:
       name: "Editor: Find in Page"
       key: "Ctrl-f"
       mac: "Cmd-f"
+
+  # Outline helper functions
+  determineItemBounds:
+    path: ./outline.ts:determineItemBounds
+  ensureNewLine:
+    path: ./outline.ts:ensureNewLine
 
   # Undo/redo
   undoCommand:

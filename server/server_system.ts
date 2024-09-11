@@ -1,10 +1,10 @@
 import { PlugNamespaceHook } from "$common/hooks/plug_namespace.ts";
-import { SilverBulletHooks } from "../lib/manifest.ts";
+import type { SilverBulletHooks } from "../lib/manifest.ts";
 import { EventedSpacePrimitives } from "$common/spaces/evented_space_primitives.ts";
 import { PlugSpacePrimitives } from "$common/spaces/plug_space_primitives.ts";
 import { createSandbox } from "../lib/plugos/sandboxes/web_worker_sandbox.ts";
 import { CronHook } from "../lib/plugos/hooks/cron.ts";
-import { EventHook } from "../common/hooks/event.ts";
+import type { EventHook } from "../common/hooks/event.ts";
 import { MQHook } from "../lib/plugos/hooks/mq.ts";
 import assetSyscalls from "../lib/plugos/syscalls/asset.ts";
 import { eventSyscalls } from "../lib/plugos/syscalls/event.ts";
@@ -14,11 +14,12 @@ import { Space } from "../common/space.ts";
 import { markdownSyscalls } from "$common/syscalls/markdown.ts";
 import { spaceReadSyscalls, spaceWriteSyscalls } from "./syscalls/space.ts";
 import { systemSyscalls } from "$common/syscalls/system.ts";
+import { jsonschemaSyscalls } from "$common/syscalls/jsonschema.ts";
 import { yamlSyscalls } from "$common/syscalls/yaml.ts";
 import { sandboxFetchSyscalls } from "../lib/plugos/syscalls/fetch.ts";
 import { shellSyscalls } from "./syscalls/shell.ts";
-import { SpacePrimitives } from "$common/spaces/space_primitives.ts";
-import { Plug } from "../lib/plugos/plug.ts";
+import type { SpacePrimitives } from "$common/spaces/space_primitives.ts";
+import type { Plug } from "../lib/plugos/plug.ts";
 import { DataStore } from "$lib/data/datastore.ts";
 import {
   dataStoreReadSyscalls,
@@ -29,15 +30,16 @@ import { templateSyscalls } from "$common/syscalls/template.ts";
 import { codeWidgetSyscalls } from "../web/syscalls/code_widget.ts";
 import { CodeWidgetHook } from "../web/hooks/code_widget.ts";
 import { KVPrimitivesManifestCache } from "$lib/plugos/manifest_cache.ts";
-import { KvPrimitives } from "$lib/data/kv_primitives.ts";
-import { ShellBackend } from "./shell_backend.ts";
+import type { KvPrimitives } from "$lib/data/kv_primitives.ts";
+import type { ShellBackend } from "./shell_backend.ts";
 import { ensureSpaceIndex } from "$common/space_index.ts";
-import { FileMeta } from "../plug-api/types.ts";
+import type { FileMeta } from "../plug-api/types.ts";
 import { CommandHook } from "$common/hooks/command.ts";
 import { CommonSystem } from "$common/common_system.ts";
-import { DataStoreMQ } from "$lib/data/mq.datastore.ts";
+import type { DataStoreMQ } from "$lib/data/mq.datastore.ts";
 import { plugPrefix } from "$common/spaces/constants.ts";
 import { base64EncodedDataUrl } from "$lib/crypto.ts";
+import type { ConfigContainer } from "../type/config.ts";
 
 const fileListInterval = 30 * 1000; // 30s
 
@@ -55,6 +57,7 @@ export class ServerSystem extends CommonSystem {
     eventHook: EventHook,
     readOnlyMode: boolean,
     enableSpaceScript: boolean,
+    private configContainer: ConfigContainer,
   ) {
     super(mq, ds, eventHook, readOnlyMode, enableSpaceScript);
   }
@@ -97,25 +100,38 @@ export class ServerSystem extends CommonSystem {
 
     this.system.addHook(codeWidgetHook);
 
-    this.spacePrimitives = new EventedSpacePrimitives(
+    const eventedSpacePrimitives = new EventedSpacePrimitives(
       new PlugSpacePrimitives(
         this.spacePrimitives,
         plugNamespaceHook,
       ),
       this.eventHook,
+      {},
     );
+
+    // Disable events until everything is set up
+    eventedSpacePrimitives.enabled = false;
+
+    this.spacePrimitives = eventedSpacePrimitives;
+
     const space = new Space(this.spacePrimitives, this.eventHook);
 
     // Add syscalls
     this.system.registerSyscalls(
       [],
       eventSyscalls(this.eventHook),
-      spaceReadSyscalls(space),
+      spaceReadSyscalls(space, this.allKnownFiles),
       assetSyscalls(this.system),
       yamlSyscalls(),
-      systemSyscalls(this.system, this.readOnlyMode, this),
+      systemSyscalls(
+        this.system,
+        this.readOnlyMode,
+        this,
+        this.configContainer,
+      ),
       mqSyscalls(this.mq),
       languageSyscalls(),
+      jsonschemaSyscalls(),
       templateSyscalls(this.ds),
       dataStoreReadSyscalls(this.ds),
       codeWidgetSyscalls(codeWidgetHook),
@@ -153,6 +169,7 @@ export class ServerSystem extends CommonSystem {
     this.eventHook.addLocalListener(
       "file:changed",
       async (path, localChange) => {
+        this.allKnownFiles.add(path);
         if (!localChange) {
           console.log("Outside file change: reindexing", path);
           // Change made outside of editor, trigger reindex
@@ -163,8 +180,6 @@ export class ServerSystem extends CommonSystem {
               name: pageName,
               text: new TextDecoder().decode(data.data),
             });
-          } else if (!path.startsWith(plugPrefix)) {
-            await this.eventHook.dispatchEvent("attachment:index", path);
           }
         }
 
@@ -176,6 +191,7 @@ export class ServerSystem extends CommonSystem {
       },
     );
 
+    // Keep allKnownFiles up to date
     this.eventHook.addLocalListener(
       "file:listed",
       (allFiles: FileMeta[]) => {
@@ -188,6 +204,18 @@ export class ServerSystem extends CommonSystem {
         });
       },
     );
+    this.eventHook.addLocalListener(
+      "file:deleted",
+      (path: string) => {
+        // Update list of known pages and attachments
+        this.allKnownFiles.delete(path);
+      },
+    );
+
+    // All setup, enable eventing
+    eventedSpacePrimitives.enabled = true;
+
+    space.updatePageList().catch(console.error);
 
     // Ensure a valid index
     const indexPromise = ensureSpaceIndex(this.ds, this.system);

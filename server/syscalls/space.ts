@@ -1,11 +1,18 @@
-import { AttachmentMeta, FileMeta, PageMeta } from "../../plug-api/types.ts";
-import { SysCallMapping } from "../../lib/plugos/system.ts";
+import type {
+  AttachmentMeta,
+  FileMeta,
+  PageMeta,
+} from "../../plug-api/types.ts";
+import type { SysCallMapping } from "../../lib/plugos/system.ts";
 import type { Space } from "../../common/space.ts";
 
 /**
  * Almost the same as web/syscalls/space.ts except leaving out client-specific stuff
  */
-export function spaceReadSyscalls(space: Space): SysCallMapping {
+export function spaceReadSyscalls(
+  space: Space,
+  allKnownFiles: Set<string>,
+): SysCallMapping {
   return {
     "space.listPages": (): Promise<PageMeta[]> => {
       return space.fetchPageList();
@@ -41,6 +48,9 @@ export function spaceReadSyscalls(space: Space): SysCallMapping {
     },
     "space.readFile": async (_ctx, name: string): Promise<Uint8Array> => {
       return (await space.spacePrimitives.readFile(name)).data;
+    },
+    "space.fileExists": (_ctx, name: string): boolean => {
+      return allKnownFiles.has(name);
     },
   };
 }

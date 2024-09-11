@@ -16,11 +16,13 @@ import { go as goLanguage } from "@codemirror/legacy-modes/mode/go?external=@cod
 import { diff as diffLanguage } from "@codemirror/legacy-modes/mode/diff?external=@codemirror/language&target=es2022";
 import { powerShell as powerShellLanguage } from "@codemirror/legacy-modes/mode/powershell?external=@codemirror/language&target=es2022";
 import { perl as perlLanguage } from "@codemirror/legacy-modes/mode/perl?external=@codemirror/language&target=es2022";
+import { ruby as rubyLanguage } from "@codemirror/legacy-modes/mode/ruby?external=@codemirror/language&target=es2022";
 import { tcl as tclLanguage } from "@codemirror/legacy-modes/mode/tcl?external=@codemirror/language&target=es2022";
 import { verilog as verilogLanguage } from "@codemirror/legacy-modes/mode/verilog?external=@codemirror/language&target=es2022";
 import { vhdl as vhdlLanguage } from "@codemirror/legacy-modes/mode/vhdl?external=@codemirror/language&target=es2022";
 import { dockerFile as dockerfileLanguage } from "@codemirror/legacy-modes/mode/dockerfile?external=@codemirror/language&target=es2022";
 import { cmake as cmakeLanguage } from "@codemirror/legacy-modes/mode/cmake?external=@codemirror/language&target=es2022";
+import { erlang as erlangLanguage } from "@codemirror/legacy-modes/mode/erlang?external=@codemirror/language&target=es2022";
 import {
   c as cLanguage,
   cpp as cppLanguage,
@@ -32,7 +34,7 @@ import {
   objectiveCpp as objectiveCppLanguage,
   scala as scalaLanguage,
 } from "@codemirror/legacy-modes/mode/clike?external=@codemirror/language&target=es2022";
-import { Language, StreamLanguage } from "@codemirror/language";
+import { type Language, StreamLanguage } from "@codemirror/language";
 import {
   javascriptLanguage,
   typescriptLanguage,
@@ -43,14 +45,18 @@ import {
   highlightingQueryParser,
 } from "./markdown_parser/parser.ts";
 import { cssLanguage } from "@codemirror/lang-css";
+import { nixLanguage } from "@replit/codemirror-lang-nix";
+
+const yamlStreamLanguage = StreamLanguage.define(yamlLanguage);
 
 export const builtinLanguages: Record<string, Language> = {
-  "meta": StreamLanguage.define(yamlLanguage),
-  "yaml": StreamLanguage.define(yamlLanguage),
-  "include": StreamLanguage.define(yamlLanguage),
-  "embed": StreamLanguage.define(yamlLanguage),
-  "data": StreamLanguage.define(yamlLanguage),
-  "toc": StreamLanguage.define(yamlLanguage),
+  "meta": yamlStreamLanguage,
+  "yaml": yamlStreamLanguage,
+  "include": yamlStreamLanguage,
+  "space-config": yamlStreamLanguage,
+  "embed": yamlStreamLanguage,
+  "data": yamlStreamLanguage,
+  "toc": yamlStreamLanguage,
   "javascript": javascriptLanguage,
   "space-script": javascriptLanguage,
   "js": javascriptLanguage,
@@ -102,11 +108,14 @@ export const builtinLanguages: Record<string, Language> = {
   "diff": StreamLanguage.define(diffLanguage),
   "powershell": StreamLanguage.define(powerShellLanguage),
   "perl": StreamLanguage.define(perlLanguage),
+  "ruby": StreamLanguage.define(rubyLanguage),
   "tcl": StreamLanguage.define(tclLanguage),
   "verilog": StreamLanguage.define(verilogLanguage),
   "vhdl": StreamLanguage.define(vhdlLanguage),
   "dockerfile": StreamLanguage.define(dockerfileLanguage),
   "cmake": StreamLanguage.define(cmakeLanguage),
+  "erlang": StreamLanguage.define(erlangLanguage),
+  "nix": nixLanguage,
   "query": LRLanguage.define({
     name: "query",
     parser: highlightingQueryParser,

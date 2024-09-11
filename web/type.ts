@@ -1,29 +1,7 @@
-import { Manifest } from "../lib/manifest.ts";
-import { PageMeta } from "../plug-api/types.ts";
-import { AppCommand } from "../lib/command.ts";
-import { defaultSettings } from "$common/settings.ts";
-import {
-  ActionButton,
-  EmojiConfig,
-  FilterOption,
-  Notification,
-  PanelMode,
-  Shortcut,
-} from "$lib/web.ts";
-
-export type BuiltinSettings = {
-  indexPage: string;
-  customStyles?: string | string[];
-  plugOverrides?: Record<string, Partial<Manifest>>;
-  shortcuts?: Shortcut[];
-  hideSyncButton?: boolean;
-  maximumAttachmentSize?: number;
-  defaultLinkStyle?: string;
-  actionButtons: ActionButton[];
-  // Format: compatible with docker ignore
-  spaceIgnore?: string;
-  emoji?: EmojiConfig;
-};
+import type { AppCommand } from "../lib/command.ts";
+import type { FilterOption, Notification, PanelMode } from "../type/client.ts";
+import { type Config, defaultConfig } from "../type/config.ts";
+import type { PageMeta } from "@silverbulletmd/silverbullet/types";
 
 export type PanelConfig = {
   mode?: PanelMode;
@@ -49,7 +27,7 @@ export type AppViewState = {
   notifications: Notification[];
   recentCommands: Map<string, Date>;
 
-  settings: BuiltinSettings;
+  config: Config;
 
   uiOptions: {
     vimMode: boolean;
@@ -59,7 +37,7 @@ export type AppViewState = {
   };
 
   // Page navigator mode
-  pageNavigatorMode: "page" | "template";
+  pageNavigatorMode: "page" | "meta" | "all";
 
   // Filter box
   showFilterBox: boolean;
@@ -100,7 +78,7 @@ export const initialViewState: AppViewState = {
     bhs: {},
     modal: {},
   },
-  settings: defaultSettings,
+  config: defaultConfig,
   allPages: [],
   commands: new Map(),
   recentCommands: new Map(),
@@ -122,9 +100,10 @@ export type Action =
   | { type: "page-changed" }
   | { type: "page-saved" }
   | { type: "sync-change"; syncSuccess: boolean }
+  | { type: "update-current-page-meta"; meta: PageMeta }
   | { type: "update-page-list"; allPages: PageMeta[] }
-  | { type: "settings-loaded"; settings: BuiltinSettings }
-  | { type: "start-navigate"; mode: "page" | "template" }
+  | { type: "config-loaded"; config: Config }
+  | { type: "start-navigate"; mode: "page" | "meta" | "all" }
   | { type: "stop-navigate" }
   | {
     type: "update-commands";

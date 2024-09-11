@@ -1,20 +1,26 @@
-import {
+import type {
   CompleteEvent,
   SlashCompletionOption,
   SlashCompletions,
 } from "../../plug-api/types.ts";
-import { editor, markdown, space, YAML } from "$sb/syscalls.ts";
+import {
+  editor,
+  markdown,
+  space,
+  system,
+  YAML,
+} from "@silverbulletmd/silverbullet/syscalls";
 import type { AttributeCompletion } from "../index/attributes.ts";
 import { queryObjects } from "../index/plug_api.ts";
-import { TemplateObject } from "./types.ts";
+import type { TemplateObject } from "./types.ts";
 import { loadPageObject } from "./page.ts";
 import { renderTemplate } from "./api.ts";
 import {
   extractFrontmatter,
   prepareFrontmatterDispatch,
-} from "$sb/lib/frontmatter.ts";
-import { SnippetConfig } from "./types.ts";
-import { deepObjectMerge } from "$sb/lib/json.ts";
+} from "@silverbulletmd/silverbullet/lib/frontmatter";
+import type { SnippetConfig } from "./types.ts";
+import { deepObjectMerge } from "@silverbulletmd/silverbullet/lib/json";
 
 export async function snippetSlashComplete(
   completeEvent: CompleteEvent,
@@ -46,27 +52,16 @@ export async function insertSnippetTemplate(
     slashCompletion.pageName || (await editor.getCurrentPage()),
   );
 
+  const config = await system.getSpaceConfig();
+
   const templateText = await space.readPage(slashCompletion.templatePage);
   let { renderedFrontmatter, text: replacementText, frontmatter } =
     await renderTemplate(
       templateText,
       pageObject,
-      { page: pageObject },
+      { page: pageObject, config },
     );
-  let snippetTemplate: SnippetConfig;
-  try {
-    snippetTemplate = SnippetConfig.parse(frontmatter.hooks!.snippet!);
-  } catch (e: any) {
-    console.error(
-      `Invalid template configuration for ${slashCompletion.templatePage}:`,
-      e.message,
-    );
-    await editor.flashNotification(
-      `Invalid template configuration for ${slashCompletion.templatePage}, won't insert snippet`,
-      "error",
-    );
-    return;
-  }
+  const snippetTemplate: SnippetConfig = frontmatter.hooks.snippet;
 
   let cursorPos = await editor.getCursor();
 

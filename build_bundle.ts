@@ -1,4 +1,4 @@
-import { denoPlugins } from "esbuild_deno_loader";
+import { denoPlugins } from "@luca/esbuild-deno-loader";
 import * as esbuild from "esbuild";
 
 await Deno.mkdir("dist", { recursive: true });
@@ -15,8 +15,7 @@ await esbuild.build({
   logLevel: "error",
   minify: true,
   plugins: denoPlugins({
-    importMapURL: new URL("./import_map.json", import.meta.url)
-      .toString(),
+    configPath: new URL("./deno.json", import.meta.url).pathname,
   }),
 });
 const bundleJs = await Deno.readTextFile("dist/silverbullet.js");

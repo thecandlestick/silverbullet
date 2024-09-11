@@ -1,4 +1,4 @@
-import { EditorState } from "@codemirror/state";
+import type { EditorState } from "@codemirror/state";
 import { syntaxTree } from "@codemirror/language";
 import { Decoration } from "@codemirror/view";
 import {
@@ -24,13 +24,6 @@ export function cleanBlockPlugin() {
                 class: "sb-line-hr",
               }).range(node.from),
             );
-          }
-
-          if (
-            node.name === "Image" &&
-            !isCursorInRange(state, [node.from, node.to])
-          ) {
-            widgets.push(invisibleDecoration.range(node.from, node.to));
           }
         },
       });

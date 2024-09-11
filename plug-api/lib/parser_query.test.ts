@@ -1,7 +1,7 @@
 import { parse } from "$common/markdown_parser/parse_tree.ts";
-import { AST, collectNodesOfType, parseTreeToAST } from "./tree.ts";
-import { assert, assertEquals } from "$std/testing/asserts.ts";
-import { astToKvQuery } from "$sb/lib/parse-query.ts";
+import { type AST, collectNodesOfType, parseTreeToAST } from "./tree.ts";
+import { assert, assertEquals } from "@std/assert";
+import { astToKvQuery } from "./parse_query.ts";
 import { languageFor } from "$common/languages.ts";
 
 function wrapQueryParse(query: string): AST | null {
@@ -434,6 +434,26 @@ Deno.test("Test query parser", () => {
     {
       querySource: "page",
       filter: ["*", ["number", 1], ["-", ["number", 2]]],
+    },
+  );
+
+  assertEquals(
+    astToKvQuery(
+      wrapQueryParse(`page where 10.2`)!,
+    ),
+    {
+      querySource: "page",
+      filter: ["number", 10.2],
+    },
+  );
+
+  assertEquals(
+    astToKvQuery(
+      wrapQueryParse(`page where 10.2 > 2.2`)!,
+    ),
+    {
+      querySource: "page",
+      filter: [">", ["number", 10.2], ["number", 2.2]],
     },
   );
 });

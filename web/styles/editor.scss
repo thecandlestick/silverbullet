@@ -32,26 +32,44 @@
     background-color: var(--editor-directive-background-color);
   }
 
-  .sb-line-h1 {
+  .sb-line-h1,
+  h1 {
     font-size: 1.5em;
   }
 
-  .sb-line-h2 {
+  .sb-line-h2,
+  h2 {
     font-size: 1.2em;
   }
 
-  .sb-line-h3 {
+  .sb-line-h3,
+  h3 {
     font-size: 1.1em;
   }
 
   .sb-line-h4,
+  h4,
   .sb-line-h5,
-  .sb-line-h6 {
+  h5,
+  .sb-line-h6,
+  h6 {
     font-size: 1em;
   }
 
-  .sb-inline-img {
+  // If a header only contains a tag, it's likely a line containging "#" which may turn into a hashtag, so style it as such instead of a header
+  .sb-line-h1:has(> span.sb-hashtag:only-child) {
+    font-size: 1em;
+    padding: 0;
+    font-weight: normal;
+
+    .sb-meta {
+      color: var(--editor-hashtag-color);
+    }
+  }
+
+  .sb-inline-content * {
     max-width: 100%;
+    display: block;
   }
 
   .cm-panels-bottom .cm-vim-panel {
@@ -570,6 +588,10 @@
     }
   }
 
+  .sb-markdown-widget-inline {
+    margin: 0 0 0 0;
+  }
+
   .sb-fenced-code-iframe {
     background-color: transparent;
 
@@ -593,7 +615,8 @@
     border-left-style: solid;
   }
 
-  .sb-admonition-icon {
+  .sb-admonition-type::before {
+    content: "";
     mask: var(--admonition-icon) no-repeat;
     -webkit-mask: var(--admonition-icon) no-repeat;
     mask-size: cover;
@@ -602,8 +625,7 @@
     height: 1.1em;
     display: inline-flex;
     vertical-align: middle;
-    margin-left: 16px;
-    margin-right: 8px;
+    margin-left: 5px;
   }
 
   .sb-frontmatter-marker {

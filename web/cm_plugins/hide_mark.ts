@@ -2,7 +2,7 @@
 // Original author: Pranav Karawale
 // License: Apache License 2.0.
 
-import { EditorState } from "@codemirror/state";
+import type { EditorState } from "@codemirror/state";
 import { syntaxTree } from "@codemirror/language";
 import { Decoration } from "@codemirror/view";
 import {
@@ -21,6 +21,8 @@ const typesWithMarks = [
   "InlineCode",
   "Highlight",
   "Strikethrough",
+  "Superscript",
+  "Subscript",
 ];
 /**
  * The elements which are used as marks.
@@ -30,6 +32,8 @@ const markTypes = [
   "CodeMark",
   "HighlightMark",
   "StrikethroughMark",
+  "SuperscriptMark",
+  "SubscriptMark",
 ];
 
 /**
@@ -88,6 +92,17 @@ export function hideHeaderMarkPlugin() {
         }
         // Get the active line
         const line = state.sliceDoc(from, to);
+        if (line === "#") {
+          // Empty header, potentially a tag, style it as such
+          widgets.push(
+            Decoration.mark({
+              tagName: "span",
+              class: "sb-hashtag",
+            }).range(from, from + 1),
+          );
+
+          return;
+        }
         if (isCursorInRange(state, [from, to])) {
           widgets.push(
             Decoration.line({ class: "sb-header-inside" }).range(from),

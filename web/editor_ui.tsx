@@ -4,9 +4,9 @@ import { FilterList } from "./components/filter.tsx";
 import { PageNavigator } from "./components/page_navigator.tsx";
 import { TopBar } from "./components/top_bar.tsx";
 import reducer from "./reducer.ts";
-import { Action, AppViewState, initialViewState } from "../type/web.ts";
+import { type Action, type AppViewState, initialViewState } from "./type.ts";
 import * as featherIcons from "preact-feather";
-import * as mdi from "./filtered_material_icons.ts"
+import * as mdi from "./filtered_material_icons.ts";
 import { h, render as preactRender } from "preact";
 import { useEffect, useReducer } from "preact/hooks";
 import { closeSearchPanel } from "@codemirror/search";
@@ -15,6 +15,7 @@ import type { Client } from "./client.ts";
 import { Panel } from "./components/panel.tsx";
 import { safeRun, sleep } from "../lib/async.ts";
 import { parseCommand } from "$common/command.ts";
+import { defaultActionButtons } from "@silverbulletmd/silverbullet/type/config";
 
 export class MainUI {
   viewState: AppViewState = initialViewState;
@@ -60,6 +61,12 @@ export class MainUI {
         });
       }
     });
+
+    globalThis.addEventListener("mouseup", (_) => {
+      setTimeout(() => {
+        client.editorView.dispatch({});
+      });
+    });
   }
 
   ViewComponent() {
@@ -71,9 +78,11 @@ export class MainUI {
 
     useEffect(() => {
       if (viewState.currentPage) {
-        document.title = viewState.currentPage;
+        document.title =
+          (viewState.currentPageMeta?.pageDecoration?.prefix ?? "") +
+          viewState.currentPage;
       }
-    }, [viewState.currentPage]);
+    }, [viewState.currentPage, viewState.currentPageMeta]);
 
     useEffect(() => {
       client.tweakEditorDOM(
@@ -107,6 +116,12 @@ export class MainUI {
             completer={client.miniEditorComplete.bind(client)}
             vimMode={viewState.uiOptions.vimMode}
             darkMode={viewState.uiOptions.darkMode}
+            onModeSwitch={(mode) => {
+              dispatch({ type: "stop-navigate" });
+              setTimeout(() => {
+                dispatch({ type: "start-navigate", mode });
+              });
+            }}
             onNavigate={(page) => {
               dispatch({ type: "stop-navigate" });
               setTimeout(() => {
@@ -144,7 +159,7 @@ export class MainUI {
             darkMode={viewState.uiOptions.darkMode}
             completer={client.miniEditorComplete.bind(client)}
             recentCommands={viewState.recentCommands}
-            settings={this.client.settings}
+            config={this.client.config}
           />
         )}
         {viewState.showFilterBox && (
@@ -188,7 +203,6 @@ export class MainUI {
           syncFailures={viewState.syncFailures}
           unsavedChanges={viewState.unsavedChanges}
           isLoading={viewState.isLoading}
-          isMobile={viewState.isMobile}
           vimMode={viewState.uiOptions.vimMode}
           darkMode={viewState.uiOptions.darkMode}
           progressPerc={viewState.progressPerc}
@@ -213,8 +227,9 @@ export class MainUI {
             client.focus();
           }}
           actionButtons={[
+            // Sync button
             ...(!window.silverBulletConfig.syncOnly &&
-                !viewState.settings.hideSyncButton)
+                !viewState.config.hideSyncButton)
               // If we support syncOnly, don't show this toggle button
               ? [{
                 icon: featherIcons.RefreshCw,
@@ -245,7 +260,33 @@ export class MainUI {
                 },
               }]
               : [],
-            ...viewState.settings.actionButtons
+            // Edit (reader/writer) button ONLY on mobile
+            ...(viewState.isMobile && !viewState.config.hideEditButton)
+              ? [{
+                icon: featherIcons.Edit3,
+                description: viewState.uiOptions.forcedROMode
+                  ? "Currently in reader mode, click to switch to writer mode"
+                  : "Currently in writer mode, click to switch to reader mode",
+                class: !viewState.uiOptions.forcedROMode
+                  ? "sb-enabled"
+                  : undefined,
+                callback: () => {
+                  dispatch({
+                    type: "set-ui-option",
+                    key: "forcedROMode",
+                    value: !viewState.uiOptions.forcedROMode,
+                  });
+                  // After a tick (to have the dispatch update the state), rebuild the editor
+                  setTimeout(() => {
+                    client.rebuildEditorState();
+                  });
+                },
+              }]
+              : [],
+            // Custom action buttons
+            ...(viewState.config.actionButtons.length > 0
+              ? viewState.config.actionButtons
+              : defaultActionButtons)
               .filter((button) =>
                 (typeof button.mobile === "undefined") ||
                 (button.mobile === viewState.isMobile)
@@ -283,6 +324,13 @@ export class MainUI {
               style={{ flex: viewState.panels.lhs.mode }}
             />
           )}
+          pageNamePrefix={viewState.currentPageMeta?.pageDecoration
+            ?.prefix ??
+            ""}
+          cssClass={viewState.currentPageMeta?.pageDecoration?.cssClasses
+            ? viewState.currentPageMeta?.pageDecoration?.cssClasses
+              .join(" ").replaceAll(/[^a-zA-Z0-9-_ ]/g, "")
+            : ""}
         />
         <div id="sb-main">
           {!!viewState.panels.lhs.mode && (

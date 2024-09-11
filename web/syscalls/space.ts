@@ -1,6 +1,10 @@
-import { Client } from "../client.ts";
-import { SysCallMapping } from "../../lib/plugos/system.ts";
-import { AttachmentMeta, FileMeta, PageMeta } from "../../plug-api/types.ts";
+import type { Client } from "../client.ts";
+import type { SysCallMapping } from "../../lib/plugos/system.ts";
+import type {
+  AttachmentMeta,
+  FileMeta,
+  PageMeta,
+} from "../../plug-api/types.ts";
 
 export function spaceReadSyscalls(editor: Client): SysCallMapping {
   return {
@@ -37,6 +41,9 @@ export function spaceReadSyscalls(editor: Client): SysCallMapping {
     },
     "space.readFile": async (_ctx, name: string): Promise<Uint8Array> => {
       return (await editor.space.spacePrimitives.readFile(name)).data;
+    },
+    "space.fileExists": (_ctx, name: string): boolean => {
+      return editor.clientSystem.allKnownFiles.has(name);
     },
   };
 }

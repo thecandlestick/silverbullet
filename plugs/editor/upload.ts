@@ -1,14 +1,14 @@
-import { readSetting } from "$sb/lib/settings_page.ts";
-import { editor, space } from "$sb/syscalls.ts";
-import { UploadFile } from "$sb/types.ts";
+import { editor, space, system } from "@silverbulletmd/silverbullet/syscalls";
+import type { UploadFile } from "@silverbulletmd/silverbullet/types";
 import {
   defaultLinkStyle,
   maximumAttachmentSize,
 } from "../../web/constants.ts";
-import { resolvePath } from "$sb/lib/resolve.ts";
+import { resolvePath } from "@silverbulletmd/silverbullet/lib/resolve";
+import { encodePageURI } from "@silverbulletmd/silverbullet/lib/page_ref";
 
 export async function saveFile(file: UploadFile) {
-  const maxSize = await readSetting(
+  const maxSize = await system.getSpaceConfig(
     "maximumAttachmentSize",
     maximumAttachmentSize,
   );
@@ -39,7 +39,7 @@ export async function saveFile(file: UploadFile) {
   );
   await space.writeAttachment(attachmentPath, file.content);
 
-  const linkStyle = await readSetting(
+  const linkStyle = await system.getSpaceConfig(
     "defaultLinkStyle",
     defaultLinkStyle,
   );
@@ -47,7 +47,7 @@ export async function saveFile(file: UploadFile) {
   if (linkStyle === "wikilink") {
     attachmentMarkdown = `[[${attachmentPath}]]`;
   } else {
-    attachmentMarkdown = `[${finalFileName}](${encodeURI(finalFileName)})`;
+    attachmentMarkdown = `[${finalFileName}](${encodePageURI(finalFileName)})`;
   }
   if (file.contentType.startsWith("image/")) {
     attachmentMarkdown = "!" + attachmentMarkdown;

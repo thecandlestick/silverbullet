@@ -1,8 +1,8 @@
 import { path, YAML } from "../lib/deps_server.ts";
-import { denoPlugins } from "esbuild_deno_loader";
+import { denoPlugins } from "@luca/esbuild-deno-loader";
 import * as esbuild from "esbuild";
 import { bundleAssets } from "../lib/asset_bundle/builder.ts";
-import { Manifest } from "../lib/plugos/types.ts";
+import type { Manifest } from "../lib/plugos/types.ts";
 import { version } from "../version.ts";
 
 // const workerRuntimeUrl = new URL("./worker_runtime.ts", import.meta.url);
@@ -12,6 +12,9 @@ const workerRuntimeUrl =
 export type CompileOptions = {
   debug?: boolean;
   runtimeUrl?: string;
+  // path to config file
+  configPath?: string;
+  // path to import map
   importMap?: string;
   // Reload plug import cache
   reload?: boolean;
@@ -39,6 +42,11 @@ export async function compileManifest(
     manifest.assets as string[] || [],
   );
   manifest.assets = assetsBundle.toJSON();
+
+  // Normalize the edge case of a plug with no functions
+  if (!manifest.functions) {
+    manifest.functions = {};
+  }
 
   const jsFile = `
 import { setupMessageListener } from "${
@@ -103,9 +111,9 @@ setupMessageListener(functionMapping, manifest);
     treeShaking: true,
     plugins: [
       ...denoPlugins({
-        // TODO do this differently
-        importMapURL: options.importMap ||
-          new URL("../import_map.json", import.meta.url).toString(),
+        configPath: options.configPath &&
+          path.resolve(Deno.cwd(), options.configPath),
+        importMapURL: options.importMap,
         loader: "native",
       }),
     ],

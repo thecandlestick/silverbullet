@@ -3,10 +3,14 @@ import {
   findNodeOfType,
   renderToText,
   traverseTreeAsync,
-} from "$sb/lib/tree.ts";
-import { FrontmatterConfig } from "./types.ts";
-import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
-import { template, YAML } from "$sb/syscalls.ts";
+} from "@silverbulletmd/silverbullet/lib/tree";
+import { extractFrontmatter } from "@silverbulletmd/silverbullet/lib/frontmatter";
+import {
+  jsonschema,
+  template,
+  YAML,
+} from "@silverbulletmd/silverbullet/syscalls";
+import { TemplateObjectSchema } from "./types.ts";
 
 export async function lintTemplateFrontmatter(
   { tree }: LintEvent,
@@ -19,29 +23,18 @@ export async function lintTemplateFrontmatter(
   if (!frontmatter.tags?.includes("template")) {
     return [];
   }
-  try {
-    // Just parse to make sure it's valid
-    FrontmatterConfig.parse(frontmatter);
-  } catch (e: any) {
-    if (e.message.startsWith("[")) { // We got a zod error
-      const zodErrors = JSON.parse(e.message);
-      for (const zodError of zodErrors) {
-        console.log("Zod validation error", zodError);
-        diagnostics.push({
-          from: frontmatterNode.from!,
-          to: frontmatterNode.to!,
-          message: `Attribute ${zodError.path.join(".")}: ${zodError.message}`,
-          severity: "error",
-        });
-      }
-    } else {
-      diagnostics.push({
-        from: frontmatterNode.from!,
-        to: frontmatterNode.to!,
-        message: e.message,
-        severity: "error",
-      });
-    }
+  // TODO: Replace with JSON schema validation
+  const validationResults = await jsonschema.validateObject(
+    TemplateObjectSchema,
+    frontmatter,
+  );
+  if (validationResults) {
+    diagnostics.push({
+      from: frontmatterNode.from!,
+      to: frontmatterNode.to!,
+      message: validationResults,
+      severity: "error",
+    });
   }
   return diagnostics;
 }

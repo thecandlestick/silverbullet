@@ -2,14 +2,18 @@ import {
   addParentPointers,
   collectNodesOfType,
   findNodeOfType,
-  ParseTree,
+  type ParseTree,
   removeParentPointers,
   renderToText,
   traverseTree,
-} from "$sb/lib/tree.ts";
-import { encodePageRef, parsePageRef } from "$sb/lib/page_ref.ts";
-import { Fragment, renderHtml, Tag } from "./html_render.ts";
-import { isLocalPath } from "$sb/lib/resolve.ts";
+} from "@silverbulletmd/silverbullet/lib/tree";
+import {
+  encodePageRef,
+  parsePageRef,
+} from "@silverbulletmd/silverbullet/lib/page_ref";
+import { Fragment, renderHtml, type Tag } from "./html_render.ts";
+import { isLocalPath } from "@silverbulletmd/silverbullet/lib/resolve";
+import type { PageMeta } from "@silverbulletmd/silverbullet/types";
 
 export type MarkdownRenderOptions = {
   failOnUnknown?: true;
@@ -118,6 +122,11 @@ function render(
         name: "h5",
         body: cleanTags(mapRender(t.children!)),
       };
+    case "ATXHeading6":
+      return {
+        name: "h6",
+        body: cleanTags(mapRender(t.children!)),
+      };
     case "Paragraph":
       return {
         name: "span",
@@ -224,6 +233,28 @@ function render(
           href: url,
         },
         body: cleanTags(mapRender(linkTextChildren)),
+      };
+    }
+    case "Autolink": {
+      const urlNode = findNodeOfType(t, "URL");
+      if (!urlNode) {
+        return renderToText(t);
+      }
+      let url = urlNode.children![0].text!;
+      if (isLocalPath(url)) {
+        if (
+          options.attachmentUrlPrefix &&
+          !url.startsWith(options.attachmentUrlPrefix)
+        ) {
+          url = `${options.attachmentUrlPrefix}${url}`;
+        }
+      }
+      return {
+        name: "a",
+        attrs: {
+          href: url,
+        },
+        body: url,
       };
     }
     case "Image": {
@@ -409,7 +440,7 @@ function render(
         body: [
           {
             name: "tr",
-            body: cleanTags(mapRender(t.children!)),
+            body: cleanTags(mapRender(t.children!), true),
           },
         ],
       };
@@ -442,7 +473,7 @@ function render(
       }
       return {
         name: "tr",
-        body: cleanTags(mapRender(newChildren)),
+        body: cleanTags(mapRender(newChildren), true),
       };
     }
     case "Attribute":
@@ -477,6 +508,16 @@ function render(
         body: renderToText(t),
       };
     }
+    case "Superscript":
+      return {
+        name: "sup",
+        body: cleanTags(mapRender(t.children!)),
+      };
+    case "Subscript":
+      return {
+        name: "sub",
+        body: cleanTags(mapRender(t.children!)),
+      };
 
     // Text
     case undefined:
@@ -517,20 +558,37 @@ function traverseTag(
 export function renderMarkdownToHtml(
   t: ParseTree,
   options: MarkdownRenderOptions = {},
+  allPages: PageMeta[] = [],
 ) {
   preprocess(t);
   const htmlTree = posPreservingRender(t, options);
-  if (htmlTree && options.translateUrls) {
+  if (htmlTree) {
     traverseTag(htmlTree, (t) => {
       if (typeof t === "string") {
         return;
       }
-      if (t.name === "img") {
+      if (t.name === "img" && options.translateUrls) {
         t.attrs!.src = options.translateUrls!(t.attrs!.src!, "image");
       }
 
       if (t.name === "a" && t.attrs!.href) {
-        t.attrs!.href = options.translateUrls!(t.attrs!.href, "link");
+        if (options.translateUrls) {
+          t.attrs!.href = options.translateUrls!(t.attrs!.href, "link");
+        }
+        if (t.attrs!["data-ref"]?.length) {
+          const pageRef = parsePageRef(t.attrs!["data-ref"]!);
+          const pageMeta = allPages.find((p) => pageRef.page === p.name);
+          if (pageMeta) {
+            t.body = [(pageMeta.pageDecoration?.prefix ?? "") + t.body];
+            if (pageMeta.pageDecoration?.cssClasses) {
+              t.attrs!.class += " sb-decorated-object " +
+                pageMeta.pageDecoration.cssClasses.join(" ").replaceAll(
+                  /[^a-zA-Z0-9-_ ]/g,
+                  "",
+                );
+            }
+          }
+        }
         if (t.body.length === 0) {
           t.body = [t.attrs!.href];
         }

@@ -1,6 +1,6 @@
-import { SpacePrimitives } from "./space_primitives.ts";
-import { AssetBundle } from "../../lib/asset_bundle/bundle.ts";
-import { FileMeta } from "../../plug-api/types.ts";
+import type { SpacePrimitives } from "./space_primitives.ts";
+import type { AssetBundle } from "../../lib/asset_bundle/bundle.ts";
+import type { FileMeta } from "../../plug-api/types.ts";
 
 export class AssetBundlePlugSpacePrimitives implements SpacePrimitives {
   constructor(
@@ -15,6 +15,7 @@ export class AssetBundlePlugSpacePrimitives implements SpacePrimitives {
       .map((p) => ({
         name: p,
         contentType: this.assetBundle.getMimeType(p),
+        created: this.assetBundle.getMtime(p),
         lastModified: this.assetBundle.getMtime(p),
         perm: "ro",
         size: -1,
@@ -31,6 +32,7 @@ export class AssetBundlePlugSpacePrimitives implements SpacePrimitives {
         data,
         meta: {
           contentType: this.assetBundle.getMimeType(name),
+          created: this.assetBundle.getMtime(name),
           lastModified: this.assetBundle.getMtime(name),
           size: data.byteLength,
           perm: "ro",
@@ -45,6 +47,7 @@ export class AssetBundlePlugSpacePrimitives implements SpacePrimitives {
       const data = this.assetBundle.readFileSync(name);
       return Promise.resolve({
         contentType: this.assetBundle.getMimeType(name),
+        created: this.assetBundle.getMtime(name),
         lastModified: this.assetBundle.getMtime(name),
         size: data.byteLength,
         perm: "ro",

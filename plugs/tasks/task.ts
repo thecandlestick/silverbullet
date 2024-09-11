@@ -1,6 +1,12 @@
 import type { ClickEvent, IndexTreeEvent } from "../../plug-api/types.ts";
 
-import { editor, events, markdown, space, sync } from "$sb/syscalls.ts";
+import {
+  editor,
+  events,
+  markdown,
+  space,
+  sync,
+} from "@silverbulletmd/silverbullet/syscalls";
 
 import {
   addParentPointers,
@@ -9,25 +15,38 @@ import {
   findNodeOfType,
   findParentMatching,
   nodeAtPos,
-  ParseTree,
+  type ParseTree,
   renderToText,
   replaceNodesMatching,
   traverseTreeAsync,
 } from "../../plug-api/lib/tree.ts";
 import { niceDate } from "$lib/dates.ts";
-import { extractAttributes } from "$sb/lib/attribute.ts";
-import { rewritePageRefs } from "$sb/lib/resolve.ts";
-import { ObjectValue } from "../../plug-api/types.ts";
+import {
+  cleanAttributes,
+  extractAttributes,
+} from "@silverbulletmd/silverbullet/lib/attribute";
+import { rewritePageRefs } from "@silverbulletmd/silverbullet/lib/resolve";
+import type { ObjectValue } from "../../plug-api/types.ts";
 import { indexObjects, queryObjects } from "../index/plug_api.ts";
-import { updateITags } from "$sb/lib/tags.ts";
-import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
-import { parsePageRef } from "$sb/lib/page_ref.ts";
+import {
+  cleanHashTags,
+  extractHashTags,
+  updateITags,
+} from "@silverbulletmd/silverbullet/lib/tags";
+import { extractFrontmatter } from "@silverbulletmd/silverbullet/lib/frontmatter";
+import {
+  parsePageRef,
+  positionOfLine,
+} from "@silverbulletmd/silverbullet/lib/page_ref";
+import { enrichItemFromParents } from "../index/item.ts";
+import { deepClone } from "@silverbulletmd/silverbullet/lib/json";
 
 export type TaskObject = ObjectValue<
   {
     page: string;
     pos: number;
     name: string;
+    text: string;
     done: boolean;
     state: string;
     deadline?: string;
@@ -47,7 +66,10 @@ function getDeadline(deadlineNode: ParseTree): string {
 const completeStates = ["x", "X"];
 const incompleteStates = [" "];
 
-export async function indexTasks({ name, tree }: IndexTreeEvent) {
+export async function extractTasks(
+  name: string,
+  tree: ParseTree,
+): Promise<TaskObject[]> {
   const tasks: ObjectValue<TaskObject>[] = [];
   const taskStates = new Map<string, { count: number; firstPos: number }>();
   const frontmatter = await extractFrontmatter(tree);
@@ -56,6 +78,7 @@ export async function indexTasks({ name, tree }: IndexTreeEvent) {
     if (n.type !== "Task") {
       return false;
     }
+    const listItemNode = n.parent!;
     const state = n.children![0].children![1].text!;
     if (!incompleteStates.includes(state) && !completeStates.includes(state)) {
       let currentState = taskStates.get(state);
@@ -66,10 +89,12 @@ export async function indexTasks({ name, tree }: IndexTreeEvent) {
       currentState.count++;
     }
     const complete = completeStates.includes(state);
+
     const task: TaskObject = {
       ref: `${name}@${n.from}`,
       tag: "task",
       name: "",
+      text: "",
       done: complete,
       page: name,
       pos: n.from!,
@@ -78,37 +103,37 @@ export async function indexTasks({ name, tree }: IndexTreeEvent) {
 
     rewritePageRefs(n, name);
 
+    // The task text is everything after the task marker
+    task.text = n.children!.slice(1).map(renderToText).join("").trim();
+
+    // This finds the deadline and tags, and removes them from the tree
     replaceNodesMatching(n, (tree) => {
       if (tree.type === "DeadlineDate") {
         task.deadline = getDeadline(tree);
         // Remove this node from the tree
         return null;
       }
-      if (tree.type === "Hashtag") {
-        // Push the tag to the list, removing the initial #
-        const tagName = tree.children![0].text!.substring(1);
-        if (!task.tags) {
-          task.tags = [];
-        }
-        task.tags.push(tagName);
-        tree.children = [];
-      }
     });
 
-    // Extract attributes and remove from tree
-    task.name = n.children!.slice(1).map(renderToText).join("").trim();
+    // Extract tags and attributes
+    task.tags = extractHashTags(n);
     const extractedAttributes = await extractAttributes(
       ["task", ...task.tags || []],
       n,
-      true,
     );
-    task.name = n.children!.slice(1).map(renderToText).join("").trim();
+
+    // Then clean them out
+    const clonedNode = deepClone(n, ["parent"]);
+    cleanHashTags(clonedNode);
+    cleanAttributes(clonedNode);
+    task.name = clonedNode.children!.slice(1).map(renderToText).join("").trim();
 
     for (const [key, value] of Object.entries(extractedAttributes)) {
       task[key] = value;
     }
 
     updateITags(task, frontmatter);
+    await enrichItemFromParents(listItemNode, task, name, frontmatter);
 
     tasks.push(task);
     return true;
@@ -127,10 +152,15 @@ export async function indexTasks({ name, tree }: IndexTreeEvent) {
       })),
     );
   }
+  return tasks;
+}
+
+export async function indexTasks({ name, tree }: IndexTreeEvent) {
+  const extractedTasks = await extractTasks(name, tree);
 
   // Index tasks themselves
-  if (tasks.length > 0) {
-    await indexObjects(name, tasks);
+  if (extractTasks.length > 0) {
+    await indexObjects(name, extractedTasks);
   }
 }
 
@@ -214,10 +244,13 @@ export async function updateTaskState(
   if (page === currentPage) {
     // In current page, just update the task marker with dispatch
     const editorText = await editor.getText();
+    const targetPos = pos instanceof Object
+      ? positionOfLine(editorText, pos.line, pos.column)
+      : pos;
     // Check if the task state marker is still there
     const targetText = editorText.substring(
-      pos + 1,
-      pos + 1 + oldState.length,
+      targetPos + 1,
+      targetPos + 1 + oldState.length,
     );
     if (targetText !== oldState) {
       console.error(
@@ -228,8 +261,8 @@ export async function updateTaskState(
     }
     await editor.dispatch({
       changes: {
-        from: pos + 1,
-        to: pos + 1 + oldState.length,
+        from: targetPos + 1,
+        to: targetPos + 1 + oldState.length,
         insert: newState,
       },
     });
@@ -237,8 +270,11 @@ export async function updateTaskState(
     let text = await space.readPage(page);
 
     const referenceMdTree = await markdown.parseMarkdown(text);
+    const targetPos = pos instanceof Object
+      ? positionOfLine(text, pos.line, pos.column)
+      : pos;
     // Adding +1 to immediately hit the task state node
-    const taskStateNode = nodeAtPos(referenceMdTree, pos + 1);
+    const taskStateNode = nodeAtPos(referenceMdTree, targetPos + 1);
     if (!taskStateNode || taskStateNode.type !== "TaskState") {
       console.error(
         "Reference not a task marker, out of date?",

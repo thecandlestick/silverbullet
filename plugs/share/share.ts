@@ -1,8 +1,16 @@
-import { editor, events, markdown, system } from "$sb/syscalls.ts";
+import {
+  editor,
+  events,
+  markdown,
+  system,
+} from "@silverbulletmd/silverbullet/syscalls";
 import { findNodeOfType, renderToText } from "../../plug-api/lib/tree.ts";
 import { replaceNodesMatching } from "../../plug-api/lib/tree.ts";
-import { ParseTree } from "../../plug-api/lib/tree.ts";
-import { parsePageRef } from "$sb/lib/page_ref.ts";
+import type { ParseTree } from "../../plug-api/lib/tree.ts";
+import {
+  encodePageURI,
+  parsePageRef,
+} from "@silverbulletmd/silverbullet/lib/page_ref";
 
 type ShareOption = {
   id: string;
@@ -80,7 +88,7 @@ export function cleanMarkdown(tree: ParseTree): ParseTree {
         return {
           text: `[${linkText}](${
             typeof location !== "undefined" ? location.origin : ""
-          }/${encodeURI(pageRef.page)})`,
+          }/${encodePageURI(pageRef.page)})`,
         };
       }
       case "NamedAnchor":

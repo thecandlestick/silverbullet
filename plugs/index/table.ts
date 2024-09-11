@@ -1,9 +1,9 @@
-import { IndexTreeEvent, ObjectValue } from "../../plug-api/types.ts";
+import type { IndexTreeEvent, ObjectValue } from "../../plug-api/types.ts";
 import {
   collectNodesMatching,
   collectNodesOfType,
-  ParseTree,
-} from "$sb/lib/tree.ts";
+  type ParseTree,
+} from "@silverbulletmd/silverbullet/lib/tree";
 import { indexObjects } from "./api.ts";
 
 type TableRowObject =

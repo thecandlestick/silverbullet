@@ -1,88 +1,165 @@
-import type { IndexTreeEvent } from "../../plug-api/types.ts";
+import type { IndexTreeEvent, ObjectValue } from "../../plug-api/types.ts";
 
 import {
-  collectNodesOfType,
-  ParseTree,
+  findParentMatching,
+  type ParseTree,
   renderToText,
-} from "../../plug-api/lib/tree.ts";
-import { extractAttributes } from "$sb/lib/attribute.ts";
-import { rewritePageRefs } from "$sb/lib/resolve.ts";
-import { ObjectValue } from "../../plug-api/types.ts";
+  traverseTreeAsync,
+} from "@silverbulletmd/silverbullet/lib/tree";
+import {
+  cleanAttributes,
+  extractAttributes,
+} from "@silverbulletmd/silverbullet/lib/attribute";
+import { rewritePageRefs } from "@silverbulletmd/silverbullet/lib/resolve";
 import { indexObjects } from "./api.ts";
-import { updateITags } from "$sb/lib/tags.ts";
-import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
+import {
+  cleanHashTags,
+  extractHashTags,
+  updateITags,
+} from "@silverbulletmd/silverbullet/lib/tags";
+import {
+  extractFrontmatter,
+  type FrontMatter,
+} from "@silverbulletmd/silverbullet/lib/frontmatter";
+import { deepClone } from "@silverbulletmd/silverbullet/lib/json";
 
 export type ItemObject = ObjectValue<
   {
-    name: string;
     page: string;
+    name: string;
+    text: string;
     pos: number;
   } & Record<string, any>
 >;
 
 export async function indexItems({ name, tree }: IndexTreeEvent) {
+  const items = await extractItems(name, tree);
+  // console.log("Found", items, "item(s)");
+  await indexObjects(name, items);
+}
+
+export async function extractItems(name: string, tree: ParseTree) {
   const items: ObjectValue<ItemObject>[] = [];
 
   const frontmatter = await extractFrontmatter(tree);
 
-  const coll = collectNodesOfType(tree, "ListItem");
+  await traverseTreeAsync(tree, async (n) => {
+    if (n.type !== "ListItem") {
+      return false;
+    }
 
-  for (let n of coll) {
     if (!n.children) {
-      continue;
-    }
-    if (collectNodesOfType(n, "Task").length > 0) {
-      // This is a task item, skip it
-      continue;
+      // Weird, let's jump out
+      return true;
     }
 
-    const tags = new Set<string>();
-    const item: ItemObject = {
-      ref: `${name}@${n.from}`,
-      tag: "item",
-      name: "", // to be replaced
-      page: name,
-      pos: n.from!,
-    };
+    // Is this a task?
+    if (n.children.find((n) => n.type === "Task")) {
+      // Skip tasks
+      return true;
+    }
 
-    const textNodes: ParseTree[] = [];
-
-    collectNodesOfType(n, "Hashtag").forEach((h) => {
-      // Push tag to the list, removing the initial #
-      tags.add(h.children![0].text!.substring(1));
-      h.children = [];
-    });
-
-    // Extract attributes and remove from tree
-    const extractedAttributes = await extractAttributes(
-      ["item", ...tags],
+    const item: ItemObject = await extractItemFromNode(
+      name,
       n,
-      true,
+      frontmatter,
     );
 
-    for (const child of n.children!.slice(1)) {
-      rewritePageRefs(child, name);
-      if (child.type === "OrderedList" || child.type === "BulletList") {
-        break;
-      }
-      textNodes.push(child);
-    }
-
-    item.name = textNodes.map(renderToText).join("").trim();
-    if (tags.size > 0) {
-      item.tags = [...tags];
-    }
-
-    for (
-      const [key, value] of Object.entries(extractedAttributes)
-    ) {
-      item[key] = value;
-    }
-
-    updateITags(item, frontmatter);
-
     items.push(item);
+
+    return false;
+  });
+  return items;
+}
+
+export async function extractItemFromNode(
+  name: string,
+  itemNode: ParseTree,
+  frontmatter: FrontMatter,
+) {
+  const item: ItemObject = {
+    ref: `${name}@${itemNode.from}`,
+    tag: "item",
+    name: "",
+    text: "",
+    page: name,
+    pos: itemNode.from!,
+  };
+
+  // Now let's extract tags and attributes
+  const tags = extractHashTags(itemNode);
+  const extractedAttributes = await extractAttributes(
+    ["item", ...tags],
+    itemNode,
+  );
+
+  const clonedTextNodes: ParseTree[] = [];
+
+  for (const child of itemNode.children!.slice(1)) {
+    rewritePageRefs(child, name);
+
+    if (child.type === "OrderedList" || child.type === "BulletList") {
+      break;
+    }
+    clonedTextNodes.push(deepClone(child, ["parent"]));
   }
-  // console.log("Found", items, "item(s)");
-  await indexObjects(name, items);
+
+  // Original text
+  item.text = clonedTextNodes.map(renderToText).join("").trim();
+
+  // Clean out attribtus and tags and render a clean item name
+  for (const clonedTextNode of clonedTextNodes) {
+    cleanHashTags(clonedTextNode);
+    cleanAttributes(clonedTextNode);
+  }
+
+  item.name = clonedTextNodes.map(renderToText).join("").trim();
+
+  if (tags.length > 0) {
+    item.tags = tags;
+  }
+
+  for (const [key, value] of Object.entries(extractedAttributes)) {
+    item[key] = value;
+  }
+
+  updateITags(item, frontmatter);
+
+  await enrichItemFromParents(itemNode, item, name, frontmatter);
+
+  return item;
+}
+
+export async function enrichItemFromParents(
+  n: ParseTree,
+  item: ObjectValue<any>,
+  pageName: string,
+  frontmatter: FrontMatter,
+) {
+  let directParent = true;
+  let parentItemNode = findParentMatching(n, (n) => n.type === "ListItem");
+  while (parentItemNode) {
+    // console.log("Got parent", parentItemNode);
+    const parentItem = await extractItemFromNode(
+      pageName,
+      parentItemNode,
+      frontmatter,
+    );
+    if (directParent) {
+      item.parent = parentItem.ref;
+      directParent = false;
+    }
+    // Merge tags
+    item.itags = [
+      ...new Set([
+        ...item.itags || [],
+        ...(parentItem.itags!.filter((t) => !["item", "task"].includes(t))),
+      ]),
+    ];
+
+    parentItemNode = findParentMatching(
+      parentItemNode,
+      (n) => n.type === "ListItem",
+    );
+  }
 }

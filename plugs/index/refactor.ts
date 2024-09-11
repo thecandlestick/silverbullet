@@ -1,9 +1,19 @@
-import { editor, space, system } from "$sb/syscalls.ts";
-import { validatePageName } from "$sb/lib/page_ref.ts";
-import { getBackLinks, LinkObject } from "./page_links.ts";
+import { editor, markdown, space } from "@silverbulletmd/silverbullet/syscalls";
+import { validatePageName } from "@silverbulletmd/silverbullet/lib/page_ref";
+import { getBackLinks, type LinkObject } from "./page_links.ts";
 import { queryObjects } from "./api.ts";
-import { absoluteToRelativePath, folderName } from "$sb/lib/resolve.ts";
-import { ObjectValue } from "$sb/types.ts";
+import {
+  absoluteToRelativePath,
+  folderName,
+} from "@silverbulletmd/silverbullet/lib/resolve";
+import type { ObjectValue } from "@silverbulletmd/silverbullet/types";
+import {
+  addParentPointers,
+  findParentMatching,
+  nodeAtPos,
+} from "@silverbulletmd/silverbullet/lib/tree";
+import type { ParseTree } from "@silverbulletmd/silverbullet/lib/tree";
+import { findNodeOfType } from "@silverbulletmd/silverbullet/lib/tree";
 
 /**
  * Renames a single page.
@@ -24,6 +34,38 @@ export async function renamePageCommand(cmdDef: any) {
   const pageList: [string, string][] = [[oldName + ".md", newName + ".md"]];
   await batchRenameFiles(pageList);
   return true;
+}
+
+export async function renamePageLinkCommand() {
+  const mdTree = await markdown.parseMarkdown(await editor.getText());
+  const link = nodeAtPos(mdTree, await editor.getCursor());
+  if (!link) {
+    console.error("No link found at cursor position...");
+    return;
+  }
+  console.log("Link node", mdTree);
+  addParentPointers(mdTree);
+  let node: ParseTree | null = link;
+  if (node.type !== "WikiLink") {
+    node = findParentMatching(node, (t) => t.type === "WikiLink");
+    if (!node) {
+      console.error("No link found at cursor position");
+      return;
+    }
+  }
+  const wikiLinkPage = findNodeOfType(node, "WikiLinkPage");
+  if (!wikiLinkPage) {
+    console.error("No link found at cursor position");
+    return;
+  }
+  const oldName = wikiLinkPage.children![0].text!;
+
+  const newName = await editor.prompt(`Rename ${oldName} to:`, oldName);
+  if (!newName) {
+    return false;
+  }
+  const pageList: [string, string][] = [[oldName + ".md", newName + ".md"]];
+  await batchRenameFiles(pageList);
 }
 
 /**
@@ -84,39 +126,6 @@ export async function batchRenameFiles(fileList: [string, string][]) {
         }
       }
     }
-
-    /* Deleting folders not yet implemented
-    // Cleanup empty folders
-    const folders = new Set(fileList.flatMap((f) => {
-      let fileFolder = folderName(f[0]);
-      const splitFolders: string[] = [];
-      while (fileFolder) {
-        splitFolders.push(fileFolder);
-        const pos = fileFolder.lastIndexOf("/");
-        fileFolder = fileFolder.slice(0, pos === -1 ? 0 : pos);
-      }
-      return splitFolders;
-    }));
-
-    const allFiles = await space.listFiles();
-    for (const fol of folders) {
-      console.log(allFiles.some((f) => f.name.startsWith(fol + "/")));
-      if (allFiles.some((f) => f.name.startsWith(fol + "/"))) {
-        folders.delete(fol);
-      }
-    }
-
-    if (folders.size > 0) {
-      try {
-        for (const fol of folders) {
-          console.log("Deleting empty folder", fol);
-          await space.deleteFolder(fol);
-        }
-      } catch (e: any) {
-        throw e;
-      }
-    }
-    */
 
     return true;
   } catch (e: any) {

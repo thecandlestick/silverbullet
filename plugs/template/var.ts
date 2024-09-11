@@ -1,7 +1,7 @@
-import { CompleteEvent } from "../../plug-api/types.ts";
-import { datastore, events } from "$sb/syscalls.ts";
+import type { CompleteEvent } from "../../plug-api/types.ts";
+import { datastore, events } from "@silverbulletmd/silverbullet/syscalls";
 
-import {
+import type {
   AttributeCompleteEvent,
   AttributeCompletion,
 } from "../index/attributes.ts";
@@ -76,6 +76,7 @@ export function templateVariableComplete(completeEvent: CompleteEvent) {
   }
 
   allVariables.add("page");
+  allVariables.add("config");
   allCompletions = allCompletions.concat(
     [...allVariables].map((key) => ({
       label: `@${key}`,

@@ -1,15 +1,18 @@
 import { FilterList } from "./filter.tsx";
-import { FilterOption } from "$lib/web.ts";
-import { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
-import { PageMeta } from "../../plug-api/types.ts";
-import { isFederationPath } from "$sb/lib/resolve.ts";
-import { tagRegex as mdTagRegex } from "$common/markdown_parser/parser.ts";
+import type { FilterOption } from "@silverbulletmd/silverbullet/type/client";
+import type {
+  CompletionContext,
+  CompletionResult,
+} from "@codemirror/autocomplete";
+import type { PageMeta } from "../../plug-api/types.ts";
+import { tagRegex as mdTagRegex } from "$common/markdown_parser/constants.ts";
 
 const tagRegex = new RegExp(mdTagRegex.source, "g");
 
 export function PageNavigator({
   allPages,
   onNavigate,
+  onModeSwitch,
   completer,
   vimMode,
   mode,
@@ -19,8 +22,9 @@ export function PageNavigator({
   allPages: PageMeta[];
   vimMode: boolean;
   darkMode: boolean;
-  mode: "page" | "template";
+  mode: "page" | "meta" | "all";
   onNavigate: (page: string | undefined) => void;
+  onModeSwitch: (mode: "page" | "meta" | "all") => void;
   completer: (context: CompletionContext) => Promise<CompletionResult | null>;
   currentPage?: string;
 }) {
@@ -41,10 +45,8 @@ export function PageNavigator({
       // ... then we put it all the way to the end
       orderId = Infinity;
     }
-    // And deprioritize federated pages too
-    if (isFederationPath(pageMeta.name)) {
-      orderId = Math.round(orderId / 10); // Just 10x lower the timestamp to push them down, should work
-    }
+    const cssClass = (pageMeta.pageDecoration?.cssClasses || []).join(" ")
+      .replaceAll(/[^a-zA-Z0-9-_ ]/g, "");
 
     if (mode === "page") {
       // Special behavior for regular pages
@@ -65,18 +67,41 @@ export function PageNavigator({
       }
       options.push({
         ...pageMeta,
+        name: (pageMeta.pageDecoration?.prefix ?? "") + pageMeta.name,
         description,
         orderId: orderId,
+        hint: pageMeta._isAspiring ? "Create page" : undefined,
+        cssClass,
       });
-    } else {
-      // Special behavior for templates
+    } else if (mode === "meta") {
+      // Special behavior for #template and #meta pages
+      if (pageMeta._isAspiring) {
+        // Skip over broken links
+        continue;
+      }
       options.push({
         ...pageMeta,
         // Use the displayName or last bit of the path as the name
         name: pageMeta.displayName || pageMeta.name.split("/").pop()!,
         // And use the full path as the description
         description: pageMeta.name,
+        hint: pageMeta.tags![0],
         orderId: orderId,
+        cssClass,
+      });
+    } else { // all
+      // In mode "all" just show the full path and all tags
+      let description: string | undefined;
+      if (pageMeta.tags) {
+        description = (description || "") +
+          pageMeta.tags.map((tag) => `#${tag}`).join(" ");
+      }
+      options.push({
+        ...pageMeta,
+        name: pageMeta.name,
+        description,
+        orderId: orderId,
+        cssClass,
       });
     }
   }
@@ -87,9 +112,15 @@ export function PageNavigator({
   } else if (currentPage && currentPage.includes(" ")) {
     completePrefix = currentPage.split(" ")[0] + " ";
   }
+
+  const pageNoun = mode === "meta" ? mode : "page";
   return (
     <FilterList
-      placeholder={mode === "page" ? "Page" : "Template"}
+      placeholder={mode === "page"
+        ? "Page"
+        : (mode === "meta"
+          ? "#template or #meta page"
+          : "Any page, also hidden")}
       label="Open"
       options={options}
       vimMode={vimMode}
@@ -98,6 +129,22 @@ export function PageNavigator({
       phrasePreprocessor={(phrase) => {
         phrase = phrase.replaceAll(tagRegex, "").trim();
         return phrase;
+      }}
+      onKeyPress={(key, text) => {
+        // Pages cannot start with ^, as documented in Page Name Rules
+        if (key === "^" && text === "^") {
+          switch (mode) {
+            case "page":
+              onModeSwitch("meta");
+              break;
+            case "meta":
+              onModeSwitch("all");
+              break;
+            case "all":
+              onModeSwitch("page");
+              break;
+          }
+        }
       }}
       preFilter={(options, phrase) => {
         if (mode === "page") {
@@ -114,21 +161,30 @@ export function PageNavigator({
               );
             });
           }
+          // Remove pages that are tagged as templates or meta
           options = options.filter((pageMeta) => {
-            return !pageMeta.tags?.includes("template");
+            return !pageMeta.tags?.includes("template") &&
+              !pageMeta.tags?.includes("meta");
           });
-          return options;
-        } else {
-          // Filter on pages tagged with "template"
+        } else if (mode === "meta") {
+          // Filter on pages tagged with "template" or "meta"
           options = options.filter((pageMeta) => {
-            return pageMeta.tags?.includes("template");
+            return pageMeta.tags?.includes("template") ||
+              pageMeta.tags?.includes("meta");
           });
-          return options;
         }
+
+        if (mode !== "all") {
+          // Filter out hidden pages
+          options = options.filter((page) =>
+            !(page.pageDecoration?.hide === true)
+          );
+        }
+        return options;
       }}
       allowNew={true}
-      helpText={`Press <code>Enter</code> to open the selected ${mode}, or <code>Shift-Enter</code> to create a new ${mode} with this exact name.`}
-      newHint={`Create ${mode}`}
+      helpText={`Press <code>Enter</code> to open the selected ${pageNoun}, or <code>Shift-Enter</code> to create a new ${pageNoun} with this exact name.`}
+      newHint={`Create ${pageNoun}`}
       completePrefix={completePrefix}
       onSelect={(opt) => {
         onNavigate(opt?.ref || opt?.name);

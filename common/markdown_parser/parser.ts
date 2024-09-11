@@ -1,25 +1,21 @@
 import { commandLinkRegex } from "../command.ts";
 import { yaml as yamlLanguage } from "@codemirror/legacy-modes/mode/yaml?external=@codemirror/language&target=es2022";
-import { styleTags, Tag, tags as t } from "@lezer/highlight";
+import { styleTags, type Tag, tags as t } from "@lezer/highlight";
 import {
-  BlockContext,
-  LeafBlock,
-  LeafBlockParser,
-  Line,
-  MarkdownConfig,
+  type BlockContext,
+  type LeafBlock,
+  type LeafBlockParser,
+  type Line,
+  type MarkdownConfig,
   Strikethrough,
+  Subscript,
+  Superscript,
 } from "@lezer/markdown";
 import { markdown } from "@codemirror/lang-markdown";
 import { StreamLanguage } from "@codemirror/language";
 import * as ct from "./customtags.ts";
 import { NakedURLTag } from "./customtags.ts";
 import { TaskList } from "./extended_task.ts";
-
-export const wikiLinkRegex = /(!?\[\[)([^\]\|]+)(?:\|([^\]]+))?(\]\])/g; // [fullMatch, firstMark, url, alias, lastMark]
-export const mdLinkRegex = /!?\[(?<title>[^\]]*)\]\((?<url>.+)\)/g; // [fullMatch, alias, url]
-export const tagRegex =
-  /#[^\d\s!@#$%^&*(),.?":{}|<>\\][^\s!@#$%^&*(),.?":{}|<>\\]*/;
-const pWikiLinkRegex = new RegExp("^" + wikiLinkRegex.source); // Modified regex used only in parser
 
 const WikiLink: MarkdownConfig = {
   defineNodes: [
@@ -544,6 +540,9 @@ const NamedAnchor = regexParser({
 
 import { Table } from "./table_parser.ts";
 import { foldNodeProp } from "@codemirror/language";
+import { pWikiLinkRegex, tagRegex } from "$common/markdown_parser/constants.ts";
+import { parse } from "$common/markdown_parser/parse_tree.ts";
+import type { ParseTree } from "@silverbulletmd/silverbullet/lib/tree";
 
 // FrontMatter parser
 
@@ -624,6 +623,8 @@ export const extendedMarkdownLanguage = markdown({
     Hashtag,
     TaskDeadline,
     NamedAnchor,
+    Superscript,
+    Subscript,
     {
       props: [
         foldNodeProp.add({
@@ -646,8 +647,9 @@ export const extendedMarkdownLanguage = markdown({
           Task: ct.TaskTag,
           TaskMark: ct.TaskMarkTag,
           Comment: ct.CommentTag,
-          "TableDelimiter SubscriptMark SuperscriptMark StrikethroughMark":
-            t.processingInstruction,
+          "Subscript": ct.SubscriptTag,
+          "Superscript": ct.SuperscriptTag,
+          "TableDelimiter StrikethroughMark": t.processingInstruction,
           "TableHeader/...": t.heading,
           TableCell: t.content,
           CodeInfo: ct.CodeInfoTag,
@@ -661,3 +663,7 @@ export const extendedMarkdownLanguage = markdown({
     },
   ],
 }).language;
+
+export function parseMarkdown(text: string): ParseTree {
+  return parse(extendedMarkdownLanguage, text);
+}

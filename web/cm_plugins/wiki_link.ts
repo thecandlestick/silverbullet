@@ -1,11 +1,14 @@
-import { ClickEvent } from "$sb/types.ts";
+import type { ClickEvent } from "@silverbulletmd/silverbullet/types";
 import { syntaxTree } from "@codemirror/language";
 import { Decoration } from "@codemirror/view";
-import { Client } from "../client.ts";
+import type { Client } from "../client.ts";
 import { decoratorStateField, isCursorInRange, LinkWidget } from "./util.ts";
-import { resolvePath } from "$sb/lib/resolve.ts";
-import { encodePageRef, parsePageRef } from "$sb/lib/page_ref.ts";
-import { wikiLinkRegex } from "$common/markdown_parser/parser.ts";
+import { resolvePath } from "@silverbulletmd/silverbullet/lib/resolve";
+import {
+  encodePageRef,
+  encodePageURI,
+  parsePageRef,
+} from "@silverbulletmd/silverbullet/lib/page_ref";
 
 /**
  * Plugin to hide path prefix when the cursor is not inside.
@@ -67,9 +70,28 @@ export function cleanWikiLinkPlugin(client: Client) {
           }
           return;
         }
-
+        const pageMeta = client.ui.viewState.allPages.find((p) =>
+          p.name == url
+        );
+        let cleanLinkText = url.includes("/") ? url.split("/").pop()! : url;
+        if (cleanLinkText.startsWith("^")) {
+          // Hide the ^ prefix
+          cleanLinkText = cleanLinkText.slice(1);
+        }
         const linkText = alias ||
-          (url.includes("/") ? url.split("/").pop()! : url);
+          ((pageMeta?.pageDecoration?.prefix ?? "") + cleanLinkText);
+
+        let cssClass = fileExists
+          ? "sb-wiki-link-page"
+          : "sb-wiki-link-page-missing";
+
+        if (pageMeta?.pageDecoration?.cssClasses) {
+          cssClass += " sb-decorated-object " +
+            pageMeta.pageDecoration.cssClasses.join(" ").replaceAll(
+              /[^a-zA-Z0-9-_ ]/g,
+              "",
+            );
+        }
 
         // And replace it with a widget
         widgets.push(
@@ -80,16 +102,17 @@ export function cleanWikiLinkPlugin(client: Client) {
                 title: fileExists
                   ? `Navigate to ${encodePageRef(pageRef)}`
                   : `Create ${pageRef.page}`,
-                href: `/${encodePageRef(pageRef)}`,
-                cssClass: fileExists
-                  ? "sb-wiki-link-page"
-                  : "sb-wiki-link-page-missing",
+                href: `/${encodePageURI(encodePageRef(pageRef))}`,
+                cssClass,
+                from,
                 callback: (e) => {
                   if (e.altKey) {
                     // Move cursor into the link
-                    return client.editorView.dispatch({
+                    client.editorView.dispatch({
                       selection: { anchor: from + firstMark.length },
                     });
+                    client.focus();
+                    return;
                   }
                   // Dispatch click event to navigate there without moving the cursor
                   const clickEvent: ClickEvent = {

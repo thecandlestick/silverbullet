@@ -1,5 +1,5 @@
-import { assert, assertEquals } from "$std/testing/asserts.ts";
-import { SpacePrimitives } from "./space_primitives.ts";
+import { assert, assertEquals } from "@std/assert";
+import type { SpacePrimitives } from "./space_primitives.ts";
 
 export async function testSpacePrimitives(spacePrimitives: SpacePrimitives) {
   const files = await spacePrimitives.fetchFileList();

@@ -1,14 +1,13 @@
 import { HttpServer } from "../server/http_server.ts";
-import clientAssetBundle from "../dist/client_asset_bundle.json" assert {
+import clientAssetBundle from "../dist/client_asset_bundle.json" with {
   type: "json",
 };
-import plugAssetBundle from "../dist/plug_asset_bundle.json" assert {
+import plugAssetBundle from "../dist/plug_asset_bundle.json" with {
   type: "json",
 };
-import { AssetBundle, AssetJson } from "../lib/asset_bundle/bundle.ts";
+import { AssetBundle, type AssetJson } from "../lib/asset_bundle/bundle.ts";
 
 import { determineDatabaseBackend } from "../server/db_backend.ts";
-import { SpaceServerConfig } from "../server/instance.ts";
 import { runPlug } from "../cmd/plug_run.ts";
 import { PrefixedKvPrimitives } from "$lib/data/prefixed_kv_primitives.ts";
 import { sleep } from "$lib/async.ts";
@@ -23,7 +22,6 @@ export async function serveCommand(
     key?: string;
     reindex?: boolean;
     syncOnly?: boolean;
-    clientEncryption?: boolean;
   },
   folder?: string,
 ) {
@@ -31,15 +29,6 @@ export async function serveCommand(
     "127.0.0.1";
   const port = options.port ||
     (Deno.env.get("SB_PORT") && +Deno.env.get("SB_PORT")!) || 3000;
-
-  const clientEncryption = options.clientEncryption ||
-    !!Deno.env.get("SB_CLIENT_ENCRYPTION");
-
-  if (clientEncryption) {
-    console.log(
-      "Running in client encryption mode, this will implicitly enable sync-only mode",
-    );
-  }
 
   const syncOnly = options.syncOnly || !!Deno.env.get("SB_SYNC_ONLY");
 
@@ -83,20 +72,6 @@ export async function serveCommand(
   const backendConfig = Deno.env.get("SB_SHELL_BACKEND") || "local";
   const enableSpaceScript = Deno.env.get("SB_SPACE_SCRIPT") !== "off";
 
-  const configs = new Map<string, SpaceServerConfig>();
-  configs.set("*", {
-    hostname,
-    namespace: "*",
-    auth: userCredentials,
-    authToken: Deno.env.get("SB_AUTH_TOKEN"),
-    syncOnly,
-    readOnly,
-    shellBackend: backendConfig,
-    clientEncryption,
-    enableSpaceScript,
-    pagesPath: folder,
-  });
-
   const plugAssets = new AssetBundle(plugAssetBundle as AssetJson);
 
   if (readOnly) {
@@ -125,14 +100,20 @@ export async function serveCommand(
   const manifestDescription = Deno.env.get("SB_DESCRIPTION");
 
   if (manifestName || manifestDescription) {
-    const manifestData = JSON.parse(clientAssets.readTextFileSync('.client/manifest.json'));
+    const manifestData = JSON.parse(
+      clientAssets.readTextFileSync(".client/manifest.json"),
+    );
     if (manifestName) {
       manifestData.name = manifestData.short_name = manifestName;
     }
     if (manifestDescription) {
       manifestData.description = manifestDescription;
     }
-    clientAssets.writeTextFileSync('.client/manifest.json', 'application/json', JSON.stringify(manifestData));
+    clientAssets.writeTextFileSync(
+      ".client/manifest.json",
+      "application/json",
+      JSON.stringify(manifestData),
+    );
   }
   const httpServer = new HttpServer({
     hostname,
@@ -142,9 +123,16 @@ export async function serveCommand(
     baseKvPrimitives,
     keyFile: options.key,
     certFile: options.cert,
-    configs,
+
+    auth: userCredentials,
+    authToken: Deno.env.get("SB_AUTH_TOKEN"),
+    syncOnly,
+    readOnly,
+    shellBackend: backendConfig,
+    enableSpaceScript,
+    pagesPath: folder,
   });
-  httpServer.start();
+  await httpServer.start();
 
   // Wait in an infinite loop (to keep the HTTP server running, only cancelable via Ctrl+C or other signal)
   while (true) {

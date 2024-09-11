@@ -1,16 +1,25 @@
-import type { IndexTreeEvent } from "../../plug-api/types.ts";
-import { editor, markdown, space, YAML } from "$sb/syscalls.ts";
+import type { IndexTreeEvent } from "@silverbulletmd/silverbullet/types";
+import {
+  editor,
+  jsonschema,
+  markdown,
+  space,
+  system,
+  YAML,
+} from "@silverbulletmd/silverbullet/syscalls";
 
 import type { LintDiagnostic, PageMeta } from "../../plug-api/types.ts";
-import { extractFrontmatter } from "$sb/lib/frontmatter.ts";
-import { extractAttributes } from "$sb/lib/attribute.ts";
-import { indexObjects } from "./api.ts";
+import { extractFrontmatter } from "@silverbulletmd/silverbullet/lib/frontmatter";
+import { extractAttributes } from "@silverbulletmd/silverbullet/lib/attribute";
+import { indexObjects, queryDeleteObjects } from "./api.ts";
 import {
   findNodeOfType,
   renderToText,
   traverseTreeAsync,
-} from "../../plug-api/lib/tree.ts";
-import { updateITags } from "$sb/lib/tags.ts";
+} from "@silverbulletmd/silverbullet/lib/tree";
+import { updateITags } from "@silverbulletmd/silverbullet/lib/tags";
+import type { AspiringPageObject } from "./page_links.ts";
+import { deepObjectMerge } from "@silverbulletmd/silverbullet/lib/json";
 
 export async function indexPage({ name, tree }: IndexTreeEvent) {
   if (name.startsWith("_")) {
@@ -22,7 +31,6 @@ export async function indexPage({ name, tree }: IndexTreeEvent) {
   const toplevelAttributes = await extractAttributes(
     ["page", ...frontmatter.tags || []],
     tree,
-    false,
   );
 
   // Push them all into the page object
@@ -55,6 +63,36 @@ export async function indexPage({ name, tree }: IndexTreeEvent) {
   }
 
   updateITags(combinedPageMeta, frontmatter);
+
+  // Make sure this page is no (longer) in the aspiring pages list
+  await queryDeleteObjects<AspiringPageObject>("aspiring-page", {
+    filter: ["=", ["attr", "name"], ["string", name]],
+  });
+
+  const tagSchema = (await system.getSpaceConfig("schema")).tag;
+  // Validate the page meta against schemas, and only index the tags that validate
+  for (const tag of combinedPageMeta.tags) {
+    let schema = tagSchema[tag];
+    if (schema) {
+      schema = deepObjectMerge({ type: "object" }, schema);
+      const validationError = await jsonschema.validateObject(
+        schema,
+        combinedPageMeta,
+      );
+      if (validationError) {
+        console.warn(
+          "Validation failed for",
+          combinedPageMeta,
+          "for tag",
+          tag,
+          ". Error:",
+          validationError,
+          ". Removing tag until this is resolved.",
+        );
+        combinedPageMeta.tags.splice(combinedPageMeta.tags.indexOf(tag), 1);
+      }
+    }
+  }
 
   // console.log("Page object", combinedPageMeta);
   await indexObjects<PageMeta>(name, [combinedPageMeta]);

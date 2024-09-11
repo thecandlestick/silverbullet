@@ -1,14 +1,24 @@
 import type { ClickEvent } from "../../plug-api/types.ts";
-import { editor, markdown, system } from "$sb/syscalls.ts";
+import {
+  editor,
+  markdown,
+  system,
+} from "@silverbulletmd/silverbullet/syscalls";
 import {
   addParentPointers,
   findNodeOfType,
   findParentMatching,
   nodeAtPos,
-  ParseTree,
-} from "$sb/lib/tree.ts";
-import { isLocalPath, resolvePath } from "$sb/lib/resolve.ts";
-import { parsePageRef } from "$sb/lib/page_ref.ts";
+  type ParseTree,
+} from "@silverbulletmd/silverbullet/lib/tree";
+import {
+  isLocalPath,
+  resolvePath,
+} from "@silverbulletmd/silverbullet/lib/resolve";
+import {
+  looksLikePathWithExtension,
+  parsePageRef,
+} from "@silverbulletmd/silverbullet/lib/page_ref";
 import { tagPrefix } from "../index/constants.ts";
 
 async function actionClickOrActionEnter(
@@ -18,7 +28,6 @@ async function actionClickOrActionEnter(
   if (!mdTree) {
     return;
   }
-  // console.log("Got a click on", mdTree);
   const navigationNodeFinder = (t: ParseTree) =>
     [
       "WikiLink",
@@ -45,7 +54,7 @@ async function actionClickOrActionEnter(
     case "WikiLink": {
       const link = mdTree.children![1]!.children![0].text!;
       // Assume is attachment if it has extension
-      if (/\.[a-zA-Z0-9]+$/.test(link)) {
+      if (looksLikePathWithExtension(link)) {
         const attachmentPath = resolvePath(
           currentPage,
           "/" + decodeURI(link),
@@ -61,7 +70,7 @@ async function actionClickOrActionEnter(
         if (pageRef.pos === undefined) {
           pageRef.pos = 0;
         }
-        return editor.navigate(pageRef, false);
+        return editor.navigate(pageRef, false, inNewWindow);
       }
     }
     case "PageRef": {
@@ -69,6 +78,7 @@ async function actionClickOrActionEnter(
       return editor.navigate({ page: pageName, pos: 0 }, false, inNewWindow);
     }
     case "NakedURL":
+    case "URL":
       return editor.openUrl(mdTree.children![0].text!);
     case "Image":
     case "Link": {
@@ -88,6 +98,8 @@ async function actionClickOrActionEnter(
         } else {
           return editor.navigate(
             parsePageRef(resolvePath(currentPage, decodeURI(url))),
+            false,
+            inNewWindow,
           );
         }
       } else {
@@ -97,7 +109,7 @@ async function actionClickOrActionEnter(
     case "CommandLink": {
       const commandName = mdTree.children![1]!.children![0].text!;
       const argsNode = findNodeOfType(mdTree, "CommandLinkArgs");
-      const argsText = argsNode?.children![0]?.text;
+      const argsText = argsNode?.children?.[0]?.text;
       // Assume the arguments are can be parsed as the innards of a valid JSON list
       try {
         const args = argsText ? JSON.parse(`[${argsText}]`) : [];

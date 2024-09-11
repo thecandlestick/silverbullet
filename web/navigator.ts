@@ -1,8 +1,11 @@
-import { PageRef, parsePageRef } from "../plug-api/lib/page_ref.ts";
-import { Client } from "./client.ts";
-import { cleanPageRef } from "$sb/lib/resolve.ts";
+import {
+  encodePageURI,
+  type PageRef,
+  parsePageRef,
+} from "../plug-api/lib/page_ref.ts";
+import type { Client } from "./client.ts";
+import { cleanPageRef } from "@silverbulletmd/silverbullet/lib/resolve";
 import { renderTheTemplate } from "$common/syscalls/template.ts";
-import { builtinFunctions } from "../lib/builtin_query_functions.ts";
 import { safeRun } from "../lib/async.ts";
 
 export type PageState = PageRef & {
@@ -27,7 +30,7 @@ export class PathPageNavigator {
   async init() {
     this.indexPage = cleanPageRef(
       await renderTheTemplate(
-        this.client.settings.indexPage,
+        this.client.config.indexPage,
         {},
         {},
         this.client.stateDataStore.functionMap,
@@ -58,18 +61,18 @@ export class PathPageNavigator {
       window.history.replaceState(
         cleanState,
         "",
-        `/${currentState.page}`,
+        `/${encodePageURI(currentState.page)}`,
       );
       window.history.pushState(
         pageRef,
         "",
-        `/${pageRef.page}`,
+        `/${encodePageURI(pageRef.page)}`,
       );
     } else {
       window.history.replaceState(
         pageRef,
         "",
-        `/${pageRef.page}`,
+        `/${encodePageURI(pageRef.page)}`,
       );
     }
     globalThis.dispatchEvent(
@@ -144,12 +147,12 @@ export class PathPageNavigator {
 }
 
 export function parsePageRefFromURI(): PageRef {
-  const pageRef = parsePageRef(decodeURI(
+  const pageRef = parsePageRef(decodeURIComponent(
     location.pathname.substring(1),
   ));
 
   if (location.hash) {
-    pageRef.header = decodeURI(location.hash.substring(1));
+    pageRef.header = decodeURIComponent(location.hash.substring(1));
   }
 
   return pageRef;

@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "https://esm.sh/preact@10.11.1/hooks";
-import { Client } from "../client.ts";
-import { PanelConfig } from "../../type/web.ts";
+import { useEffect, useRef } from "preact/hooks";
+import type { Client } from "../client.ts";
+import type { PanelConfig } from "../type.ts";
 import { panelHtml } from "./panel_html.ts";
 
 export function Panel({
@@ -11,24 +11,31 @@ export function Panel({
   editor: Client;
 }) {
   const iFrameRef = useRef<HTMLIFrameElement>(null);
-  useEffect(() => {
-    function loadContent() {
-      if (iFrameRef.current?.contentWindow) {
-        iFrameRef.current.contentWindow.postMessage({
-          type: "html",
-          html: config.html,
-          script: config.script,
-        });
-      }
-    }
-    if (!iFrameRef.current) {
+
+  function updateContent() {
+    if (!iFrameRef.current?.contentWindow) {
       return;
     }
+
+    iFrameRef.current.contentWindow.postMessage({
+      type: "html",
+      html: config.html,
+      script: config.script,
+      theme: document.getElementsByTagName("html")[0].dataset.theme,
+    });
+  }
+
+  useEffect(() => {
     const iframe = iFrameRef.current;
-    iframe.onload = loadContent;
-    loadContent();
+    if (!iframe) {
+      return;
+    }
+
+    iframe.addEventListener("load", updateContent);
+    updateContent();
+
     return () => {
-      iframe.onload = null;
+      iframe.removeEventListener("load", updateContent);
     };
   }, [config.html, config.script]);
 
@@ -82,7 +89,12 @@ export function Panel({
 
   return (
     <div className="sb-panel" style={{ flex: config.mode }}>
-      <iframe srcDoc={panelHtml} ref={iFrameRef} />
+      <iframe
+        srcDoc={panelHtml}
+        ref={iFrameRef}
+        style={{ visibility: "hidden" }}
+        onLoad={() => iFrameRef.current!.style.visibility = "visible"}
+      />
     </div>
   );
 }

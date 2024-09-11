@@ -16,10 +16,21 @@ export type PageMeta = ObjectValue<
     name: string;
     created: string; // indexing it as a string
     lastModified: string; // indexing it as a string
-    lastOpened?: number;
     perm: "ro" | "rw";
+    lastOpened?: number;
+    pageDecoration?: PageDecoration;
   } & Record<string, any>
 >;
+
+/**
+ * Decorates a page when it matches certain criteria
+ */
+export type PageDecoration = {
+  prefix?: string;
+  cssClasses?: string[];
+  hide?: boolean;
+  renderWidgets?: boolean; // Defaults to true
+};
 
 export type AttachmentMeta = ObjectValue<
   {
@@ -162,7 +173,7 @@ export type CodeWidgetButton = {
   widgetTarget?: boolean;
   description: string;
   svg: string;
-  invokeFunction: string;
+  invokeFunction: string[];
 };
 
 export type LintDiagnostic = {
@@ -262,4 +273,20 @@ export type WidgetContent = {
  */
 export type PageModifiedEvent = {
   changes: TextChange[];
+};
+
+// HTTP Endpoint related types
+export type EndpointRequest = {
+  method: string;
+  fullPath: string;
+  path: string;
+  query: { [key: string]: string };
+  headers: { [key: string]: string };
+  body: any;
+};
+
+export type EndpointResponse = {
+  status?: number;
+  headers?: { [key: string]: string };
+  body: any;
 };

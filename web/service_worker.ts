@@ -2,6 +2,10 @@ import type { FileContent } from "$common/spaces/datastore_space_primitives.ts";
 import { simpleHash } from "$lib/crypto.ts";
 import { DataStore } from "$lib/data/datastore.ts";
 import { IndexedDBKvPrimitives } from "$lib/data/indexeddb_kv_primitives.ts";
+import {
+  decodePageURI,
+  looksLikePathWithExtension,
+} from "@silverbulletmd/silverbullet/lib/page_ref";
 
 const CACHE_NAME = "{{CACHE_NAME}}_{{CONFIG_HASH}}";
 
@@ -97,9 +101,13 @@ self.addEventListener("fetch", (event: any) => {
 
       const pathname = requestUrl.pathname;
 
-      if (pathname === "/.auth" || pathname === "/index.json") {
+      if (
+        pathname === "/.auth" ||
+        pathname === "/.logout" ||
+        pathname === "/index.json"
+      ) {
         return fetch(request);
-      } else if (/\/.+\.[a-zA-Z]+$/.test(pathname)) {
+      } else if (looksLikePathWithExtension(pathname)) {
         // If this is a /*.* request, this can either be a plug worker load or an attachment load
         return handleLocalFileRequest(request, pathname);
       } else {
@@ -119,7 +127,7 @@ async function handleLocalFileRequest(
   request: Request,
   pathname: string,
 ): Promise<Response> {
-  const path = decodeURIComponent(pathname.slice(1));
+  const path = decodePageURI(pathname.slice(1));
   const data = await ds?.get<FileContent>([...filesContentPrefix, path]);
   if (data) {
     // console.log("Serving from space", path);

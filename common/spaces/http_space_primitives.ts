@@ -1,6 +1,9 @@
-import { SpacePrimitives } from "./space_primitives.ts";
-import { FileMeta } from "../../plug-api/types.ts";
+import type { SpacePrimitives } from "./space_primitives.ts";
+import type { FileMeta } from "../../plug-api/types.ts";
 import { flushCachesAndUnregisterServiceWorker } from "../sw_util.ts";
+import { encodePageURI } from "@silverbulletmd/silverbullet/lib/page_ref";
+
+const defaultFetchTimeout = 30000; // 30 seconds
 
 export class HttpSpacePrimitives implements SpacePrimitives {
   constructor(
@@ -13,6 +16,7 @@ export class HttpSpacePrimitives implements SpacePrimitives {
   public async authenticatedFetch(
     url: string,
     options: RequestInit,
+    fetchTimeout: number = defaultFetchTimeout,
   ): Promise<Response> {
     if (!options.headers) {
       options.headers = {};
@@ -29,27 +33,46 @@ export class HttpSpacePrimitives implements SpacePrimitives {
     }
 
     try {
+      options.signal = AbortSignal.timeout(fetchTimeout);
+      options.redirect = "manual";
       const result = await fetch(url, options);
       if (result.status === 503) {
         throw new Error("Offline");
       }
-      if (result.redirected) {
-        if (result.status === 401) {
+      const redirectHeader = result.headers.get("location");
+
+      // console.log("Got response", result.status, result.statusText, result.url);
+
+      // Attempting to handle various authentication proxies
+      if (result.status >= 300 && result.status < 400) {
+        if (redirectHeader) {
+          // Got a redirect
+          alert("Received a redirect, redirecting to URL: " + redirectHeader);
+          location.href = redirectHeader;
+          throw new Error("Redirected");
+        } else {
+          console.error("Got a redirect status but no location header", result);
+        }
+      }
+      // Check for unauthorized status
+      if (result.status === 401 || result.status === 403) {
+        // If it came with a redirect header, we'll redirect to that URL
+        if (redirectHeader) {
           console.log(
             "Received unauthorized status and got a redirect via the API so will redirect to URL",
             result.url,
           );
-          alert("You are not authenticated, redirecting to login page...");
-          location.href = result.url;
+          alert("You are not authenticated, redirecting to: " + redirectHeader);
+          location.href = redirectHeader;
           throw new Error("Not authenticated");
         } else {
-          location.href = result.url;
-          throw new Error("Redirected");
+          // If not, let's reload
+          alert(
+            "You are not authenticated, going to reload and hope that that kicks off authentication",
+          );
+          location.reload();
+          throw new Error("Not authenticated, got 401");
         }
-      }
-      if (result.status === 401) {
-        location.reload();
-        throw new Error("Not authenticated, got 403");
       }
       return result;
     } catch (e: any) {
@@ -101,7 +124,7 @@ export class HttpSpacePrimitives implements SpacePrimitives {
     name: string,
   ): Promise<{ data: Uint8Array; meta: FileMeta }> {
     const res = await this.authenticatedFetch(
-      `${this.url}/${encodeURI(name)}`,
+      `${this.url}/${encodePageURI(name)}`,
       {
         method: "GET",
         headers: {
@@ -135,7 +158,7 @@ export class HttpSpacePrimitives implements SpacePrimitives {
     }
 
     const res = await this.authenticatedFetch(
-      `${this.url}/${encodeURI(name)}`,
+      `${this.url}/${encodePageURI(name)}`,
       {
         method: "PUT",
         headers,
@@ -148,7 +171,7 @@ export class HttpSpacePrimitives implements SpacePrimitives {
 
   async deleteFile(name: string): Promise<void> {
     const req = await this.authenticatedFetch(
-      `${this.url}/${encodeURI(name)}`,
+      `${this.url}/${encodePageURI(name)}`,
       {
         method: "DELETE",
       },
@@ -160,7 +183,7 @@ export class HttpSpacePrimitives implements SpacePrimitives {
 
   async getFileMeta(name: string): Promise<FileMeta> {
     const res = await this.authenticatedFetch(
-      `${this.url}/${encodeURI(name)}`,
+      `${this.url}/${encodePageURI(name)}`,
       // This used to use HEAD, but it seems that Safari on iOS is blocking cookies/credentials to be sent along with HEAD requests
       // so we'll use GET instead with a magic header which the server may or may not use to omit the body.
       {
@@ -196,11 +219,11 @@ export class HttpSpacePrimitives implements SpacePrimitives {
   // Used to check if the server is reachable and the user is authenticated
   // If not: throws an error or invokes a redirect
   async ping() {
-    await this.authenticatedFetch(`${this.url}/index.json`, {
+    await this.authenticatedFetch(`${this.url}/.ping`, {
       method: "GET",
       headers: {
         Accept: "application/json",
       },
-    });
+    }, 5000);
   }
 }

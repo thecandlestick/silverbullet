@@ -3,9 +3,9 @@ import {
   federatedPathToUrl,
   resolvePath,
   rewritePageRefs,
-} from "$sb/lib/resolve.ts";
-import { assertEquals } from "$std/testing/asserts.ts";
-import { ParseTree, renderToText } from "./tree.ts";
+} from "@silverbulletmd/silverbullet/lib/resolve";
+import { assertEquals } from "@std/assert";
+import { type ParseTree, renderToText } from "./tree.ts";
 import { parse } from "$common/markdown_parser/parse_tree.ts";
 import { extendedMarkdownLanguage } from "$common/markdown_parser/parser.ts";
 

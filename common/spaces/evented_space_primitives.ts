@@ -1,5 +1,5 @@
-import { FileMeta } from "$sb/types.ts";
-import { EventHook } from "$common/hooks/event.ts";
+import type { FileMeta } from "@silverbulletmd/silverbullet/types";
+import type { EventHook } from "$common/hooks/event.ts";
 import { plugPrefix } from "$common/spaces/constants.ts";
 
 import type { SpacePrimitives } from "./space_primitives.ts";
@@ -18,13 +18,28 @@ export class EventedSpacePrimitives implements SpacePrimitives {
   // This is ok, because any event will be picked up in a following iteration.
   operationInProgress = false;
 
-  initialFileListLoad = true;
+  initialFileListLoad: boolean;
 
-  spaceSnapshot: Record<string, number> = {};
+  public enabled = true;
+
   constructor(
     private wrapped: SpacePrimitives,
     private eventHook: EventHook,
+    private spaceSnapshot: Record<string, number> = {},
   ) {
+    // Translate file change events for attachments into attachment:index events
+    this.eventHook.addLocalListener(
+      "file:changed",
+      async (
+        name: string,
+      ) => {
+        if (!name.endsWith(".md") && !name.startsWith(plugPrefix)) {
+          // Not a page nor plug, so an attachment!
+          await this.dispatchEvent("attachment:index", name);
+        }
+      },
+    );
+    this.initialFileListLoad = Object.keys(this.spaceSnapshot).length === 0;
   }
 
   dispatchEvent(name: string, ...args: any[]): Promise<any[]> {
@@ -32,6 +47,9 @@ export class EventedSpacePrimitives implements SpacePrimitives {
   }
 
   async fetchFileList(): Promise<FileMeta[]> {
+    if (!this.enabled) {
+      return this.wrapped.fetchFileList();
+    }
     if (this.operationInProgress) {
       // Some other operation (read, write, list, meta) is already going on
       // this will likely trigger events, so let's not worry about any of that and avoid race condition and inconsistent data.
@@ -40,6 +58,7 @@ export class EventedSpacePrimitives implements SpacePrimitives {
       );
       return this.wrapped.fetchFileList();
     }
+    // console.log("Fetching file list");
     // Fetching mutex
     this.operationInProgress = true;
     try {
@@ -65,6 +84,7 @@ export class EventedSpacePrimitives implements SpacePrimitives {
             oldHash !== newHash
           )
         ) {
+          console.log("Detected file change", meta.name, oldHash, newHash);
           await this.dispatchEvent(
             "file:changed",
             meta.name,
@@ -98,6 +118,9 @@ export class EventedSpacePrimitives implements SpacePrimitives {
   async readFile(
     name: string,
   ): Promise<{ data: Uint8Array; meta: FileMeta }> {
+    if (!this.enabled) {
+      return this.wrapped.readFile(name);
+    }
     try {
       // Fetching mutex
       const wasFetching = this.operationInProgress;
@@ -117,9 +140,13 @@ export class EventedSpacePrimitives implements SpacePrimitives {
   async writeFile(
     name: string,
     data: Uint8Array,
+    // TODO: Is self update still used or can it now be removed?
     selfUpdate?: boolean,
     meta?: FileMeta,
   ): Promise<FileMeta> {
+    if (!this.enabled) {
+      return this.wrapped.writeFile(name, data, selfUpdate, meta);
+    }
     try {
       this.operationInProgress = true;
       const newMeta = await this.wrapped.writeFile(
@@ -128,15 +155,13 @@ export class EventedSpacePrimitives implements SpacePrimitives {
         selfUpdate,
         meta,
       );
-      if (!selfUpdate) {
-        await this.dispatchEvent(
-          "file:changed",
-          name,
-          true,
-          undefined,
-          newMeta.lastModified,
-        );
-      }
+      await this.dispatchEvent(
+        "file:changed",
+        name,
+        true,
+        undefined,
+        newMeta.lastModified,
+      );
       this.spaceSnapshot[name] = newMeta.lastModified;
 
       if (name.endsWith(".md")) {
@@ -151,8 +176,6 @@ export class EventedSpacePrimitives implements SpacePrimitives {
           name: pageName,
           text,
         });
-      } else if (!name.endsWith(plugPrefix)) {
-        await this.dispatchEvent("attachment:index", name, newMeta);
       }
       return newMeta;
     } finally {
@@ -171,6 +194,9 @@ export class EventedSpacePrimitives implements SpacePrimitives {
   }
 
   async getFileMeta(name: string): Promise<FileMeta> {
+    if (!this.enabled) {
+      return this.wrapped.getFileMeta(name);
+    }
     try {
       const wasFetching = this.operationInProgress;
       this.operationInProgress = true;
@@ -195,6 +221,9 @@ export class EventedSpacePrimitives implements SpacePrimitives {
   }
 
   async deleteFile(name: string): Promise<void> {
+    if (!this.enabled) {
+      return this.wrapped.deleteFile(name);
+    }
     try {
       this.operationInProgress = true;
       if (name.endsWith(".md")) {

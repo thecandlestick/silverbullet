@@ -18,7 +18,7 @@ globalThis.addEventListener("unhandledrejection", (event) => {
 
 await new Command()
   .name("silverbullet")
-  .description("Markdown as a platform")
+  .description("Note taking for knowledge hackers")
   .version(version)
   .help({
     colors: false,
@@ -48,10 +48,6 @@ await new Command()
     "Run the server as a pure space (file) store only without any backend processing (this disables 'online mode' in the client)",
   )
   .option(
-    "--client-encryption",
-    "Enable client-side encryption for spaces",
-  )
-  .option(
     "--reindex",
     "Reindex space on startup",
   )
@@ -76,6 +72,7 @@ await new Command()
     { default: "." },
   )
   .option("--importmap <path:string>", "Path to import map file to use")
+  .option("-c, --config <path:string>", "Path to deno.json file to use")
   .option("--runtimeUrl <url:string>", "URL to worker_runtime.ts to use")
   .action(plugCompileCommand)
   // plug:run
@@ -106,4 +103,5 @@ await new Command()
   .command("version", "Get current version")
   .action(versionCommand)
   .parse(Deno.args);
+
 Deno.exit(0);

@@ -1,4 +1,4 @@
-import { debug, editor } from "$sb/syscalls.ts";
+import { debug, editor } from "@silverbulletmd/silverbullet/syscalls";
 
 export async function cleanCommand() {
   if (
@@ -10,5 +10,5 @@ export async function cleanCommand() {
   }
   await editor.flashNotification("Now wiping all state and logging out...");
   await debug.cleanup();
-  await editor.openUrl("/.auth?logout", true);
+  await editor.openUrl("/.logout", true);
 }

@@ -1,4 +1,4 @@
-import { editor } from "$sb/syscalls.ts";
+import { editor } from "@silverbulletmd/silverbullet/syscalls";
 
 export async function moveItemUp() {
   const cursorPos = await editor.getCursor();
@@ -180,7 +180,7 @@ export async function outdentItem() {
   }
 }
 
-function ensureNewLine(s: string) {
+export function ensureNewLine(s: string) {
   if (!s.endsWith("\n")) {
     return s + "\n";
   } else {
@@ -188,7 +188,7 @@ function ensureNewLine(s: string) {
   }
 }
 
-function determineItemBounds(
+export function determineItemBounds(
   text: string,
   pos: number,
   minIndentLevel?: number,

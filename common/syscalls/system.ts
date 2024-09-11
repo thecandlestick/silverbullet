@@ -1,16 +1,18 @@
-import { SyscallMeta } from "../../plug-api/types.ts";
-import { SysCallMapping, System } from "../../lib/plugos/system.ts";
+import type { SyscallMeta } from "../../plug-api/types.ts";
+import type { SysCallMapping, System } from "../../lib/plugos/system.ts";
 import type { Client } from "../../web/client.ts";
-import { CommandDef } from "$lib/command.ts";
+import type { CommandDef } from "$lib/command.ts";
 import { proxySyscall } from "../../web/syscalls/util.ts";
 import type { CommonSystem } from "../common_system.ts";
 import { version } from "../../version.ts";
-import { ParseTree } from "../../plug-api/lib/tree.ts";
+import type { ParseTree } from "../../plug-api/lib/tree.ts";
+import type { Config, ConfigContainer } from "../../type/config.ts";
 
 export function systemSyscalls(
   system: System<any>,
   readOnlyMode: boolean,
   commonSystem: CommonSystem,
+  configContainer: ConfigContainer,
   client?: Client,
 ): SysCallMapping {
   const api: SysCallMapping = {
@@ -45,6 +47,34 @@ export function systemSyscalls(
       }
       return plug.invoke(functionName, args);
     },
+    "system.invokeFunctionOnServer": (
+      ctx,
+      fullName: string, // plug.function
+      ...args: any[]
+    ) => {
+      const [plugName, functionName] = fullName.split(".");
+      if (!plugName || !functionName) {
+        throw Error(`Invalid function name ${fullName}`);
+      }
+      const plug = system.loadedPlugs.get(plugName);
+      if (!plug) {
+        throw Error(`Plug ${plugName} not found`);
+      }
+      const functionDef = plug.manifest!.functions[functionName];
+      if (!functionDef) {
+        throw Error(`Function ${functionName} not found`);
+      }
+      if (!client) {
+        throw new Error("Not supported");
+      }
+      // Proxy to system env
+      return proxySyscall(
+        ctx,
+        client.httpSpacePrimitives,
+        "system.invokeFunction",
+        [fullName, ...args],
+      );
+    },
     "system.invokeCommand": (_ctx, name: string, args?: string[]) => {
       if (!client) {
         throw new Error("Not supported");
@@ -76,22 +106,21 @@ export function systemSyscalls(
       }
       return client.loadPlugs();
     },
+    "system.reloadConfig": async (): Promise<Config> => {
+      await configContainer.loadConfig();
+      return configContainer.config;
+    },
     "system.loadSpaceScripts": async () => {
       // Reload scripts locally
       await commonSystem.loadSpaceScripts();
       if (client) {
-        // And we are in a hybrud mode, tell the server to do the same
-        if (system.env === "client") {
-          console.info(
-            "Sending syscall to server to trigger space script reload",
-          );
-          await proxySyscall(
-            {},
-            client.httpSpacePrimitives,
-            "system.loadSpaceScripts",
-            [],
-          );
-        }
+        // Reload scripts remotely
+        await proxySyscall(
+          {},
+          client.httpSpacePrimitives,
+          "system.loadSpaceScripts",
+          [],
+        );
       }
     },
     "system.loadSpaceStyles": async () => {
@@ -110,6 +139,14 @@ export function systemSyscalls(
       tree: ParseTree,
     ): Promise<Record<string, any>> => {
       return commonSystem.applyAttributeExtractors(tags, text, tree);
+    },
+    "system.getSpaceConfig": (_ctx, key?: string): any => {
+      const config: any = configContainer.config || {};
+      if (key) {
+        return config[key];
+      } else {
+        return config;
+      }
     },
     "system.getEnv": () => {
       return system.env;

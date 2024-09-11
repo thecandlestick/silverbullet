@@ -9,7 +9,7 @@ import {
   renderToText,
   replaceNodesMatching,
 } from "./tree.ts";
-import { assertEquals, assertNotEquals } from "$std/testing/asserts.ts";
+import { assertEquals, assertNotEquals } from "@std/assert";
 import { parse } from "$common/markdown_parser/parse_tree.ts";
 import { extendedMarkdownLanguage } from "$common/markdown_parser/parser.ts";
 
@@ -33,14 +33,6 @@ http://zef.plus
   - [x] Hello
 - And a _third_ one [[Wiki Page]] yo
 `;
-
-const mdTest2 = `
-Hello
-
-* Item 1
-*
-
-Sup`;
 
 const mdTest3 = `
 \`\`\`yaml
@@ -74,7 +66,7 @@ Deno.test("Test parsing", () => {
     }
   });
   // console.log(JSON.stringify(mdTree, null, 2));
-  let mdTree3 = parse(extendedMarkdownLanguage, mdTest3);
+  parse(extendedMarkdownLanguage, mdTest3);
   // console.log(JSON.stringify(mdTree3, null, 2));
 });
 

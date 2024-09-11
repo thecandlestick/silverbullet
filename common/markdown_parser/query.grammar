@@ -99,6 +99,8 @@ BinExpression {
 | Expression !mulop "%" Expression
 | Expression !addop "+" Expression
 | Expression !addop "-" Expression
+
+| Expression !or "??" Expression
 }
 
 TernaryExpression {
@@ -139,7 +141,7 @@ Bool {
   Order { "order by" }
   Regex { "/" ( ![/\\\n\r] | "\\" _ )+ "/" }
 
-  Number { std.digit+ }
+  Number { std.digit+ | std.digit+ "." std.digit+ }
 
   BooleanKW { "true" | "false" }
 

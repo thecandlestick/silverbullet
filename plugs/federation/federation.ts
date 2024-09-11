@@ -1,37 +1,27 @@
-import "$sb/lib/native_fetch.ts";
-import { federatedPathToUrl } from "$sb/lib/resolve.ts";
-import { readFederationConfigs } from "./config.ts";
-import { datastore } from "$sb/syscalls.ts";
+import "@silverbulletmd/silverbullet/lib/native_fetch";
+import { federatedPathToUrl } from "@silverbulletmd/silverbullet/lib/resolve";
+import { datastore } from "@silverbulletmd/silverbullet/syscalls";
 import type { FileMeta } from "../../plug-api/types.ts";
+import { wildcardPathToRegex } from "./util.ts";
 
-async function responseToFileMeta(
+function responseToFileMeta(
   r: Response,
   name: string,
-): Promise<FileMeta> {
-  const federationConfigs = await readFederationConfigs();
-
-  // Default permission is "ro" unless explicitly set otherwise
-  let perm: "ro" | "rw" = "ro";
-  const federationConfig = federationConfigs.find((config) =>
-    name.startsWith(config.uri)
-  );
-  if (federationConfig?.perm) {
-    perm = federationConfig.perm;
-  }
+): FileMeta {
   return {
     name: name,
     size: r.headers.get("Content-length")
       ? +r.headers.get("Content-length")!
       : 0,
     contentType: r.headers.get("Content-type")!,
-    perm,
+    perm: "ro",
     created: +(r.headers.get("X-Created") || "0"),
     lastModified: +(r.headers.get("X-Last-Modified") || "0"),
   };
 }
 
 const fileListingPrefixCacheKey = `federationListCache`;
-const listingCacheTimeout = 1000 * 30;
+const listingCacheTimeout = 1000 * 5;
 const listingFetchTimeout = 2000;
 
 type FileListingCacheEntry = {
@@ -39,80 +29,78 @@ type FileListingCacheEntry = {
   lastUpdated: number;
 };
 
-export async function listFiles(): Promise<FileMeta[]> {
-  let fileMetas: FileMeta[] = [];
-  // Fetch them all in parallel
-  try {
-    await Promise.all((await readFederationConfigs()).map(async (config) => {
-      const items = await cacheFileListing(config.uri);
-      fileMetas = fileMetas.concat(items);
-    }));
-
-    // console.log("All of em: ", fileMetas);
-    return fileMetas;
-  } catch (e: any) {
-    console.error("Error listing federation files", e);
-    return [];
-  }
-}
-
-export async function cacheFileListing(uri: string): Promise<FileMeta[]> {
+export async function listFilesCached(
+  uri: string,
+  supportWildcards = false,
+): Promise<FileMeta[]> {
+  const uriParts = uri.split("/");
+  const rootUri = uriParts[0];
+  const prefix = uriParts.slice(1).join("/");
+  console.log(
+    "Fetching listing from federated",
+    rootUri,
+    "with prefix",
+    prefix,
+  );
   const cachedListing = await datastore.get(
-    [fileListingPrefixCacheKey, uri],
+    [fileListingPrefixCacheKey, rootUri],
   ) as FileListingCacheEntry;
+  let items: FileMeta[] = [];
   if (
     cachedListing &&
     cachedListing.lastUpdated > Date.now() - listingCacheTimeout
   ) {
-    // console.info("Using cached listing", cachedListing);
-    return cachedListing.items;
-  }
-  console.log("Fetching listing from federated", uri);
-  const uriParts = uri.split("/");
-  const rootUri = uriParts[0];
-  const prefix = uriParts.slice(1).join("/");
-  const indexUrl = `${federatedPathToUrl(rootUri)}/index.json`;
-  try {
-    const fetchController = new AbortController();
-    const timeout = setTimeout(
-      () => fetchController.abort(),
-      listingFetchTimeout,
-    );
+    console.info("Using cached listing", cachedListing.items.length);
+    items = cachedListing.items;
+  } else {
+    const indexUrl = `${federatedPathToUrl(rootUri)}/index.json`;
+    try {
+      const fetchController = new AbortController();
+      const timeout = setTimeout(
+        () => fetchController.abort(),
+        listingFetchTimeout,
+      );
 
-    const r = await nativeFetch(indexUrl, {
-      method: "GET",
-      headers: {
-        "X-Sync-Mode": "true",
-        "Cache-Control": "no-cache",
-      },
-      signal: fetchController.signal,
-    });
-    clearTimeout(timeout);
+      const r = await nativeFetch(indexUrl, {
+        method: "GET",
+        headers: {
+          "X-Sync-Mode": "true",
+          "Cache-Control": "no-cache",
+        },
+        signal: fetchController.signal,
+      });
+      clearTimeout(timeout);
 
-    if (r.status !== 200) {
-      throw new Error(`Got status ${r.status}`);
-    }
-    const jsonResult = await r.json();
-    const items: FileMeta[] = jsonResult.filter((meta: FileMeta) =>
-      meta.name.startsWith(prefix)
-    ).map((meta: FileMeta) => ({
-      ...meta,
-      perm: "ro",
-      name: `${rootUri}/${meta.name}`,
-    }));
-    await datastore.set([fileListingPrefixCacheKey, uri], {
-      items,
-      lastUpdated: Date.now(),
-    } as FileListingCacheEntry);
-    return items;
-  } catch (e: any) {
-    console.error("Failed to process", indexUrl, e);
-    if (cachedListing) {
-      console.info("Using cached listing");
-      return cachedListing.items;
+      if (r.status !== 200) {
+        throw new Error(`Got status ${r.status}`);
+      }
+      const jsonResult = await r.json();
+      // Transform them a little bit
+      items = jsonResult.map((meta: FileMeta) => ({
+        ...meta,
+        perm: "ro",
+        name: `${rootUri}/${meta.name}`,
+      }));
+      // Cache the entire listing
+      await datastore.set([fileListingPrefixCacheKey, rootUri], {
+        items,
+        lastUpdated: Date.now(),
+      } as FileListingCacheEntry);
+    } catch (e: any) {
+      console.error("Failed to process", indexUrl, e);
+      if (cachedListing) {
+        console.info("Using cached listing");
+        return cachedListing.items;
+      }
     }
   }
-  return [];
+  // And then filter based on prefix before returning
+  if (!supportWildcards) {
+    return items.filter((meta: FileMeta) => meta.name.startsWith(uri));
+  } else {
+    const prefixRegex = wildcardPathToRegex(uri);
+    return items.filter((meta) => prefixRegex.test(meta.name));
+  }
 }
 
 export async function readFile(
@@ -129,7 +117,7 @@ export async function readFile(
   if (r.status === 503) {
     throw new Error("Offline");
   }
-  const fileMeta = await responseToFileMeta(r, name);
+  const fileMeta = responseToFileMeta(r, name);
   if (r.status === 404) {
     throw Error("Not found");
   }
@@ -161,37 +149,17 @@ function errorResult(
   };
 }
 
-export async function writeFile(
-  name: string,
-  data: Uint8Array,
+export function writeFile(
+  _name: string,
+  _data: Uint8Array,
 ): Promise<FileMeta> {
   throw new Error("Writing federation file, not yet supported");
-  // const url = resolveFederated(name);
-  // console.log("Writing federation file", url);
-
-  // const r = await nativeFetch(url, {
-  //   method: "PUT",
-  //   body: data,
-  // });
-  // const fileMeta = await responseToFileMeta(r, name);
-  // if (!r.ok) {
-  //   throw new Error("Could not write file");
-  // }
-
-  // return fileMeta;
 }
 
-export async function deleteFile(
-  name: string,
+export function deleteFile(
+  _name: string,
 ): Promise<void> {
   throw new Error("Writing federation file, not yet supported");
-
-  // console.log("Deleting federation file", name);
-  // const url = resolveFederated(name);
-  // const r = await nativeFetch(url, { method: "DELETE" });
-  // if (!r.ok) {
-  //   throw Error("Failed to delete file");
-  // }
 }
 
 export async function getFileMeta(name: string): Promise<FileMeta> {
@@ -207,7 +175,7 @@ export async function getFileMeta(name: string): Promise<FileMeta> {
   if (r.status === 503) {
     throw new Error("Offline");
   }
-  const fileMeta = await responseToFileMeta(r, name);
+  const fileMeta = responseToFileMeta(r, name);
   if (!r.ok) {
     throw new Error("Not found");
   }

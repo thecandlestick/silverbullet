@@ -1,0 +1,2 @@
+/* esm.sh - @codemirror/legacy-modes@6.3.1/mode/swift */
+export * from "https://esm.sh/v119/@codemirror/legacy-modes@6.3.1/X-ZS9AY29kZW1pcnJvci9sYW5ndWFnZQ/deno/mode/swift.js";

@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "cf-cache-status": "HIT",
+    "vary": "Origin, Accept-Encoding",
+    "last-modified": "Mon, 08 May 2023 03:39:45 GMT",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "content-length": "158",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=%2FAsJEN%2FY%2FJisc15MlXRqFDvRG%2BiGuMoQBuaIaHvHRkt%2B0ljUXdJdY6rACmUdjLRvkpFdq3%2B8kqsTQ%2Ff5lGsDQUlmyUEagegueWzTjXGuCpZgxt32l9UkSrg%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "accept-ranges": "bytes",
+    "access-control-allow-origin": "*",
+    "x-content-source": "r2",
+    "date": "Mon, 08 May 2023 03:39:51 GMT",
+    "cache-control": "public, max-age=31536000, immutable",
+    "age": "6",
+    "server": "cloudflare",
+    "content-type": "application/typescript; charset=utf-8",
+    "cf-ray": "7c3ead8f5a850ca8-EWR",
+    "access-control-allow-methods": "*"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/life-buoy.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517197,
+    "nanos_since_epoch": 799433563
+  }
+}

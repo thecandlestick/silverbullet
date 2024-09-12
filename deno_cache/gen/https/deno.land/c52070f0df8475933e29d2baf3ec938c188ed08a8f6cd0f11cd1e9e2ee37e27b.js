@@ -1,0 +1,3 @@
+import { sass } from "./src/mod.ts";
+export default sass;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImh0dHBzOi8vZGVuby5sYW5kL3gvZGVub3Nhc3NAMS4wLjQvbW9kLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IHNhc3MgfSBmcm9tIFwiLi9zcmMvbW9kLnRzXCI7XG5leHBvcnQgZGVmYXVsdCBzYXNzO1xuIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLFNBQVMsSUFBSSxRQUFRLGVBQWU7QUFDcEMsZUFBZSxLQUFLIn0=

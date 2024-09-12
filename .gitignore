@@ -10,8 +10,6 @@ website_build
 deno.lock
 fly.toml
 env.sh
-deno_cache/
-dist_bundle/
 node_modules
 *.db*
 test_space

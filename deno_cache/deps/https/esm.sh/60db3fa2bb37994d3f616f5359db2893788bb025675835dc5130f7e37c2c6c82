@@ -1,0 +1,12 @@
+export function yCollab(ytext: Y.Text, awareness: any, { undoManager }?: {
+    undoManager: Y.UndoManager | false;
+}): cmState.Extension;
+import { yRemoteSelections } from "./y-remote-selections.d.ts";
+import { yRemoteSelectionsTheme } from "./y-remote-selections.d.ts";
+import { ySync } from "./y-sync.d.ts";
+import { ySyncFacet } from "./y-sync.d.ts";
+import { YSyncConfig } from "./y-sync.d.ts";
+import { yUndoManagerKeymap } from "./y-undomanager.d.ts";
+import * as Y from "yjs";
+import * as cmState from "@codemirror/state";
+export { yRemoteSelections, yRemoteSelectionsTheme, ySync, ySyncFacet, YSyncConfig, yUndoManagerKeymap };

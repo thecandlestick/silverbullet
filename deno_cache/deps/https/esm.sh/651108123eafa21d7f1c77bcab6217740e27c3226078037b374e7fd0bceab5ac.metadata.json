@@ -1,0 +1,24 @@
+{
+  "headers": {
+    "last-modified": "Mon, 08 May 2023 03:39:55 GMT",
+    "cache-control": "public, max-age=31536000, immutable",
+    "cf-cache-status": "HIT",
+    "date": "Mon, 08 May 2023 03:39:56 GMT",
+    "content-type": "application/javascript; charset=utf-8",
+    "x-content-source": "workers-kv",
+    "server": "cloudflare",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=9ATnl0I4UgYFix7kqw7JgVlZ8z35O72IYi7jHBZKZCv3YH5vAgbek8lJvBypm2iZOX6zFUlfRk7H0zRG4hVrP7qobOX0UYVIZy0qsGD2oLu%2BY75D5asTlkU%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "age": "1",
+    "cf-ray": "7c3eadafff050ca8-EWR",
+    "vary": "Origin, Accept-Encoding",
+    "access-control-allow-methods": "*",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}"
+  },
+  "url": "https://esm.sh/v119/lib0@0.2.74/deno/encoding.js",
+  "now": {
+    "secs_since_epoch": 1683517200,
+    "nanos_since_epoch": 321177507
+  }
+}

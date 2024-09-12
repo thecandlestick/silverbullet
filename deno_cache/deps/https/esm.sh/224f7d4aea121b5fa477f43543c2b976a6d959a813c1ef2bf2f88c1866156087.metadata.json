@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "accept-ranges": "bytes",
+    "cf-ray": "7c3eadcaeaab428b-EWR",
+    "x-content-source": "r2",
+    "vary": "Origin, Accept-Encoding",
+    "access-control-allow-methods": "*",
+    "last-modified": "Mon, 08 May 2023 03:28:00 GMT",
+    "content-type": "application/typescript; charset=utf-8",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "server": "cloudflare",
+    "cf-cache-status": "HIT",
+    "content-length": "6026",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=66jQD%2B4XDPelN66s7rQOrWHNwVWwohGoYzVEhczJlBjENkxovV6WyP7kz%2BkloP87JnxdEL6llGebsZ6BbrZi3VwPzRBQwhGwRr%2BmRrmD0ZTfCSpt6%2BVdenI%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "cache-control": "public, max-age=31536000, immutable",
+    "date": "Mon, 08 May 2023 03:40:01 GMT",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "access-control-allow-origin": "*",
+    "age": "721"
+  },
+  "url": "https://esm.sh/v119/yjs@13.5.42/dist/src/utils/UndoManager.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517257,
+    "nanos_since_epoch": 815322126
+  }
+}

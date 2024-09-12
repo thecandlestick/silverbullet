@@ -1,0 +1,22 @@
+{
+  "headers": {
+    "content-length": "162",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "access-control-allow-origin": "*",
+    "vary": "Origin, Accept-Encoding",
+    "cf-ray": "7c3ead68ab990ca8-EWR",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=dp4OagNTWnOb9LxuiR8dwR4qff5e3Ljz4Vt%2FxbOe51MbgmyUm4jXmVnnrvPAVMMop3LkaM2HTKdjilbNiZekUZgD2GKEoy0A3Njg3yyf7JjnSINNiNDvDgM%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "server": "cloudflare",
+    "date": "Mon, 08 May 2023 03:39:46 GMT",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "content-type": "application/typescript; charset=utf-8",
+    "access-control-allow-methods": "*",
+    "x-content-source": "r2",
+    "cache-control": "public, max-age=31536000, immutable"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/chevrons-down.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517194,
+    "nanos_since_epoch": 894901736
+  }
+}

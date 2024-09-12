@@ -1,0 +1,22 @@
+{
+  "headers": {
+    "cache-control": "public, max-age=31536000, immutable",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "server": "cloudflare",
+    "cf-ray": "7c3ead68aba90ca8-EWR",
+    "vary": "Origin, Accept-Encoding",
+    "date": "Mon, 08 May 2023 03:39:46 GMT",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=ahG014A6cQTiQffKJIs8jNGXk5x8%2BUHhp%2FY3cwFdINT4R8E%2F7b5N0Qj2V1LbzGtmQ4XOQSl%2BqE2JcE1Vmtu3Xc%2B59vAA6Kkb2ur%2FigL0cg6XH0JULJHx2%2F4%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "x-content-source": "r2",
+    "access-control-allow-methods": "*",
+    "access-control-allow-origin": "*",
+    "content-length": "155",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "content-type": "application/typescript; charset=utf-8"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/cloud.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517195,
+    "nanos_since_epoch": 928138579
+  }
+}

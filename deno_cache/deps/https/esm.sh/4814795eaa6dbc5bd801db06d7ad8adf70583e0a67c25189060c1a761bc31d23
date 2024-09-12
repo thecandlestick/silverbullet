@@ -1,0 +1,3 @@
+/* esm.sh - esbuild bundle(lib0@0.2.74/object) deno production */
+var u=()=>Object.create(null),f=Object.assign,s=Object.keys,a=(t,e)=>{for(let r in t)e(t[r],r)},i=(t,e)=>{let r=[];for(let n in t)r.push(e(t[n],n));return r},o=t=>s(t).length,l=(t,e)=>{for(let r in t)if(e(t[r],r))return!0;return!1},x=t=>{for(let e in t)return!1;return!0},c=(t,e)=>{for(let r in t)if(!e(t[r],r))return!1;return!0},p=(t,e)=>Object.prototype.hasOwnProperty.call(t,e),y=(t,e)=>t===e||o(t)===o(e)&&c(t,(r,n)=>(r!==void 0||p(e,n))&&e[n]===r);export{f as assign,u as create,y as equalFlat,c as every,a as forEach,p as hasProperty,x as isEmpty,s as keys,o as length,i as map,l as some};
+//# sourceMappingURL=object.js.map

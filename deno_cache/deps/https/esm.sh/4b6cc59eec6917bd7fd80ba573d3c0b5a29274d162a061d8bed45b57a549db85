@@ -1,0 +1,2 @@
+/* esm.sh - yjs@13.5.42 */
+export * from "https://esm.sh/v119/yjs@13.5.42/deno/yjs.mjs";

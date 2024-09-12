@@ -1,0 +1,2 @@
+/* esm.sh - @lezer/common@1.0.2 */
+export * from "https://esm.sh/v119/@lezer/common@1.0.2/deno/common.mjs";

@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "vary": "Origin, Accept-Encoding",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "date": "Mon, 08 May 2023 03:39:45 GMT",
+    "cf-ray": "7c3ead68ea1f428b-EWR",
+    "access-control-allow-methods": "*",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=HMlGVYKillaE4GV7u3MwhE%2BJjkemGzROs%2BHfbfwtPP8fT7Iim4yBowUY2CtGqfoSLfuMG2lXQ14xq5VjcSRPQmaK4PsfK0HQxb0q5nyeYSBIeGhpMjPDPAU%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "last-modified": "Mon, 08 May 2023 03:27:58 GMT",
+    "access-control-allow-origin": "*",
+    "x-content-source": "r2",
+    "accept-ranges": "bytes",
+    "server": "cloudflare",
+    "content-length": "160",
+    "cf-cache-status": "HIT",
+    "content-type": "application/typescript; charset=utf-8",
+    "cache-control": "public, max-age=31536000, immutable",
+    "age": "707"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/credit-card.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517194,
+    "nanos_since_epoch": 824209427
+  }
+}

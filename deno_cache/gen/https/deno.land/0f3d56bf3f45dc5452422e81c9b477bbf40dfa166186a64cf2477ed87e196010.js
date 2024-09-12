@@ -1,0 +1,27 @@
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+import * as path from "../path/mod.ts";
+import { ensureDir, ensureDirSync } from "./ensure_dir.ts";
+import { toPathString } from "./_util.ts";
+/**
+ * Ensures that the hard link exists.
+ * If the directory structure does not exist, it is created.
+ *
+ * @param src the source file path. Directory hard links are not allowed.
+ * @param dest the destination link path
+ */ export async function ensureLink(src, dest) {
+    dest = toPathString(dest);
+    await ensureDir(path.dirname(dest));
+    await Deno.link(toPathString(src), dest);
+}
+/**
+ * Ensures that the hard link exists.
+ * If the directory structure does not exist, it is created.
+ *
+ * @param src the source file path. Directory hard links are not allowed.
+ * @param dest the destination link path
+ */ export function ensureLinkSync(src, dest) {
+    dest = toPathString(dest);
+    ensureDirSync(path.dirname(dest));
+    Deno.linkSync(toPathString(src), dest);
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImh0dHBzOi8vZGVuby5sYW5kL3N0ZEAwLjE2NS4wL2ZzL2Vuc3VyZV9saW5rLnRzIl0sInNvdXJjZXNDb250ZW50IjpbIi8vIENvcHlyaWdodCAyMDE4LTIwMjIgdGhlIERlbm8gYXV0aG9ycy4gQWxsIHJpZ2h0cyByZXNlcnZlZC4gTUlUIGxpY2Vuc2UuXG5pbXBvcnQgKiBhcyBwYXRoIGZyb20gXCIuLi9wYXRoL21vZC50c1wiO1xuaW1wb3J0IHsgZW5zdXJlRGlyLCBlbnN1cmVEaXJTeW5jIH0gZnJvbSBcIi4vZW5zdXJlX2Rpci50c1wiO1xuaW1wb3J0IHsgdG9QYXRoU3RyaW5nIH0gZnJvbSBcIi4vX3V0aWwudHNcIjtcblxuLyoqXG4gKiBFbnN1cmVzIHRoYXQgdGhlIGhhcmQgbGluayBleGlzdHMuXG4gKiBJZiB0aGUgZGlyZWN0b3J5IHN0cnVjdHVyZSBkb2VzIG5vdCBleGlzdCwgaXQgaXMgY3JlYXRlZC5cbiAqXG4gKiBAcGFyYW0gc3JjIHRoZSBzb3VyY2UgZmlsZSBwYXRoLiBEaXJlY3RvcnkgaGFyZCBsaW5rcyBhcmUgbm90IGFsbG93ZWQuXG4gKiBAcGFyYW0gZGVzdCB0aGUgZGVzdGluYXRpb24gbGluayBwYXRoXG4gKi9cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBlbnN1cmVMaW5rKHNyYzogc3RyaW5nIHwgVVJMLCBkZXN0OiBzdHJpbmcgfCBVUkwpIHtcbiAgZGVzdCA9IHRvUGF0aFN0cmluZyhkZXN0KTtcbiAgYXdhaXQgZW5zdXJlRGlyKHBhdGguZGlybmFtZShkZXN0KSk7XG5cbiAgYXdhaXQgRGVuby5saW5rKHRvUGF0aFN0cmluZyhzcmMpLCBkZXN0KTtcbn1cblxuLyoqXG4gKiBFbnN1cmVzIHRoYXQgdGhlIGhhcmQgbGluayBleGlzdHMuXG4gKiBJZiB0aGUgZGlyZWN0b3J5IHN0cnVjdHVyZSBkb2VzIG5vdCBleGlzdCwgaXQgaXMgY3JlYXRlZC5cbiAqXG4gKiBAcGFyYW0gc3JjIHRoZSBzb3VyY2UgZmlsZSBwYXRoLiBEaXJlY3RvcnkgaGFyZCBsaW5rcyBhcmUgbm90IGFsbG93ZWQuXG4gKiBAcGFyYW0gZGVzdCB0aGUgZGVzdGluYXRpb24gbGluayBwYXRoXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBlbnN1cmVMaW5rU3luYyhzcmM6IHN0cmluZyB8IFVSTCwgZGVzdDogc3RyaW5nIHwgVVJMKSB7XG4gIGRlc3QgPSB0b1BhdGhTdHJpbmcoZGVzdCk7XG4gIGVuc3VyZURpclN5bmMocGF0aC5kaXJuYW1lKGRlc3QpKTtcblxuICBEZW5vLmxpbmtTeW5jKHRvUGF0aFN0cmluZyhzcmMpLCBkZXN0KTtcbn1cbiJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSwwRUFBMEU7QUFDMUUsWUFBWSxVQUFVLGlCQUFpQjtBQUN2QyxTQUFTLFNBQVMsRUFBRSxhQUFhLFFBQVEsa0JBQWtCO0FBQzNELFNBQVMsWUFBWSxRQUFRLGFBQWE7QUFFMUM7Ozs7OztDQU1DLEdBQ0QsT0FBTyxlQUFlLFdBQVcsR0FBaUIsRUFBRSxJQUFrQixFQUFFO0lBQ3RFLE9BQU8sYUFBYTtJQUNwQixNQUFNLFVBQVUsS0FBSyxPQUFPLENBQUM7SUFFN0IsTUFBTSxLQUFLLElBQUksQ0FBQyxhQUFhLE1BQU07QUFDckMsQ0FBQztBQUVEOzs7Ozs7Q0FNQyxHQUNELE9BQU8sU0FBUyxlQUFlLEdBQWlCLEVBQUUsSUFBa0IsRUFBRTtJQUNwRSxPQUFPLGFBQWE7SUFDcEIsY0FBYyxLQUFLLE9BQU8sQ0FBQztJQUUzQixLQUFLLFFBQVEsQ0FBQyxhQUFhLE1BQU07QUFDbkMsQ0FBQyJ9

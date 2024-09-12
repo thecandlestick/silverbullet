@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "cf-ray": "7c3ead68ab8d0ca8-EWR",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=vN0yCZ0KJ8%2B%2B55C8EddO1Q1pzn2k%2FTEYXKyaXpUjRHzqw7v9pkS3crpjFYIZLxbx1z%2FBE0CQUVKRNtk%2B1Se5o03E06ALVvpZliT3%2BvmeiqEBRZsR%2FAYVzC0%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "x-content-source": "r2",
+    "date": "Mon, 08 May 2023 03:39:45 GMT",
+    "access-control-allow-origin": "*",
+    "content-type": "application/typescript; charset=utf-8",
+    "cache-control": "public, max-age=31536000, immutable",
+    "age": "1",
+    "last-modified": "Mon, 08 May 2023 03:39:44 GMT",
+    "cf-cache-status": "HIT",
+    "vary": "Origin, Accept-Encoding",
+    "access-control-allow-methods": "*",
+    "accept-ranges": "bytes",
+    "server": "cloudflare",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "content-length": "159"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/camera-off.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517194,
+    "nanos_since_epoch": 91853364
+  }
+}

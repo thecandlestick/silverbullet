@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "cf-ray": "7c3ead8f5b210ca8-EWR",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=%2FFc%2B0Vc2pCetGR8FM3haOC3KOR5ESoYFv%2F7ob1DFJEPDDajueynljkSom%2F0jgOC3H2Nn243EeJETsMZSzKbov8ena7INDb4UKA%2BTqfvLnm7k%2FNx4TX9e%2BtU%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "cache-control": "public, max-age=31536000, immutable",
+    "access-control-allow-methods": "*",
+    "age": "6",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "x-content-source": "r2",
+    "server": "cloudflare",
+    "cf-cache-status": "HIT",
+    "content-type": "application/typescript; charset=utf-8",
+    "accept-ranges": "bytes",
+    "last-modified": "Mon, 08 May 2023 03:39:45 GMT",
+    "access-control-allow-origin": "*",
+    "date": "Mon, 08 May 2023 03:39:51 GMT",
+    "content-length": "156",
+    "vary": "Origin, Accept-Encoding"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/twitch.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517199,
+    "nanos_since_epoch": 191766381
+  }
+}

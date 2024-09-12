@@ -26,7 +26,8 @@ for await (
     created: lastModifiedTimestamp,
     contentType: mime.getType(fullPath) || "application/octet-stream",
     size: s.size,
-    perm: "ro",
+    perm: "rw",
+    #perm: "ro",
   });
 }
 console.log(JSON.stringify(allFiles, null, 2));

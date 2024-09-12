@@ -1,0 +1,16 @@
+/*
+ * Skypack CDN - turndown@7.1.1
+ *
+ * Learn more:
+ *   📙 Package Documentation: https://www.skypack.dev/view/turndown
+ *   📘 Skypack Documentation: https://www.skypack.dev/docs
+ *
+ * Pinned URL: (Optimized for Production)
+ *   ▶️ Normal: https://cdn.skypack.dev/pin/turndown@v7.1.1-VIg5Mi398SyAWes2nQHX/mode=imports/optimized/turndown.js
+ *   ⏩ Minified: https://cdn.skypack.dev/pin/turndown@v7.1.1-VIg5Mi398SyAWes2nQHX/mode=imports,min/optimized/turndown.js
+ *
+ */
+
+// Browser-Optimized Imports (Don't directly import the URLs below in your application!)
+export * from '/-/turndown@v7.1.1-VIg5Mi398SyAWes2nQHX/dist=es2019,mode=imports/optimized/turndown.js';
+export {default} from '/-/turndown@v7.1.1-VIg5Mi398SyAWes2nQHX/dist=es2019,mode=imports/optimized/turndown.js';

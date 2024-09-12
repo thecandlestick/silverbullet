@@ -1,0 +1,22 @@
+{
+  "headers": {
+    "cache-control": "public, max-age=31536000, immutable",
+    "content-length": "159",
+    "access-control-allow-methods": "*",
+    "x-content-source": "r2",
+    "server": "cloudflare",
+    "vary": "Origin, Accept-Encoding",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "cf-ray": "7c3ead619c1842e6-EWR",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=LUfh%2BLQ%2F1Ctf%2Bj%2BII0wx13jSKc2ub0xP1loO%2FYa3iUpMnK8gJBKtPei%2Frgx4j8PM8RGlRcQb3ICIQg3IZz%2B6dG8%2Fle6Q3E4oECaZkXsNjIQR2zGMRCYCSdY%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "date": "Mon, 08 May 2023 03:39:44 GMT",
+    "content-type": "application/typescript; charset=utf-8"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/align-left.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517194,
+    "nanos_since_epoch": 101436744
+  }
+}

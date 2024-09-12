@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "date": "Mon, 08 May 2023 03:39:45 GMT",
+    "content-length": "165",
+    "cache-control": "public, max-age=31536000, immutable",
+    "access-control-allow-origin": "*",
+    "x-content-source": "r2",
+    "cf-cache-status": "HIT",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "access-control-allow-methods": "*",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=kpW356cq33SD8Jqdm8uWCCfyBJETs1xEMSrU2uHNxRPsW3YAgxtH65TAxvHgnweFFlPScZ7KTzo6lQY1JCLdeyA5elNHeDM6OirRAkohc3pyq07kTAISsDg%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "server": "cloudflare",
+    "cf-ray": "7c3ead68ab7f0ca8-EWR",
+    "age": "1",
+    "content-type": "application/typescript; charset=utf-8",
+    "last-modified": "Mon, 08 May 2023 03:39:44 GMT",
+    "accept-ranges": "bytes",
+    "vary": "Origin, Accept-Encoding"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/battery-charging.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517193,
+    "nanos_since_epoch": 997237024
+  }
+}

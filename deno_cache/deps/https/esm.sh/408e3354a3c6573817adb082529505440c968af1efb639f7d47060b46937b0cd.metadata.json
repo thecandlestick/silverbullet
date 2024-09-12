@@ -1,0 +1,24 @@
+{
+  "headers": {
+    "server": "cloudflare",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=ySCZsGXqZ1%2B52uPZGJ6Bik2wfW32wFhoI2eiI6NLJsj8tSK4ccYSWd0Ednu9qkI%2Bks23wSuGdvyS1s8QFoqxfvgcdYh1LABrxOEyrH1o1Xv%2FknxiX%2FY42w0%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "vary": "Origin, Accept-Encoding",
+    "access-control-allow-origin": "*",
+    "cache-control": "public, max-age=31536000, immutable",
+    "last-modified": "Mon, 08 May 2023 03:39:55 GMT",
+    "cf-ray": "7c3eadafff010ca8-EWR",
+    "content-type": "application/javascript; charset=utf-8",
+    "access-control-allow-methods": "*",
+    "age": "1",
+    "date": "Mon, 08 May 2023 03:39:56 GMT",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "cf-cache-status": "HIT",
+    "x-content-source": "workers-kv"
+  },
+  "url": "https://esm.sh/v119/lib0@0.2.74/deno/observable.js",
+  "now": {
+    "secs_since_epoch": 1683517200,
+    "nanos_since_epoch": 133820313
+  }
+}

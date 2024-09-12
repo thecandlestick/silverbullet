@@ -1,0 +1,9 @@
+export type { CapacitorGlobal, PermissionState, Plugin, PluginCallback, PluginImplementations, PluginListenerHandle, PluginResultData, PluginResultError, } from './definitions.d.ts';
+export { CapacitorPlatforms, addPlatform, setPlatform } from './platforms.d.ts';
+export { Capacitor, registerPlugin } from './global.d.ts';
+export { WebPlugin, WebPluginConfig, ListenerCallback } from './web-plugin.d.ts';
+export { CapacitorCookies, CapacitorHttp, WebView } from './core-plugins.d.ts';
+export type { ClearCookieOptions, DeleteCookieOptions, SetCookieOptions, HttpHeaders, HttpOptions, HttpParams, HttpResponse, HttpResponseType, WebViewPath, WebViewPlugin, } from './core-plugins.d.ts';
+export { CapacitorException, ExceptionCode } from './util.d.ts';
+export { Plugins, registerWebPlugin } from './global.d.ts';
+export type { CallbackID, CancellableCallback, ISODateString, PluginConfig, PluginRegistry, } from './legacy/legacy-definitions.d.ts';

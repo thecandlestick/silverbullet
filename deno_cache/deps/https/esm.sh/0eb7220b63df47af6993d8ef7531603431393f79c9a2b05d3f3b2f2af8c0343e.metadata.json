@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "cf-ray": "7c3ead8f5a770ca8-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "date": "Mon, 08 May 2023 03:39:51 GMT",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "cf-cache-status": "HIT",
+    "cache-control": "public, max-age=31536000, immutable",
+    "last-modified": "Mon, 08 May 2023 03:39:45 GMT",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=HsT8VsgTFVnHr91lDS4xOtiMFdcshMs3HYqOV0QNIZROhVphCEFOpx3eyxxVdRufQBNezA2kc4VIPfwMf7qDDohbwdq2xH9yxIiVUqkrOOi%2B49Kk%2FsRPQPw%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "server": "cloudflare",
+    "access-control-allow-origin": "*",
+    "age": "6",
+    "access-control-allow-methods": "*",
+    "accept-ranges": "bytes",
+    "content-length": "160",
+    "vary": "Origin, Accept-Encoding",
+    "content-type": "application/typescript; charset=utf-8",
+    "x-content-source": "r2"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/help-circle.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517197,
+    "nanos_since_epoch": 619571211
+  }
+}

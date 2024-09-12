@@ -1,0 +1,2 @@
+/* esm.sh - @codemirror/lang-markdown@6.1.0 */
+export * from "https://esm.sh/v119/@codemirror/lang-markdown@6.1.0/X-ZS9AQGNvZGVtaXJyb3IvbGFuZy1odG1sLEBjb2RlbWlycm9yL2xhbmd1YWdlLEBjb2RlbWlycm9yL3N0YXRlLEBjb2RlbWlycm9yL3ZpZXcsQGxlemVyL2NvbW1vbixAbGV6ZXIvaGlnaGxpZ2h0LEBsZXplci9tYXJrZG93bg/deno/lang-markdown.mjs";

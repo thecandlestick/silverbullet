@@ -1,0 +1,3 @@
+import {LRParser} from "https://esm.sh/v119/@lezer/lr@1.3.4/X-ZS9AY29kZW1pcnJvci9sYW5ndWFnZSxAbGV6ZXIvY29tbW9uLEBsZXplci9oaWdobGlnaHQ/dist/index.d.ts"
+
+export const parser: LRParser

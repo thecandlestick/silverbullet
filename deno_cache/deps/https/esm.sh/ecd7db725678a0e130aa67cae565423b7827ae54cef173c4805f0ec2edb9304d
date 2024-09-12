@@ -1,0 +1,2 @@
+/* esm.sh - @capacitor-community/sqlite@4.6.0 */
+export * from "https://esm.sh/v119/@capacitor-community/sqlite@4.6.0/X-ZS9AY2FwYWNpdG9yL2NvcmU/deno/sqlite.mjs";

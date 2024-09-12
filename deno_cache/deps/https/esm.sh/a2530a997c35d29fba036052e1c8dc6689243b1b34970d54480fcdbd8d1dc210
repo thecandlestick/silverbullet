@@ -1,0 +1,3 @@
+/* esm.sh - esbuild bundle(lib0@0.2.74/random) deno production */
+var o=Math.floor;var p=Number.isNaN;import{getRandomValues as r}from"/v119/lib0@0.2.74/deno/webcrypto.js";var n=Math.random,s=()=>r(new Uint32Array(1))[0],l=()=>{let t=r(new Uint32Array(8));return(t[0]&2097151)*(4294967295+1)+(t[1]>>>0)},h=t=>t[o(n()*t.length)],a=[1e7]+-1e3+-4e3+-8e3+-1e11,m=()=>a.replace(/[018]/g,t=>(t^s()&15>>t/4).toString(16));export{h as oneOf,n as rand,s as uint32,l as uint53,m as uuidv4};
+//# sourceMappingURL=random.js.map

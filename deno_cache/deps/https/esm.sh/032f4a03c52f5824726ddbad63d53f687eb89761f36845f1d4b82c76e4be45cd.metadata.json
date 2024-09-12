@@ -1,0 +1,22 @@
+{
+  "headers": {
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=Q4TCwJVjrV0TRLo6BRX%2BVQVSYIh7Qj7uHSogJKXtwiK%2BTIw%2FwCg35SoeokodrNue0ukdkOr%2BD8mPTeqonG1VwYYZaAIP%2F1YXilJu5rdgUGai%2FcrjYXk2sVM%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "access-control-allow-methods": "*",
+    "content-type": "application/typescript; charset=utf-8",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "content-length": "153",
+    "server": "cloudflare",
+    "cf-ray": "7c3ead68abf50ca8-EWR",
+    "access-control-allow-origin": "*",
+    "x-content-source": "r2",
+    "vary": "Origin, Accept-Encoding",
+    "cache-control": "public, max-age=31536000, immutable",
+    "date": "Mon, 08 May 2023 03:39:46 GMT"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/eye.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517195,
+    "nanos_since_epoch": 943780287
+  }
+}

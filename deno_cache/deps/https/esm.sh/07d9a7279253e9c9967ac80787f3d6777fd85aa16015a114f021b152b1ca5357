@@ -1,0 +1,2 @@
+/* esm.sh - @codemirror/autocomplete@6.4.2 */
+export * from "https://esm.sh/v119/@codemirror/autocomplete@6.4.2/X-ZS9AY29kZW1pcnJvci9jb21tYW5kcyxAY29kZW1pcnJvci9zdGF0ZSxAY29kZW1pcnJvci92aWV3LEBsZXplci9jb21tb24/deno/autocomplete.mjs";

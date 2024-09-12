@@ -1,0 +1,24 @@
+{
+  "headers": {
+    "last-modified": "Mon, 08 May 2023 03:27:56 GMT",
+    "cf-cache-status": "HIT",
+    "access-control-allow-methods": "*",
+    "server": "cloudflare",
+    "age": "706",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "cf-ray": "7c3ead568a6e42e6-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=4uvSgZ0vfamLB%2B%2B9IPgqd33DZRkWwbvO5G05OfPkLGjVSIZO%2BEr0wDzx9SMSnP8WoYsNfVN3RlTDT430U0hwhwR%2FHBNfN4tq8Ep3YB9PIgpgzlHy7DE1FI8%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "vary": "Origin, Accept-Encoding",
+    "access-control-allow-origin": "*",
+    "cache-control": "public, max-age=31536000, immutable",
+    "x-content-source": "workers-kv",
+    "date": "Mon, 08 May 2023 03:39:42 GMT",
+    "content-type": "application/javascript; charset=utf-8"
+  },
+  "url": "https://esm.sh/v119/y-websocket@1.4.5/X-ZS95anM/deno/y-websocket.mjs",
+  "now": {
+    "secs_since_epoch": 1683517182,
+    "nanos_since_epoch": 701633939
+  }
+}

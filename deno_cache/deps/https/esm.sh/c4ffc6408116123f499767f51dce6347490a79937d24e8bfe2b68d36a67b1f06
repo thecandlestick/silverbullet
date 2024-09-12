@@ -1,0 +1,2 @@
+/* esm.sh - preact-feather@4.2.1 */
+export * from "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/deno/preact-feather.mjs";

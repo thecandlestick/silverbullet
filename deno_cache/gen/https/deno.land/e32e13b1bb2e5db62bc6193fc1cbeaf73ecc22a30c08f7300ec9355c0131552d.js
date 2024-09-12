@@ -1,0 +1,16 @@
+// Ported from js-yaml v3.13.1:
+// https://github.com/nodeca/js-yaml/commit/665aadda42349dcae869f12040d9b10ef18d12da
+// Copyright 2011-2015 by Vitaly Puzrin. All rights reserved. MIT license.
+// Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+export class YAMLError extends Error {
+    mark;
+    constructor(message = "(unknown reason)", mark = ""){
+        super(`${message} ${mark}`);
+        this.mark = mark;
+        this.name = this.constructor.name;
+    }
+    toString(_compact) {
+        return `${this.name}: ${this.message} ${this.mark}`;
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImh0dHBzOi8vZGVuby5sYW5kL3N0ZEAwLjE4NC4wL3lhbWwvX2Vycm9yLnRzIl0sInNvdXJjZXNDb250ZW50IjpbIi8vIFBvcnRlZCBmcm9tIGpzLXlhbWwgdjMuMTMuMTpcbi8vIGh0dHBzOi8vZ2l0aHViLmNvbS9ub2RlY2EvanMteWFtbC9jb21taXQvNjY1YWFkZGE0MjM0OWRjYWU4NjlmMTIwNDBkOWIxMGVmMThkMTJkYVxuLy8gQ29weXJpZ2h0IDIwMTEtMjAxNSBieSBWaXRhbHkgUHV6cmluLiBBbGwgcmlnaHRzIHJlc2VydmVkLiBNSVQgbGljZW5zZS5cbi8vIENvcHlyaWdodCAyMDE4LTIwMjMgdGhlIERlbm8gYXV0aG9ycy4gQWxsIHJpZ2h0cyByZXNlcnZlZC4gTUlUIGxpY2Vuc2UuXG5cbmltcG9ydCB0eXBlIHsgTWFyayB9IGZyb20gXCIuL19tYXJrLnRzXCI7XG5cbmV4cG9ydCBjbGFzcyBZQU1MRXJyb3IgZXh0ZW5kcyBFcnJvciB7XG4gIGNvbnN0cnVjdG9yKFxuICAgIG1lc3NhZ2UgPSBcIih1bmtub3duIHJlYXNvbilcIixcbiAgICBwcm90ZWN0ZWQgbWFyazogTWFyayB8IHN0cmluZyA9IFwiXCIsXG4gICkge1xuICAgIHN1cGVyKGAke21lc3NhZ2V9ICR7bWFya31gKTtcbiAgICB0aGlzLm5hbWUgPSB0aGlzLmNvbnN0cnVjdG9yLm5hbWU7XG4gIH1cblxuICBwdWJsaWMgb3ZlcnJpZGUgdG9TdHJpbmcoX2NvbXBhY3Q6IGJvb2xlYW4pOiBzdHJpbmcge1xuICAgIHJldHVybiBgJHt0aGlzLm5hbWV9OiAke3RoaXMubWVzc2FnZX0gJHt0aGlzLm1hcmt9YDtcbiAgfVxufVxuIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLCtCQUErQjtBQUMvQixvRkFBb0Y7QUFDcEYsMEVBQTBFO0FBQzFFLDBFQUEwRTtBQUkxRSxPQUFPLE1BQU0sa0JBQWtCO0lBR2pCO0lBRlosWUFDRSxVQUFVLGtCQUFrQixFQUNsQixPQUFzQixFQUFFLENBQ2xDO1FBQ0EsS0FBSyxDQUFDLENBQUMsRUFBRSxRQUFRLENBQUMsRUFBRSxLQUFLLENBQUM7b0JBRmhCO1FBR1YsSUFBSSxDQUFDLElBQUksR0FBRyxJQUFJLENBQUMsV0FBVyxDQUFDLElBQUk7SUFDbkM7SUFFZ0IsU0FBUyxRQUFpQixFQUFVO1FBQ2xELE9BQU8sQ0FBQyxFQUFFLElBQUksQ0FBQyxJQUFJLENBQUMsRUFBRSxFQUFFLElBQUksQ0FBQyxPQUFPLENBQUMsQ0FBQyxFQUFFLElBQUksQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUNyRDtBQUNGLENBQUMifQ==

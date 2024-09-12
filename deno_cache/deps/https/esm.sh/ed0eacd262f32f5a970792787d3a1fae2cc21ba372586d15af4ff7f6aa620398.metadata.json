@@ -1,0 +1,24 @@
+{
+  "headers": {
+    "date": "Mon, 08 May 2023 03:39:42 GMT",
+    "age": "706",
+    "last-modified": "Mon, 08 May 2023 03:27:56 GMT",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "cf-cache-status": "HIT",
+    "x-content-source": "workers-kv",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "cache-control": "public, max-age=31536000, immutable",
+    "cf-ray": "7c3ead568a6842e6-EWR",
+    "vary": "Origin, Accept-Encoding",
+    "server": "cloudflare",
+    "access-control-allow-methods": "*",
+    "access-control-allow-origin": "*",
+    "content-type": "application/javascript; charset=utf-8",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=GDd3JEtMrJcVOV9duD8q8Nc2DR3WGJIS5U3MPEYBklT2dfSJAPNYaB3FnJgv2WXBhafXWJpNNMYzHKA2mbEc%2BWHonSUSK9oR6zH5NIIYNbfSv9h%2BJfFDFTw%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/deno/preact-feather.mjs",
+  "now": {
+    "secs_since_epoch": 1683517182,
+    "nanos_since_epoch": 685801139
+  }
+}

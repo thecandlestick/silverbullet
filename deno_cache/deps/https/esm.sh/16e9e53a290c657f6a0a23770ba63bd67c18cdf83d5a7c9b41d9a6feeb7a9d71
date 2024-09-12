@@ -1,0 +1,2 @@
+/* esm.sh - @lezer/markdown@1.0.2 */
+export * from "https://esm.sh/v119/@lezer/markdown@1.0.2/X-ZS9AY29kZW1pcnJvci9sYW5ndWFnZSxAbGV6ZXIvY29tbW9uLEBsZXplci9oaWdobGlnaHQ/deno/markdown.mjs";

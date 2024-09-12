@@ -1,0 +1,3 @@
+/* esm.sh - esbuild bundle(lib0@0.2.74/set) deno production */
+var t=()=>new Set,r=e=>Array.from(e),o=e=>e.values().next().value||void 0,n=e=>new Set(e);export{t as create,o as first,n as from,r as toArray};
+//# sourceMappingURL=set.js.map

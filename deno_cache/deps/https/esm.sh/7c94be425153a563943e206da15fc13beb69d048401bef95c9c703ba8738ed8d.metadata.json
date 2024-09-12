@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "server": "cloudflare",
+    "cf-ray": "7c3ead8f5ad00ca8-EWR",
+    "access-control-allow-methods": "*",
+    "cf-cache-status": "HIT",
+    "age": "6",
+    "content-type": "application/typescript; charset=utf-8",
+    "cache-control": "public, max-age=31536000, immutable",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=ZhVsduNwx69u3QqWj8r9bMaBskB3KNRPQ2r9sd6zfW6IEVddeW5DlanPRvIieyi8qD71n4mDSZBFEtAcMMwEFk6A1uyTcelsmlP3ZomZBnHH1e8XZhGOEnY%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "last-modified": "Mon, 08 May 2023 03:39:45 GMT",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "x-content-source": "r2",
+    "access-control-allow-origin": "*",
+    "content-length": "163",
+    "vary": "Origin, Accept-Encoding",
+    "accept-ranges": "bytes",
+    "date": "Mon, 08 May 2023 03:39:51 GMT",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/phone-outgoing.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517198,
+    "nanos_since_epoch": 518169232
+  }
+}

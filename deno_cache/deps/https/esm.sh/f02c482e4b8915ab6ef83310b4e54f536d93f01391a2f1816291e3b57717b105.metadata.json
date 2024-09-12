@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "access-control-allow-methods": "*",
+    "date": "Mon, 08 May 2023 03:39:42 GMT",
+    "x-content-source": "r2",
+    "age": "706",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=QN6Rkz4AUR5XZ9y6Vu4mKbzH76z1s1YHquZfeTFGWLzIp8bAJNXCZ3A5ZXCrcGcrMJT0TLh4JcAKayTe8Rh4wZOQdBx1k3ECaN1AHqfNcespS40NRDlXqco%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "access-control-allow-origin": "*",
+    "vary": "Origin, Accept-Encoding",
+    "cache-control": "public, max-age=31536000, immutable",
+    "cf-cache-status": "HIT",
+    "content-length": "7364",
+    "content-type": "application/typescript; charset=utf-8",
+    "cf-ray": "7c3ead568a7242e6-EWR",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "server": "cloudflare",
+    "accept-ranges": "bytes",
+    "last-modified": "Mon, 08 May 2023 03:27:56 GMT"
+  },
+  "url": "https://esm.sh/v119/@replit/codemirror-vim@6.0.4/X-ZS9AY29kZW1pcnJvci9jb21tYW5kcyxAY29kZW1pcnJvci9sYW5ndWFnZSxAY29kZW1pcnJvci9zZWFyY2gsQGNvZGVtaXJyb3Ivc3RhdGUsQGNvZGVtaXJyb3Ivdmlldw/dist/index.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517182,
+    "nanos_since_epoch": 712113562
+  }
+}

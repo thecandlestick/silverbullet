@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "cf-ray": "7c3ead8f5b1f0ca8-EWR",
+    "access-control-allow-origin": "*",
+    "last-modified": "Mon, 08 May 2023 03:39:46 GMT",
+    "content-type": "application/typescript; charset=utf-8",
+    "content-length": "155",
+    "server": "cloudflare",
+    "cf-cache-status": "HIT",
+    "vary": "Origin, Accept-Encoding",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "cache-control": "public, max-age=31536000, immutable",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=WAWUkA4N6Njbpz%2FpuIz9Y9aBIK9TajxfmO%2Fx%2FbYXPLaAmkPEd4JFenM7%2F%2Bubl85KMarHp31jfxEhu%2F%2B8bR%2BP%2FCH5%2B%2FQ8amHSODQ06GOPd11xrhItKJrKYhU%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "x-content-source": "r2",
+    "accept-ranges": "bytes",
+    "access-control-allow-methods": "*",
+    "date": "Mon, 08 May 2023 03:39:51 GMT",
+    "age": "5"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/truck.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517199,
+    "nanos_since_epoch": 189059860
+  }
+}

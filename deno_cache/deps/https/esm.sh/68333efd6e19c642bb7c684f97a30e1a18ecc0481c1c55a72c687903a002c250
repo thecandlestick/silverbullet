@@ -1,0 +1,2 @@
+/* esm.sh - @lezer/javascript@1.4.1 */
+export * from "https://esm.sh/v119/@lezer/javascript@1.4.1/X-ZS9AY29kZW1pcnJvci9sYW5ndWFnZSxAbGV6ZXIvY29tbW9uLEBsZXplci9oaWdobGlnaHQ/deno/javascript.mjs";

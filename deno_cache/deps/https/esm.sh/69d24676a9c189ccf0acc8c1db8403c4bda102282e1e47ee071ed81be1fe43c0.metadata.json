@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "age": "711",
+    "vary": "Origin, Accept-Encoding",
+    "date": "Mon, 08 May 2023 03:39:36 GMT",
+    "server": "cloudflare",
+    "last-modified": "Mon, 08 May 2023 03:27:45 GMT",
+    "cf-ray": "7c3ead2e0834443e-EWR",
+    "accept-ranges": "bytes",
+    "content-length": "702",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=5SCzxrsSvQEptMFiRn5IhTUXFGjqq%2BgjEKhpHi4Uj5in49VKlRioudT2l4thO0xcfc%2BsS3ExklavIZzy%2FGlv%2BnipX044D3VDfT7R5dptUhF8R5Xe7tGXpok%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "access-control-allow-origin": "*",
+    "x-content-source": "r2",
+    "content-type": "application/typescript; charset=utf-8",
+    "cf-cache-status": "HIT",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "cache-control": "public, max-age=31536000, immutable",
+    "access-control-allow-methods": "*"
+  },
+  "url": "https://esm.sh/v119/@capacitor/core@4.6.2/types/legacy/legacy-definitions.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517176,
+    "nanos_since_epoch": 132915603
+  }
+}

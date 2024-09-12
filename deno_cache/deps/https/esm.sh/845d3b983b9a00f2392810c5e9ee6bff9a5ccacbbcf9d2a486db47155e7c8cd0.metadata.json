@@ -1,0 +1,22 @@
+{
+  "headers": {
+    "content-length": "159",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "vary": "Origin, Accept-Encoding",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=Sxm8YQNWB6sF7M7HkPr7hlIVRdBUuJKUmJN8H4GQxKWVl7rqqQP%2FNdeapUainHGqXf9NLjmr68%2B%2BTrNEV4eNS0ScknW13Bl6nAPYTumMAdEuoogdwVt6UK4%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "access-control-allow-origin": "*",
+    "x-content-source": "r2",
+    "server": "cloudflare",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "access-control-allow-methods": "*",
+    "content-type": "application/typescript; charset=utf-8",
+    "cache-control": "public, max-age=31536000, immutable",
+    "cf-ray": "7c3ead68abd10ca8-EWR",
+    "date": "Mon, 08 May 2023 03:39:46 GMT"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/crosshair.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517195,
+    "nanos_since_epoch": 953251427
+  }
+}

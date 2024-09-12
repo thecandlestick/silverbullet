@@ -1,0 +1,24 @@
+{
+  "headers": {
+    "cache-control": "public, max-age=31536000, immutable",
+    "age": "711",
+    "access-control-allow-methods": "*",
+    "x-content-source": "workers-kv",
+    "last-modified": "Mon, 08 May 2023 03:27:45 GMT",
+    "cf-cache-status": "HIT",
+    "cf-ray": "7c3ead2ed97e443e-EWR",
+    "server": "cloudflare",
+    "access-control-allow-origin": "*",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "date": "Mon, 08 May 2023 03:39:36 GMT",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=0v7zmN%2B7XzG65c1vxchq4GfxvYrdXpsUBlm%2BLJKkjtTNYRQLxW0kBZGGQX01YTDfkZmwV2%2BFpi1iiXbhQeWC8tXFtkLQ7mVbmEsXclqMv23wW9clwBmWTNY%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "content-type": "application/javascript; charset=utf-8",
+    "vary": "Origin, Accept-Encoding",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400"
+  },
+  "url": "https://esm.sh/v119/@codemirror/lint@6.1.1/X-ZS9AY29kZW1pcnJvci9zdGF0ZSxAbGV6ZXIvY29tbW9u/deno/lint.mjs",
+  "now": {
+    "secs_since_epoch": 1683517176,
+    "nanos_since_epoch": 220185585
+  }
+}

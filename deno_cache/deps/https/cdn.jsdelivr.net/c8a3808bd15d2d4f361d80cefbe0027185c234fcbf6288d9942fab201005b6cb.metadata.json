@@ -1,0 +1,27 @@
+{
+  "headers": {
+    "x-jsd-version-type": "version",
+    "alt-svc": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400",
+    "x-jsd-version": "4.4.1",
+    "x-content-type-options": "nosniff",
+    "timing-allow-origin": "*",
+    "age": "31774",
+    "vary": "Accept-Encoding",
+    "x-cache": "HIT, MISS",
+    "cross-origin-resource-policy": "cross-origin",
+    "access-control-expose-headers": "*",
+    "access-control-allow-origin": "*",
+    "etag": "W/\"13a2-qKBjBPlwVqCnlUOpjS971O4pMzg\"",
+    "cache-control": "public, max-age=604800, s-maxage=43200",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "date": "Mon, 08 May 2023 03:39:41 GMT",
+    "x-served-by": "cache-fra-eddf8230037-FRA, cache-ewr18166-EWR",
+    "accept-ranges": "bytes",
+    "content-type": "application/javascript; charset=utf-8"
+  },
+  "url": "https://cdn.jsdelivr.net/gh/hexagon/croner@4/src/tz.js",
+  "now": {
+    "secs_since_epoch": 1683517182,
+    "nanos_since_epoch": 669108584
+  }
+}

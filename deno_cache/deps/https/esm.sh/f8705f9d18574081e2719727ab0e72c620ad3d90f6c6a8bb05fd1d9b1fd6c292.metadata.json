@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "cf-cache-status": "HIT",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=IqhCYlX8QSWMpo7y5j0nEDrG5w6ftiS0mkfNfuOwnRs9Wj8tJdqWZ1W75kkKi1U8mTyLqHgxN0EUxOK3TdzDjQ9yO3ohm7IBZycaGETsrFySU6OJt4baIps%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "cf-ray": "7c3ead26cef0443e-EWR",
+    "cache-control": "public, max-age=31536000, immutable",
+    "access-control-allow-origin": "*",
+    "vary": "Origin, Accept-Encoding",
+    "access-control-allow-methods": "*",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "content-type": "application/typescript; charset=utf-8",
+    "content-length": "183",
+    "accept-ranges": "bytes",
+    "x-content-source": "r2",
+    "last-modified": "Mon, 08 May 2023 03:27:42 GMT",
+    "server": "cloudflare",
+    "date": "Mon, 08 May 2023 03:39:34 GMT",
+    "age": "712"
+  },
+  "url": "https://esm.sh/v119/@capacitor-community/sqlite@4.6.0/X-ZS9AY2FwYWNpdG9yL2NvcmU/dist/esm/index.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517174,
+    "nanos_since_epoch": 891265235
+  }
+}

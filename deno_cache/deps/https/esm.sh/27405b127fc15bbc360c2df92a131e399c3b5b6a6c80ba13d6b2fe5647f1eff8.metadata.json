@@ -1,0 +1,22 @@
+{
+  "headers": {
+    "content-type": "application/typescript; charset=utf-8",
+    "date": "Mon, 08 May 2023 03:39:46 GMT",
+    "vary": "Origin, Accept-Encoding",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=Wd4fe%2Fz70G2TVy7NeQPYDExurccEIZoiMSX5CMIX%2FMVUV2bE2Ad%2BhyNlEANUTlfou7T3QkMIJ6ffe4eiDoj8jXE4Z2AurfBGpRsJVTSFnGg%2FJp4HVtFQ%2B7M%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "access-control-allow-methods": "*",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "x-content-source": "r2",
+    "cache-control": "public, max-age=31536000, immutable",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "server": "cloudflare",
+    "cf-ray": "7c3ead68aba70ca8-EWR",
+    "access-control-allow-origin": "*",
+    "content-length": "159"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/cloud-rain.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517194,
+    "nanos_since_epoch": 895220427
+  }
+}

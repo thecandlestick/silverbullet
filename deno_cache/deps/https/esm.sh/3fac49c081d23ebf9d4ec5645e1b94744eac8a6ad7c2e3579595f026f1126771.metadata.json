@@ -1,0 +1,24 @@
+{
+  "headers": {
+    "server": "cloudflare",
+    "date": "Mon, 08 May 2023 03:39:59 GMT",
+    "age": "721",
+    "access-control-allow-methods": "*",
+    "content-type": "application/javascript; charset=utf-8",
+    "cf-cache-status": "HIT",
+    "last-modified": "Mon, 08 May 2023 03:27:58 GMT",
+    "cache-control": "public, max-age=31536000, immutable",
+    "access-control-allow-origin": "*",
+    "cf-ray": "7c3eadbec949428b-EWR",
+    "vary": "Origin, Accept-Encoding",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=LrF80cU%2BZJay6hdxc7jfJBJYu58R%2ByUyzubYbYt7MC7%2B6KTtrYQDdPVkH59kw70a2tgT7D1%2FIQLnOpijkB%2F7IX%2B8oaszDONVITa%2FALEr4OIpo%2FG0r0PkkbQ%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "x-content-source": "workers-kv"
+  },
+  "url": "https://esm.sh/v119/y-protocols@1.0.5/X-ZS95anM/deno/auth.js",
+  "now": {
+    "secs_since_epoch": 1683517203,
+    "nanos_since_epoch": 373065010
+  }
+}

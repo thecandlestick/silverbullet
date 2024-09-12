@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "age": "6",
+    "server": "cloudflare",
+    "accept-ranges": "bytes",
+    "cf-cache-status": "HIT",
+    "access-control-allow-origin": "*",
+    "report-to": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=0lrQUNYke5X6PBleFM6xyKxqn%2Bp%2BYDuPc%2BI3C2PMFduSxAVn2KC1k0K3ql61knDgB3ZnqVLvJwZUD7G8CY%2BRFvNTx6flqFRFmm0LE%2FEEHrdfDylvKvBEM1c%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+    "nel": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+    "content-length": "155",
+    "cf-ray": "7c3ead8f5aff0ca8-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400",
+    "x-content-source": "r2",
+    "content-type": "application/typescript; charset=utf-8",
+    "cache-control": "public, max-age=31536000, immutable",
+    "last-modified": "Mon, 08 May 2023 03:39:45 GMT",
+    "access-control-allow-methods": "*",
+    "date": "Mon, 08 May 2023 03:39:51 GMT",
+    "vary": "Origin, Accept-Encoding"
+  },
+  "url": "https://esm.sh/v119/preact-feather@4.2.1/X-ZS9wcmVhY3Q/dist/icons/slack.d.ts",
+  "now": {
+    "secs_since_epoch": 1683517199,
+    "nanos_since_epoch": 106705933
+  }
+}

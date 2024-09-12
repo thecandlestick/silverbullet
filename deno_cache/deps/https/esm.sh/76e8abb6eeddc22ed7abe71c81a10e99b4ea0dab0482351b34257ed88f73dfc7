@@ -1,2 +1,0 @@
-/* esm.sh - y-websocket@1.4.5 */
-export * from "https://esm.sh/v119/y-websocket@1.4.5/X-ZS95anM/deno/y-websocket.mjs";

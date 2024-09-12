@@ -1,3 +1,0 @@
-/* esm.sh - esbuild bundle(lib0@0.2.74/observable) deno production */
-var o=()=>new Map;var n=(s,e,r)=>{let t=s.get(e);return t===void 0&&s.set(e,t=r()),t};var c=()=>new Set;var f=Array.from;var x=Array.isArray;var a=class{constructor(){this._observers=o()}on(e,r){n(this._observers,e,c).add(r)}once(e,r){let t=(...p)=>{this.off(e,t),r(...p)};this.on(e,t)}off(e,r){let t=this._observers.get(e);t!==void 0&&(t.delete(r),t.size===0&&this._observers.delete(e))}emit(e,r){return f((this._observers.get(e)||o()).values()).forEach(t=>t(...r))}destroy(){this._observers=o()}};export{a as Observable};
-//# sourceMappingURL=observable.js.map

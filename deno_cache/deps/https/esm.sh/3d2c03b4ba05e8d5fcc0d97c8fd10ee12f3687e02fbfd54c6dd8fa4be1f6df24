@@ -1,2 +1,0 @@
-/* esm.sh - preact@10.11.3/src */
-export * from "https://esm.sh/stable/preact@10.11.3/deno/src.js";

@@ -1,3 +1,0 @@
-/* esm.sh - fuzzysort@2.0.1 */
-export * from "https://esm.sh/v119/fuzzysort@2.0.1/deno/fuzzysort.mjs";
-export { default } from "https://esm.sh/v119/fuzzysort@2.0.1/deno/fuzzysort.mjs";

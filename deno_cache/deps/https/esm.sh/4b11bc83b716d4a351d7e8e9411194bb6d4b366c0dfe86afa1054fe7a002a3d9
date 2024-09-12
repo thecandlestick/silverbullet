@@ -1,2 +1,0 @@
-/* esm.sh - @lezer/highlight@1.1.3 */
-export * from "https://esm.sh/v119/@lezer/highlight@1.1.3/X-ZS9AbGV6ZXIvY29tbW9u/deno/highlight.mjs";

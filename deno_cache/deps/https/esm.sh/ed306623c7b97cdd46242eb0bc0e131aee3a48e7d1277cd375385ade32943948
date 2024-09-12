@@ -1,5 +1,0 @@
-import { JSX } from 'https://esm.sh/v99/preact@10.11.3/src/index.d.ts';
-export interface FeatherProps extends JSX.SVGAttributes<SVGSVGElement> {
-    color?: string;
-    size?: number;
-}

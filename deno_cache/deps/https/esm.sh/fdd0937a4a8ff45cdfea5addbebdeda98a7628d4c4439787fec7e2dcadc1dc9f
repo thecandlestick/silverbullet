@@ -1,3 +1,0 @@
-/* esm.sh - esbuild bundle(lib0@0.2.74/url) deno production */
-var p=(t,o)=>{let e=[];for(let n in t)e.push(o(t[n],n));return e};var u=t=>{let o={},e=t.split("?"),n=e[e.length-1].split("&");for(let r=0;r<n.length;r++){let s=n[r];if(s.length>0){let c=s.split("=");o[decodeURIComponent(c[0])]=decodeURIComponent(c[1]||"")}}return o},l=t=>p(t,(o,e)=>`${encodeURIComponent(e)}=${encodeURIComponent(o)}`).join("&");export{u as decodeQueryParams,l as encodeQueryParams};
-//# sourceMappingURL=url.js.map

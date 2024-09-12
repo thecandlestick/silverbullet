@@ -1,3 +1,0 @@
-import { FunctionalComponent } from 'preact';
-import { FeatherProps } from '../types.d.ts';
-export declare const Trash2: FunctionalComponent<FeatherProps>;

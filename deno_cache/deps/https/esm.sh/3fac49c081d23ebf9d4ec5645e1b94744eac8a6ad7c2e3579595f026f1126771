@@ -1,3 +1,0 @@
-/* esm.sh - esbuild bundle(y-protocols@1.0.5/auth) deno production */
-import"yjs";import*as e from"/v119/lib0@0.2.74/X-ZS95anM/deno/encoding.js";import*as r from"/v119/lib0@0.2.74/X-ZS95anM/deno/decoding.js";var o=0,a=(i,n)=>{e.writeVarUint(i,o),e.writeVarString(i,n)},d=(i,n,t)=>{switch(r.readVarUint(i)){case o:t(n,r.readVarString(i))}};export{o as messagePermissionDenied,d as readAuthMessage,a as writePermissionDenied};
-//# sourceMappingURL=auth.js.map

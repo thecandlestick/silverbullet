@@ -1,2 +1,0 @@
-/* esm.sh - @codemirror/language@6.6.0 */
-export * from "https://esm.sh/v119/@codemirror/language@6.6.0/X-ZS9AY29kZW1pcnJvci9zdGF0ZSxAY29kZW1pcnJvci92aWV3LEBsZXplci9jb21tb24sQGxlemVyL2hpZ2hsaWdodCxAbGV6ZXIvbHI/deno/language.mjs";

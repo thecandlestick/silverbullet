@@ -1,5 +1,0 @@
-export function patchDenoLibJS(code) {
-    // The Deno std lib has one occurence of a regex that Webkit JS doesn't (yet parse), we'll strip it because it's likely never invoked anyway, YOLO
-    return code.replaceAll("/(?<=\\n)/", "/()/");
-}
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImZpbGU6Ly8vaG9tZS9qYWNrL215c2lsdmVyYnVsbGV0L3BsdWdvcy9oYWNrLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCBmdW5jdGlvbiBwYXRjaERlbm9MaWJKUyhjb2RlOiBzdHJpbmcpOiBzdHJpbmcge1xuICAvLyBUaGUgRGVubyBzdGQgbGliIGhhcyBvbmUgb2NjdXJlbmNlIG9mIGEgcmVnZXggdGhhdCBXZWJraXQgSlMgZG9lc24ndCAoeWV0IHBhcnNlKSwgd2UnbGwgc3RyaXAgaXQgYmVjYXVzZSBpdCdzIGxpa2VseSBuZXZlciBpbnZva2VkIGFueXdheSwgWU9MT1xuICByZXR1cm4gY29kZS5yZXBsYWNlQWxsKFwiLyg/PD1cXFxcbikvXCIsIFwiLygpL1wiKTtcbn1cbiJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLFNBQVMsZUFBZSxJQUFZLEVBQVU7SUFDbkQsa0pBQWtKO0lBQ2xKLE9BQU8sS0FBSyxVQUFVLENBQUMsY0FBYztBQUN2QyxDQUFDIn0=

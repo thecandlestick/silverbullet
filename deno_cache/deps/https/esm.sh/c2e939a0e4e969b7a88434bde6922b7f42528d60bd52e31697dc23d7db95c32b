@@ -1,2 +1,0 @@
-/* esm.sh - nanoid@4.0.0 */
-export * from "https://esm.sh/v119/nanoid@4.0.0/deno/nanoid.mjs";

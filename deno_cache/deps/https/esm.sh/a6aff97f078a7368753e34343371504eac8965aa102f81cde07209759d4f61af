@@ -1,2 +1,0 @@
-/* esm.sh - preact-feather@4.2.1/dist/types */
-export * from "https://esm.sh/v99/preact-feather@4.2.1/deno/dist/types.js";

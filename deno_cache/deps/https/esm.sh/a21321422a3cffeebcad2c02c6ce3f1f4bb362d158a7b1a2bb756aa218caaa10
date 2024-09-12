@@ -1,2 +1,0 @@
-/* esm.sh - y-codemirror.next@0.3.2 */
-export * from "https://esm.sh/v119/y-codemirror.next@0.3.2/X-ZS9AY29kZW1pcnJvci9jb21tYW5kcyxAY29kZW1pcnJvci9oaXN0b3J5LEBjb2RlbWlycm9yL3N0YXRlLEBjb2RlbWlycm9yL3ZpZXcseWpz/deno/y-codemirror.next.mjs";

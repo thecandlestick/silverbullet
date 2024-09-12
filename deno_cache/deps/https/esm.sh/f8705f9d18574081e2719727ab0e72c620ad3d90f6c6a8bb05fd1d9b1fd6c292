@@ -1,4 +1,0 @@
-import type { CapacitorSQLitePlugin } from './definitions.d.ts';
-declare const CapacitorSQLite: CapacitorSQLitePlugin;
-export { CapacitorSQLite };
-export * from './definitions.d.ts';

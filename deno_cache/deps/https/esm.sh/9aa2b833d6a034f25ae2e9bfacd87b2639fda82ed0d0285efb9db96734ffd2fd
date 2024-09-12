@@ -1,2 +1,0 @@
-/* esm.sh - @replit/codemirror-vim@6.0.4 */
-export * from "https://esm.sh/v119/@replit/codemirror-vim@6.0.4/X-ZS9AY29kZW1pcnJvci9jb21tYW5kcyxAY29kZW1pcnJvci9sYW5ndWFnZSxAY29kZW1pcnJvci9zZWFyY2gsQGNvZGVtaXJyb3Ivc3RhdGUsQGNvZGVtaXJyb3Ivdmlldw/deno/codemirror-vim.mjs";

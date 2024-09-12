@@ -1,3 +1,0 @@
-/* esm.sh - esbuild bundle(lib0@0.2.74/mutex) deno production */
-var n=()=>{let e=!0;return(r,t)=>{if(e){e=!1;try{r()}finally{e=!0}}else t!==void 0&&t()}};export{n as createMutex};
-//# sourceMappingURL=mutex.js.map

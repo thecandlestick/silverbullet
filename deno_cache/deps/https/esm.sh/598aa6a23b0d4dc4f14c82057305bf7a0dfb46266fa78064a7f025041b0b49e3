@@ -1,2 +1,0 @@
-/* esm.sh - @codemirror/search@6.2.3 */
-export * from "https://esm.sh/v119/@codemirror/search@6.2.3/X-ZS9AY29kZW1pcnJvci9zdGF0ZSxAY29kZW1pcnJvci92aWV3/deno/search.mjs";

@@ -1,3 +1,0 @@
-/* esm.sh - esbuild bundle(lib0@0.2.74/promise) deno production */
-var o=Date.now;var s=t=>new Promise(t),x=t=>new Promise(t),p=t=>Promise.all(t),h=t=>Promise.reject(t),u=t=>Promise.resolve(t),v=t=>Promise.resolve(t),P=(t,e,r=10)=>s((i,m)=>{let a=o(),c=t>0,n=setInterval(()=>{e()?(clearInterval(n),i()):c&&o()-a>t&&(clearInterval(n),m(new Error("Timeout")))},r)}),T=t=>s((e,r)=>setTimeout(e,t)),w=t=>t instanceof Promise||t&&t.then&&t.catch&&t.finally;export{p as all,s as create,x as createEmpty,w as isPromise,h as reject,u as resolve,v as resolveWith,P as until,T as wait};
-//# sourceMappingURL=promise.js.map

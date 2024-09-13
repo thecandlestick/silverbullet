@@ -13,7 +13,7 @@
 
 * [x] cpp-review
 * [x] pointers
-* [ ] oop
+* [x] oop
 * [ ] inheritance
 * [ ] polymorphism
 * [ ] exception-handling

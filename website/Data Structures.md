@@ -46,7 +46,7 @@ We have to make concessions and consider the trade-offs between different data s
 
 Does this all sound kinda complicated? It can be, but don’t worry! Building efficient programs takes practice, but it can be done if you follow these tried-and-true steps to programming success:
 
-**Fore! 🏌️ For-malize the problem, that is!** We need a formal, mathematical representation of the problem at hand. This often means stripping away all unnecessary details until we’re left with only the most essential characteristics.
+**Fore! 🏌️ For-malize the problem, that is!** We need a formal representation of the problem at hand. This often means stripping away all unnecessary details until we’re left with only the most essential characteristics.
 
 **Hut-hu- 🏈 High-level algorithms come next!** Don’t get too caught up in specifics just yet, a high-level algorithm describes the steps to take in plain English. It’s here that you can start to think about what kind of operations will be needed, which leads naturally into selecting an appropriate ADT.
 

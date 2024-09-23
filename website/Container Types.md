@@ -261,3 +261,17 @@ Container types can be used to store other container types! When using nested co
   'sneak-step' : True}
 ]
 ```
+
+## Constructors
+
+#Definition a _constructor_ is a special function that is used to create a particular type of object
+
+* int(_value_) - can accept integers, strings, or floats for _value_
+* float(_value_)
+* str(_value_) - creates a string representation of _value_
+* list(_container_) - creates list with items from _container_
+* tuple(_container_)
+* set(_container_) - creates set from _container_ (duplicates discarded)
+* dict(_container_) - elements of _container_ must be pairs (key, value)
+
+The parameters to these constructors are optional, a default value or empty container will be created if you don’t supply an argument.

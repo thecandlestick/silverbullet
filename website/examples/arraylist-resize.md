@@ -12,6 +12,7 @@ void ArrayList<T>::reserve(int new_max_elems)
   delete [] data;
   //Redirect data pointer
   data = temp;
+  temp = nullptr;
   //Update capacity
   max_elems = new_max_elems;
 }

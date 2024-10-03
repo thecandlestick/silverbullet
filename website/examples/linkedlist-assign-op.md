@@ -1,6 +1,6 @@
 ```c++
 template <typename T>
-const LinkedList<T>& operator=( const LinkedList<T> &rhs )
+LinkedList<T>& operator=( const LinkedList<T> &rhs )
 {
   clear(); //start by emptying list
   ListNode<T>* pos_ptr = head;
@@ -9,6 +9,7 @@ const LinkedList<T>& operator=( const LinkedList<T> &rhs )
   {
     insert(pos_ptr, data_ptr->data);
     pos_ptr = pos_ptr -> next;
+    //pos_ptr = (*pos_ptr).next;
     data_ptr = data_ptr -> next;
   }
 

@@ -9,6 +9,6 @@ ListNode<T>* find( const T& value )
       return runner;
     runner = runner -> next;
   }
-  return nullptr;
+  return nullptr; // value was not found
 }
 ```

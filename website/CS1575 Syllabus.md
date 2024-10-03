@@ -70,7 +70,7 @@ Your assignments in this course will be graded by an open-source autograding too
 
 ## Helpful Stuff
 
-**LEAD Session:** TBA
+**LEAD Session:** _Monday/Wednesday/Friday_ at **5-6pm** in **CS209**
 
 [[Assignment Tutorial]]
 

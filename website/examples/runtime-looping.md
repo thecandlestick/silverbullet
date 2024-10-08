@@ -1,3 +1,5 @@
+When analyzing code involving loops, it can be helpful to first calculate the cost of a single iteration
+
 ```c++
 template <typename T>
 bool ArrayList<T>::find( const T &value )
@@ -11,10 +13,10 @@ bool ArrayList<T>::find( const T &value )
 }
 ```
 
-let n be num_elements
+let n be num_elems
 
-RTF : Init + Σ(Body + Test + Advance) = ?
-RTF : 1 + num_elements(2 + 1 + 1) = 4n + 1
+RTF : Init + Σ(Body + Test + Advance) = 1 + num_elems(1 + 1 + 2)
+RTF : ==4n + 1==
 
 
 
@@ -22,8 +24,8 @@ RTF : 1 + num_elements(2 + 1 + 1) = 4n + 1
 template <typename T>
 ListNode<T>* LinkedList<T>::find( const T& value )
 {
-  ListNode<T> *p = head; // 1 op
-  while( p -> next != nullptr )  // Test
+  ListNode<T> *p = head; // 1
+  while( p -> next != nullptr )  // Test (2 ops)
   {  // Loop Body
     if (value == p -> data ) // 2 ops
       return p;
@@ -33,27 +35,28 @@ ListNode<T>* LinkedList<T>::find( const T& value )
 }
 ```
 
-let n = num_elements
+let n be num_elems
 
 RTF : 1 + Σ(Body + Test) 
-RTF : 1 + num_elements(4 + 2) = 6n + 1
+RTF : 1 + num_elems(2 + 4) = ==6n + 1==
 
 
+Nested loops should be analyzed “from the inside to the outside”
 
 ```c++
 int sum_sqrm(int a**, int n)  // return sum of n-by-n matrix
 {
-  int sum = 0; // 1 op
+  int sum = 0; // 1
   for (int k= 0; k < n; k++) // Outer Loop
   {
     for(int j=0; j < n; j++) // Inner Loop
-      sum += a[k][j]; // 3 ops
+      sum += a[k][j]; // ?
   }
   return sum;
 }
 ```
 
-Cost of Inner : 1 + n(3 + 1 + 1) = 5n + 1
-Cost of Outer : 1 + n(5n + 1 + 1 + 1) = 5n^2 + 3n + 1
+Cost of Inner : 1 + n(1 + 1 + 4) = 6n + 1
+Cost of Outer : 1 + n(1 + 1 + 6n+1) = 6n^2 + 3n + 1
 
-RTF : 5n^2 + 3n + 2
+RTF : ==6n^2 + 3n + 2==

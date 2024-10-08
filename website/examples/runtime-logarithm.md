@@ -21,12 +21,21 @@ bool binarySearch(int A*, int n, int x) //find x in array A of size n
 }
 ```
 
+one iteration: 11 ops
+
 How many times will the while loop iterate in terms of n?
 
 let n be length of array
 
-n = 16 -> 8 -> 4 -> 2 -> 1 -> Done
+n = 16 -> 8 -> 4 -> 2 -> 1 :: Done
 
 2^4 -> 2^3 -> 2^2 -> 2^1 -> 2^0
 
-RTF: 3 + (11)lg(n)
+
+2^x = n
+
+log_2(n) = x
+
+lg(n)
+
+RTF: ==11*lg(n) + 3==

@@ -155,7 +155,7 @@ c = range(5, 15, 3) # c = [5, 8, 11, 14]
 
 * **range(_stop_)** - generates list from 0 to _stop_-1
 * **range(_start,stop_)** - generates list from _start_ to _stop-1_
-* **range (_start,stop,step_)** - generates list beginning at _start_, adding _step_ each time, and ending before _stop_
+* **range(_start,stop,step_)** - generates list beginning at _start_, adding _step_ each time, and ending before _stop_
 
 _example:_
 How many even numbers between 0 and 10,000 are divisible by 7 and 11?
@@ -208,5 +208,27 @@ _for_ loops are best used when you know ==exactly how many times the code should
   **example:** summing the elements of a collection
 
 
+## More Loop Examples
 
+  **_General coding advice_**:
+
+For any coding challenge, the first thing you should do is _carefully_ read and understand the instructions. The specifications are specific!
+
+  - Don’t move on if the instructions are confusing! Look at any provided examples or notes, or ask your instructor for clarification
+
+The second step is to consider how you would solve the problem _yourself_ (manually, without concern for how long it would take).
+
+  * Try writing down your solution in English, you’re much more likely to spot a problem with the logic that way
+  * Practice your method on a small example to verify it works
+  * Always brainstorm “edge cases” that could stump your solution
+  
+The third step is then to describe the process to the computer in the language of python
+
+  * Do not wait until the program is finished to test it! You’ll save time by testing each step of your solution as you write it
+
+**Problem:** _Count how many vowels in a string_
+
+**Problem:** _Given integer n, generate a list of n random integers in the range of 0 to 1,000_
+
+**Problem:** _Given a list of 10 <= n <= 100 random integers in the range 0 to 1,000, find and print the largest number in the list that is divisible by 7. If no such number exists, print ‘no multiples of 7’_
 

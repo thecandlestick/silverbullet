@@ -75,6 +75,16 @@ int main()
 
 Each function (main, foo, bar) has its own scope and local variable that should only be accessible from inside that function. Execution will need to jump between these scopes several times, how might you use a stack to manage this?
 
+---
+
+![](img/call-stack.png)
+
+---
+![](img/variable-lifecycle.png)
+
+---
+
+
 Every time a function call is made, a **stack frame** is created to preserve the current state of the program. This stack frame is pushed to the top of the call stack, containing information such as local variables as a return address to where code execution should resume. 
 
 Every time a function returns, the top of the call stack is popped. The return address is followed to where execution left off, and local variables are restored.

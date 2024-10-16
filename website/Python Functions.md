@@ -220,3 +220,41 @@ append_list(myString, 'z') # Error: strings can't append
 
 These errors only appear after the code has already tried to run and crashed. This is because Python is **weakly typed** (or **dynamically typed**). **Strongly typed** languages can catch these problems before running
 
+_Note:_ Python does support **type-hinting** to replicate the benefits of a strongly-typed language
+
+* https://docs.python.org/3/library/typing.html
+* https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html
+
+
+## Documenting Functions
+
+It’s standard practice to use comments to document what your code is doing and why. This is especially important for functions
+
+```python
+def combine(a, b):
+  """
+  This function combines the values of two variables
+  Arguments:
+    - a: any valid type
+    - b: same type as a
+  Return:
+    - None
+  Preconditions: 
+    - a, b should be compatible for + and =
+  Postconditions:
+    - a and b will be modified based on their values
+    - the combined values will be printed after assignment
+  """
+  a += b
+  b = a
+  print('A:', a ,'B:', b)
+  
+```
+
+It’s typical to include information on:
+
+- **Purpose** of the function
+- **Return** value of the function
+- **Arguments** passed to the function
+- **Preconditions**, or what assumptions are needed for the function to work properly
+- **Postconditions**, or what effects and changes the function will produce

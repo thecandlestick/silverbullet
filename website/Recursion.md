@@ -21,7 +21,7 @@ While this is true of all natural numbers, the crowd still won’t be satisfied 
 
 You finally decide to use a **recursive definition**:
   * 1 is a natural number
-  * _n_ is a natural number if and only if _n-1_ is a natural number
+  * _n > 1_ is a natural number if and only if _n-1_ is a natural number
 And the mathematicians nod in approval
 
 _Recursion_ is a means of defining something in terms of itself.
@@ -84,8 +84,8 @@ int factorial(int n)
 
 We can also think of execution with some helpful rules-of-thumb:
 
-* Code _before_ a recursive call will resolve before anything else
-* Code _after_ a recursive call will resolve only **after all recursive calls** have returned. This means that the return statement of the _initial_ call is actually be the _last_ to be executed.
+* Code _before_ a recursive call will resolve immediately
+* Code _after_ a recursive call will resolve only **after all subsequent recursive calls** have returned. This means that the return statement of the _initial_ call is actually be the _last_ to be executed.
 
 #KnowledgeCheck Trace the execution of recursive_pow(2,65), how many total multiplications occur across all recursive calls? (do not try to calculate the value, just count the number of * operations)
 
@@ -179,6 +179,26 @@ int fib(int i) // return the i-th Fibonacci number
 
 However, those programmers (hopefully) then come to learn that this algorithm is horribly inefficient and are taught a much better iterative algorithm to use instead.
 
+```c++
+int better_fib(int i) // return the i-th Fibonacci number
+{
+  int fib_i_minus_one = 1
+  int fib_i_minus_two = 1 // setting up the sequence
+  
+  int fib_i = 1;
+  for(int k = 2; k < i; k++)
+  {
+    // calculate next-in-sequence
+    fib_i = fib_i_minus_one + fib_i_minus_two
+    
+    // Prepare for next iteration
+    fib_i_minus_two = fib_i_minus_one;
+    fib_i_minus_one = fib_i;
+  }
+}
+```
+
+
 So what gives? Why is something so quintessentially recursive in nature such a bad candidate for a recursive algorithm?
 * **Are all recursive algorithms _horribly inefficient_?** (no)
 * **Should we always try to use iteration instead?** (not necessarily)
@@ -191,36 +211,36 @@ fib(6) makes a call to fib(5), then a call to fib(4). However, the 4th Fibonacci
 ![](img%2Ffib.png)
 This wasteful re-calculation very quickly gets out of hand, and it’s why a _bottom-up_ approach like the iterative algorithm is the correct choice.
 
-Note that there is a technique in the field of _Dynamic Programming_ for tackling this problem of redundant sub-problems known as _memoization_, but it is beyond the scope of this course.
-
-
-
 ## Recursion is looping, looping is Recursion
 
 It may not come as a surprise that iteration and recursion are often two sides of the same coin. After all, loops in C++ can be thought of as shorthand for recursive functions.
 
 ```c++
-for( init ; test ; update )
+// Generic For-Loop
+for( init ; test ; advance )
 {
   body
 }
 
+// Recursive Equivalent
 void loop(i)
 {
   if (test(i) == false)
     return
 
   body(i)
-  loop(update(i))
+  loop(advance(i))
 }
 ```
 
 ```c++
+// Generic While-Loop
 while (test)
 {
   body
 }
 
+// Recursive Equivalent
 void loop()
 {
   if (test == false)
@@ -240,12 +260,16 @@ int fake_recursive_factorial(int n)
 {
   vector<int> stack;
   int result = 1;
-  while(n > 1)  // simulating recursive calls
+
+  // simulating recursive calls
+  while(n > 1)
   {
     stack.push_back(n);
     n--;
   }
-  while(!stack.empty()) // simulating those functions returning
+  
+  // simulating those functions returning
+  while(!stack.empty())
   {
     result *= stack.back();
     stack.pop_back();

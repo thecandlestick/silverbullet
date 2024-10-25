@@ -33,17 +33,15 @@ Can [[LinkedList]] operations efficiently implement _top_, _push_, and _pop_?
 
 
 
-* [ ] brileigh  📅2024-07-02 #cs1575EC
-
 **Top** O(1)
 
-return head -> data
+
 
 **Push** O(1)
 
-push_front(x)
+
 
 **Pop** O(1)
 
-pop_front()
+
 

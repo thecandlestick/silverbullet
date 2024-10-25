@@ -1,50 +1,44 @@
 ---
 tags:
   - template
-trigger: arrayqueue
+hooks.snippet.slashCommand: arrayqueue
 date: 2024-07-02T00:00:00.000Z
 ---
 
 Consider the following queue:
 
-  _front/head_ -> **< a0, a1, a2, ... , an >** <- _back/tail_
+ **< a0, a1, a2, ... , an >**
 
 Can [[ArrayList]] operations efficiently implement _front, enqueue, dequeue?_ 
 
-**Front** O(1)
+## Case 1 (sequence-order)
 
-return data[0];
+  _front_ -> **< a0, a1, a2, ... , an >** <- _back_
 
-**Enqueue** O(1)
+**Front** O(?)
 
-data[num_elems] = val
+**Enqueue** O(?)
 
-**Dequeue** O(n)
-
-shift data left
-
-_back/head_ -> **< a0, a1, a2, ... , an >** <- _front/tail_
-
-**Front** O(1)
-
-return data[num_elems-1];
-
-**Enqueue** O(n)
-
-shift data right
-
-**Dequeue** O(1)
-
-num_elems--;
+**Dequeue** O(?)
 
 
-* [ ] brileigh, raylynn, rae  📅2024-07-02 #cs1575EC
+## Case 2 (reverse sequence-order)
 
-How might we re-engineer the ArrayQueue to make all 3 operations into constant-time algorithms?
+  _back_ -> **< a0, a1, a2, ... , an >** <- _front_
 
-  _front / head_ -> **< a0, a1, a2, ... , an >** <- _back / tail_ 
+**Front** O(?)
 
-Offers quick enqueue operations, but dequeue requires shifting elements... _or does it..._ enter the _circular array_
+**Enqueue** O(?)
+
+**Dequeue** O(?)
+
+
+Either way requires shifting elements... _or does it..._ enter the _circular array_
+
+---
+
+## Circular Array
+
 
 [[examples/arrayqueue-class]]
 ```c++
@@ -53,14 +47,14 @@ template <typename T>
 class ArrayQueue
 {
   private:
-    int m_front;      // index-of start of valid data
-    int m_back;       // index-of next available space   
+    int front;      // index-of start of valid data
+    int back;       // index-of next available space   
     int max_elems;   // length of storage array
     int num_elems;       // # of valid data elements
     T *data;        // pointer to storage array
     void resize(int new_capacity);
   public:
-    ArrayList() : m_front (0), m_back (0), max_elems (MIN_CAPACITY) 
+    ArrayList() : front (0), back (0), max_elems (MIN_CAPACITY) 
                 { data = new T[max_elems]; } // default constructor
 
     //OPERATIONS

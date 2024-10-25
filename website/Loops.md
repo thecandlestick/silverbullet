@@ -226,9 +226,92 @@ The third step is then to describe the process to the computer in the language o
 
   * Do not wait until the program is finished to test it! You’ll save time by testing each step of your solution as you write it
 
+
+
 **Problem:** _Count how many vowels in a string_
 
 **Problem:** _Given integer n, generate a list of n random integers in the range of 0 to 1,000_
 
+```
+n is number of random integers
+initialize an empty list
+repeat n times:
+  generate a random integer within range
+  append it to the list
+```
+
+
 **Problem:** _Given a list of 10 <= n <= 100 random integers in the range 0 to 1,000, find and print the largest number in the list that is divisible by 7. If no such number exists, print ‘no multiples of 7’_
 
+```
+initialize current largest multiple to -1
+for every item in list:
+  test if item is divisible by 7:
+    compare to current largest multiple
+    if item is larger, replace largest multiple with item
+
+if largest multiple < 0:
+  print('no multiples of 7')
+else:
+  print(largest multiple)
+```
+
+**Problem:** From a list of n random integers in the range 0 to 1,000, find and print the two consecutive numbers with the largest sum
+
+```
+initialize current best pair to (-1,-1)
+for i in range(n-1):
+  current_item = listN[i]
+  add current_item to next neighbor
+  compare sum to current best pair
+  if larger:
+    replace best pair with current_item and neighbor
+
+print(best pair)
+  
+```
+
+
+**Problem:** From a list of n random integers in the range 0 to 1,000, use loops to find and print the two numbers with the largest sum
+
+```
+find largest integer in the list
+
+go through elements of the list:
+  remember current largest
+
+remove the largest
+
+find the second integer in the list
+
+go through elements of the list:
+  remember current second largest
+
+print out largest and second largest
+```
+
+```
+initialize largest pair
+for every number i in list:
+  for every number j (beyond i) in the list:
+    sum i and j
+    remember the largest pair
+
+print largest pair
+```
+
+
+**Problem:** Given a positive integer n, print the first n prime numbers.
+
+```
+prime numbers:
+  - only divisible by themselves and 1
+  - must be greater than 1
+
+
+go through positive integers until n primes found:
+  test if prime:
+    increment a counter
+  go on to next integer
+
+```

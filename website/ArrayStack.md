@@ -30,17 +30,13 @@ Consider the following stack:
 Can [[ArrayList]] operations efficiently implement _top_, _push_, and _pop_? 
 
 ![ArrayList diagram](/img/arrlist-diagram.png)
-TOP: **O(1)**
+TOP: **O()**
 
-return data[num_elems -1]
 
-PUSH: **O(1)** *
 
-insert(x, num_elems -1)
+PUSH: **O()** 
 
-POP: **O(1)**
 
-erase(num_elems -1)
 
-* [ ] raylynn  📅2024-07-01 #cs1575EC
-* [ ] brileigh  📅2024-07-01 #cs1575EC
+POP: **O()**
+

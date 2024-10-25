@@ -5,7 +5,7 @@ hooks.snippet.slashCommand: linkedqueue
 
 Consider the following queue:
 
-  _front_ -> **< a0, a1, a2, ... , an >** <- back
+   **< a0, a1, a2, ... , an >** 
 
 Can [[LinkedList]] operations efficiently implement _front, enqueue, dequeue?_ 
 

@@ -258,3 +258,36 @@ It’s typical to include information on:
 - **Arguments** passed to the function
 - **Preconditions**, or what assumptions are needed for the function to work properly
 - **Postconditions**, or what effects and changes the function will produce
+
+## More Function Examples
+
+**Problem:** Suppose you take out a loan for **L** dollars at an interest rate of **IR**% applied monthly. If you make a payment of **P** dollars every month, how long will it take you to pay off the loan and how much will you end up paying in total? Make a function to perform this task.
+
+**draft:**
+```
+def loan_payments(loan_amount, interest_rate, payment):
+  ...
+
+initialize debt equal to loan_amount
+initialize total_payment to zero
+initialize total_months to zero
+
+check if interest is greater than payment:
+  print("warning, debt will never clear. Please increase monthly payment")
+  return the function
+
+loop while debt is greater than zero:
+  calculate how much much interest
+  increase debt by interest
+  decrease debt by payment
+  increase total_payment by payment
+  increase total_months by 1
+
+check if debt is negative: *dont even need a check
+  correct the overpayment
+
+return the total months and payments
+```
+
+
+_reminder: use f’{float_var:.2f}‘ for printing monetary values_

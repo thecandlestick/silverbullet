@@ -35,19 +35,19 @@ The primary benefit of designing data structures that maintain these properties 
 
 Finding a piece of data in a Binary Search Tree follows a straightforward recursive algorithm.
 
-```
+```py
 search(root, value):
   if root.data == value
     return success
 
   if root.data > value
-    if root.left-subtree exists  
-      return search(left-subtree, value)
+    if root.left_subtree exists  
+      return search(left_subtree, value)
     else
       return failure
 
-  if root.right-subtree exists
-    return search(right-subtree, value)
+  if root.right_subtree exists
+    return search(right_subtree, value)
   else
     return failure
 ```
@@ -62,11 +62,6 @@ Every subtree in a BST is a smaller but still valid BST, so at each level we con
 ---
 # The Efficiency of a BST
 
-What is the time complexity of this search algorithm? In other words, how many recursive calls will we have to make in the worst case scenario?
-
-* What determines the _Worst-Case_ scenario?
-* What kind of BST have an ideal _Worst-Case_ (for a size of n nodes)?
-
 ## Building a BST
 
 When thinking about using a BST for storing data, that BST of course needs to be built from an existing collection of data and grow as new data arrives. 
@@ -75,7 +70,17 @@ A useful thing to note is that given an existing BST and a value _x_, there is o
 
 A similar argument can be made for removal of nodes in a BST. We must first find where a given node is in the BST before we can remove it, making the cost also equal to the cost of search.
 
-## A Balanced Tree is a Happy Little Tree 🌲🖌️🧑🏻‍🎨
+
+## Efficiency of Search
+
+What is the time complexity of this search algorithm? In other words, how many recursive calls will we have to make in the worst case scenario?
+
+* What determines the _Worst-Case_ scenario?
+* What kind of BST have an ideal _Worst-Case_ (for a size of n nodes)?
+
+
+
+### A Balanced Tree is a Happy Little Tree 🌲🖌️🧑🏻‍🎨
 
 The height of our tree plays a key role in the efficiency of our operations, and the height of a tree is correlated with how _balanced_ it is (the difference in size of its sub-trees).
 
@@ -87,13 +92,13 @@ For a _perfect_ BST like the one above, the cost of search is
 O(height) = O(?), where n is the number of nodes.
 
 ---
-#Theorem for a full binary tree
+#Theorem for a perfect binary tree
 ```latex
 \text{number of nodes } (n) = \sum_{i=0}^{\text{height}} 2^i = 2^{\text{height}+1}-1
 ```
 
 ---
 
-When operating on a BST in a data structure, we have the opportunity to strategically add and remove nodes in a way that will maintain the balance of the tree. There are many methods of building these _self-balancing_ trees (scapegoat trees, treaps, Red-Black Trees, AVL trees, etc.). We will therefore make the assumption of a roughly balanced tree when utilizing a BST in our data structures.
+When operating on a BST in a data structure, we have the opportunity to strategically add and remove nodes in a way that will maintain the balance of the tree. There are many methods of building these _self-balancing_ trees (scapegoat trees, treaps, Red-Black Trees, AVL trees, etc.). We will simply make the assumption of a roughly balanced tree when utilizing a BST in our data structures for this class.
 
 [[Honors Project - Self Balancing BST]]

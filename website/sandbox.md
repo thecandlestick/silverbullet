@@ -8,3 +8,5 @@ echo alias cs1575="apptainer shell "
 ```
 
 testing
+
+did it work? How about now?

@@ -95,3 +95,4 @@ echo "alias cs1575=\"apptainer shell /mnt/stor/ceph/cs_class/cs1575/fedora_conta
 _note: If you try to type out the command yourself, please triple check that you have it exactly correct. A single character being off can change the entire meaning of a terminal command_
 
 Now type the command ```cs1575```. If successful, you should see the word ```Apptainer>``` at the prompt of your terminal. Run this command whenever you need to use the course auto-grader and it will work until the terminal is closed.
+

@@ -1,4 +1,8 @@
-```css
-#sb-root {
-  editor-width: 1800px !important; 
+```space-style
+html {
+  --editor-width: 800px !important; 
 }
+```
+
+---
+
